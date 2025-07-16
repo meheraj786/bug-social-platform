@@ -7,9 +7,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 
 const BlogCard = ({ blog }) => {
   const deleteHandler = (id) => {};
-
-
-  blog &&  return()
+  
   return (
     <div className="blogCard mb-5 bg-white rounded-lg ">
       <div className="p-6">

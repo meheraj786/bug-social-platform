@@ -4,10 +4,12 @@ import { CgNotes } from "react-icons/cg";
 
 import { getDatabase, ref, onValue } from "firebase/database";
 import BlogCard from "../blogCard/BlogCard";
+import BlogCardSkeleton from "../blogCardSkeleton/BlogCardSkeleton";
 
 const BlogList = () => {
   const db = getDatabase();
   const [blogList, setBlogList] = useState([]);
+  const [isLoading, setIsLoading]= useState(true)
 
   useEffect(() => {
     const blogsRef = ref(db, "blogs/");
@@ -17,7 +19,8 @@ const BlogList = () => {
         const content = blog.val();
         const id = blog.key;
         arr.push({ ...content, id: id });
-      });
+      })
+      setIsLoading(false)
       setBlogList(arr);
     });
   }, []);
@@ -30,9 +33,14 @@ const BlogList = () => {
           <CgNotes size={40} />
           Recent Blogs ({blogList.length})
         </h2>
-        {blogList.map((blog) => (
-<BlogCard blog={blog}/>
-        ))}
+{isLoading ? (
+  <>
+    <BlogCardSkeleton />
+  </>
+) : blogList.length==0 ? <p className="text-white">"No Post Found"</p> : (
+  blogList.map((blog) => <BlogCard blog={blog} />
+)
+)}
       </Container>
     </div>
   );
