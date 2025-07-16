@@ -14,7 +14,6 @@ const Banner = () => {
           Anonymous Blog
           </h1>
           <p className='text-gray-400'>Share your thoughts anonymously with the world
-
 </p>
           </div>
           <div className="right w-1/2">
