@@ -5,3 +5,21 @@
   --font-primary: "Merriweather", serif;
   --font-secondary: "Open Sans", sans-serif;
 }
+
+.floating {
+  display: inline-block;
+  animation: float 3s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
