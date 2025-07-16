@@ -26,7 +26,6 @@ const BlogPostForm = () => {
     loading: false,
   });
 
-  console.log(newDate());
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -4,12 +4,20 @@ import { GoDotFill } from "react-icons/go";
 import { FaUser } from "react-icons/fa6";
 import { MdOutlineDateRange } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { getDatabase, ref, remove } from "firebase/database";
+import toast, { Toaster } from "react-hot-toast";
 
 const BlogCard = ({ blog }) => {
-  const deleteHandler = (id) => {};
+  const deleteHandler = (id) => {
+    const db = getDatabase();
+  remove(ref(db, 'blogs/' + id)).then(()=>{
+    toast.success("Blog Successfully Deleted")
+  })
+  };
   
   return (
     <div className="blogCard mb-5 bg-white rounded-lg ">
+      <Toaster position="top-right" reverseOrder={false} duration={2000} />
       <div className="p-6">
         <Flex>
           <Flex className="gap-x-2">

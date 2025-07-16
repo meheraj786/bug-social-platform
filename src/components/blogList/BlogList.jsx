@@ -5,6 +5,7 @@ import { CgNotes } from "react-icons/cg";
 import { getDatabase, ref, onValue } from "firebase/database";
 import BlogCard from "../blogCard/BlogCard";
 import BlogCardSkeleton from "../blogCardSkeleton/BlogCardSkeleton";
+import NoBlog from "../noBlog/NoBlog";
 
 const BlogList = () => {
   const db = getDatabase();
@@ -37,7 +38,7 @@ const BlogList = () => {
   <>
     <BlogCardSkeleton />
   </>
-) : blogList.length==0 ? <p className="text-white">"No Post Found"</p> : (
+) : blogList.length==0 ? <NoBlog/> : (
   blogList.map((blog) => <BlogCard blog={blog} />
 )
 )}
