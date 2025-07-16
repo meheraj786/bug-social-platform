@@ -89,7 +89,7 @@ const BlogPostForm = () => {
             Write Your Blog
           </h2>
           <Flex className="gap-x-2 pt-3 pb-2">
-            <div className="w-[49%]">
+            <div className="xl:w-[49%] w-full">
               <label className="text-[18px] font-medium" htmlFor="Name">
                 Author Name (Anonymous)
               </label>
@@ -103,7 +103,7 @@ const BlogPostForm = () => {
               />
               <p className="text-red-500">{info.nameErr}</p>
             </div>
-            <div className="w-[49%]">
+            <div className="xl:w-[49%] w-full">
               <label className="text-[18px] font-medium" htmlFor="title">
                 Title
               </label>
