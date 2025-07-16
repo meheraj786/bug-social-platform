@@ -39,7 +39,7 @@ const BlogList = () => {
     <BlogCardSkeleton />
   </>
 ) : blogList.length==0 ? <NoBlog/> : (
-  blogList.map((blog) => <BlogCard blog={blog} />
+  blogList.map((blog) => <BlogCard blog={blog} key={blogList.id} />
 )
 )}
       </Container>
