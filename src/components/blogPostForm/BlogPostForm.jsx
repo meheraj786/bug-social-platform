@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Container from "../../layouts/Container";
 import { LuPenLine } from "react-icons/lu";
 import Flex from "../../layouts/Flex";
@@ -13,6 +13,8 @@ const newDate = () => {
   });
   return date;
 };
+
+
 
 const BlogPostForm = () => {
   const [info, setInfo] = useState({

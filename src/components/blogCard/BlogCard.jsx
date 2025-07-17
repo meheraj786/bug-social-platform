@@ -1,21 +1,38 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Flex from "../../layouts/Flex";
 import { GoDotFill } from "react-icons/go";
 import { FaUser } from "react-icons/fa6";
 import { MdOutlineDateRange } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { getDatabase, ref, remove } from "firebase/database";
+import { getDatabase, onValue, ref, remove } from "firebase/database";
 import toast, { Toaster } from "react-hot-toast";
 import CommentForm from "../commentForm/CommentForm";
+import CommentList from "../commentList/CommentList";
 
 const BlogCard = ({ blog }) => {
+  const db = getDatabase();
+  const [commentList, setCommentList] = useState([]);
   const deleteHandler = (id) => {
     const db = getDatabase();
-  remove(ref(db, 'blogs/' + id)).then(()=>{
-    toast.success("Blog Successfully Deleted")
-  })
+    remove(ref(db, "blogs/" + id)).then(() => {
+      toast.success("Blog Successfully Deleted");
+    });
   };
-  
+  useEffect(() => {
+    const blogsRef = ref(db, "comments/");
+    onValue(blogsRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((comment) => {
+        const content = comment.val();
+        const id = comment.key;
+        if (id==blog.id) {
+          arr.push({ ...content, id: id });
+        }
+      });
+      setCommentList(arr);
+    });
+  }, []);
+
   return (
     <div className="blogCard mb-5 bg-white rounded-lg ">
       <Toaster position="top-right" reverseOrder={false} duration={2000} />
@@ -53,7 +70,12 @@ const BlogCard = ({ blog }) => {
           <h4 className="text-gray-500">Anonymous Blog Post</h4>
           <span className="text-gray-500">Published {blog.date}</span>
         </Flex>
-          <CommentForm/>
+        <CommentForm blog={blog} commentLength={commentList.length} />
+        {
+          commentList.map((comment)=>(
+            <CommentList comment={comment} />
+          ))
+        }
       </div>
     </div>
   );

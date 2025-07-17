@@ -1,23 +1,105 @@
-import React from 'react'
-import Flex from '../../layouts/Flex'
+import React, { useState } from "react";
+import Flex from "../../layouts/Flex";
+import { FaPaperPlane, FaRegComment } from "react-icons/fa6";
+import toast, { Toaster } from "react-hot-toast";
+import { getDatabase, ref, set } from "firebase/database";
+const newDate = () => {
+  const date = new Date().toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+  return date;
+};
 
-const CommentForm = () => {
+const CommentForm = ({blog, commentLength}) => {
+  const [commentInfo, setCommentInfo] = useState({
+    name: "",
+    comment: "",
+    nameErr: "",
+    commentErr: "",
+  });
+
+  const handleChange = (e) => {
+    setCommentInfo({
+      ...commentInfo,
+      nameErr: "",
+      commentErr: "",
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = () => {
+    if (commentInfo.name.trim() === "") {
+      setCommentInfo((prev) => ({
+        ...prev,
+        nameErr: "Enter Your Name",
+      }));
+    } else if (commentInfo.comment.trim() === "") {
+      setCommentInfo((prev) => ({
+        ...prev,
+        commentErr: "Enter a Title",
+      }));
+    } else {
+      const date = newDate();
+      const db = getDatabase();
+      set(ref(db, "comments/" + blog.id), {
+        name: commentInfo.name,
+        comment: commentInfo.comment,
+        date: date,
+      }).then(() => {
+        toast.success("Comment Published Successfully!");
+        setCommentInfo({
+          name: "",
+          comment: "",
+          nameErr: "",
+          commentErr: "",
+        });
+      });
+    }
+  };
+
   return (
-     <div className="mt-5 bg-gray-50 ">
-      <h3 className='text-[20px] font-semibold'>Comments (0)</h3>
-        <Flex>
-          <div className="w-[20%] border">
-            <input name='name' type="text" className="w-full mt-3 px-4 py-2 text-[14px] border-2 border-gray-300 rounded-lg outline-none" />
-          </div>
-          <div className="w-[69%] border">
-            <input type="text" name='comment' className="w-full mt-3 px-4 py-2 text-[14px] border-2 border-gray-300 rounded-lg outline-none" />
-          </div>
-          <div className="w-[10%] border">
-            <button className='rounded-lg bg-black text-white border-2 hover:bg-white hover:text-black px-4 py-2 text-[14px] cursor-pointer transition-all mt-3'>Sub</button>
-          </div>
-        </Flex>
-      </div>
-  )
-}
+    <div className="mt-5 font-secondary bg-gray-50 ">
+      <Toaster position="top-right" reverseOrder={false} duration={2000} />
+      <h3 className="text-[18px] text-gray-600 font-primary flex items-center gap-x-2 font-semibold">
+        <FaRegComment />
+        Comments ({commentLength})
+      </h3>
+      <Flex>
+        <div className="w-[22%]">
+          <input
+            value={commentInfo.name}
+            onChange={(e) => handleChange(e)}
+            name="name"
+            type="text"
+            className="w-full mt-3 px-4 py-2 text-[14px] border-2 border-gray-300 rounded-lg outline-none"
+            placeholder="Your Name"
+          />
+          <p className="text-red-400 text-[12px]">{commentInfo.nameErr}</p>
+        </div>
+        <div className="w-[72%]">
+          <input
+            value={commentInfo.comment}
+            onChange={(e) => handleChange(e)}
+            type="text"
+            name="comment"
+            className="w-full mt-3 px-4 py-2 text-[14px] border-2 border-gray-300 rounded-lg outline-none"
+            placeholder="Add a Comment..."
+          />
+          <p className="text-red-400 text-[12px]">{commentInfo.commentErr}</p>
+        </div>
+        <div className="w-[5%] text-center">
+          <button
+            onClick={handleSubmit}
+            className="rounded-lg bg-black text-white border-2 hover:bg-white hover:text-black px-4 py-[10px] text-[14px] cursor-pointer transition-all  mt-3"
+          >
+            <FaPaperPlane className="ms-auto" size={20} />
+          </button>
+        </div>
+      </Flex>
+    </div>
+  );
+};
 
-export default CommentForm
+export default CommentForm;
