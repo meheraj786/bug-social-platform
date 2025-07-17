@@ -86,7 +86,7 @@ const BlogPostForm = () => {
       <Toaster position="top-right" reverseOrder={false} duration={2000} />
       <Container>
         <div className="p-8 bg-white rounded-lg">
-          <h2 className="text-[32px] font-primary font-semibold mb-4 flex items-center gap-x-1">
+          <h2 className="text-[26px] lg:text-[32px] font-primary font-semibold mb-4 flex items-center gap-x-1">
             <LuPenLine size={30} />
             Write Your Blog
           </h2>

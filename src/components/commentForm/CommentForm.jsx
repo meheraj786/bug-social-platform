@@ -60,14 +60,14 @@ const CommentForm = ({blog, commentLength}) => {
   };
 
   return (
-    <div className="mt-5 font-secondary bg-gray-50 ">
+    <div className="mt-5 font-secondary border-b lg:border-b-0 pb-1 lg:pb-0 bg-gray-50 ">
       <Toaster position="top-right" reverseOrder={false} duration={2000} />
       <h3 className="text-[18px] text-gray-600 font-primary flex items-center gap-x-2 font-semibold">
         <FaRegComment />
         Comments ({commentLength})
       </h3>
-      <Flex>
-        <div className="w-[22%]">
+      <Flex className="flex-col lg:flex-row">
+        <div className="lg:w-[22%]">
           <input
             value={commentInfo.name}
             onChange={(e) => handleChange(e)}
@@ -78,7 +78,7 @@ const CommentForm = ({blog, commentLength}) => {
           />
           <p className="text-red-400 text-[12px]">{commentInfo.nameErr}</p>
         </div>
-        <div className="w-[72%]">
+        <div className="lg:w-[72%]">
           <input
             value={commentInfo.comment}
             onChange={(e) => handleChange(e)}
@@ -89,7 +89,7 @@ const CommentForm = ({blog, commentLength}) => {
           />
           <p className="text-red-400 text-[12px]">{commentInfo.commentErr}</p>
         </div>
-        <div className="w-[5%] text-center">
+        <div className="lg:w-[5%] text-center">
           <button
             onClick={handleSubmit}
             className="rounded-lg bg-black text-white border-2 hover:bg-white hover:text-black px-4 py-[10px] text-[14px] cursor-pointer transition-all  mt-3"

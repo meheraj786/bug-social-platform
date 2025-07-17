@@ -8,10 +8,10 @@ import { FaRegQuestionCircle } from "react-icons/fa";
 
 const Navbar = () => {
   return (
-    <div className="bg-black fixed w-full z-[999] font-primary text-white py-4">
+    <div className="bg-black fixed w-full  z-[999] font-primary text-white py-4">
       <Container>
-        <Flex>
-          <div className="logo flex items-center gap-x-2 text-[20px] font-semibold">
+        <Flex className="justify-center lg:justify-between gap-y-5 lg:gap-y-0">
+          <div className="logo flex  items-center gap-x-2 text-[20px] font-semibold">
             <LuPenLine size={30} />
             Anonymous Blog
           </div>
