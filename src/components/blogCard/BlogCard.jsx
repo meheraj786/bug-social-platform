@@ -8,8 +8,10 @@ import { getDatabase, onValue, ref, remove } from "firebase/database";
 import toast, { Toaster } from "react-hot-toast";
 import CommentForm from "../commentForm/CommentForm";
 import CommentList from "../commentList/CommentList";
+import { useSelector } from "react-redux";
 
 const BlogCard = ({ blog }) => {
+  const user= useSelector((state)=>state.user.user)
   const db = getDatabase();
   const [commentList, setCommentList] = useState([]);
   const deleteHandler = (id) => {
@@ -53,12 +55,15 @@ const BlogCard = ({ blog }) => {
               Published {blog.date}
             </p>
           </Flex>
-          <button
+          {
+            user?.uid == blog.bloggerId && <button
             className="cursor-pointer"
             onClick={() => deleteHandler(blog.id)}
           >
             <RiDeleteBin6Line color="red" size={26} />
           </button>
+          }
+          
         </Flex>
         <h3 className="mt-5 mb-3 font-primary text-[24px] font-semibold">
           {blog.title}

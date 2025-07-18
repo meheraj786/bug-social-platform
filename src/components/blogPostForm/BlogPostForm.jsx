@@ -5,6 +5,8 @@ import Flex from "../../layouts/Flex";
 import { getDatabase, push, ref, set } from "firebase/database";
 import toast, { Toaster } from "react-hot-toast";
 import { BeatLoader } from "react-spinners";
+import { useSelector } from "react-redux";
+import Button from "../../layouts/Button";
 const newDate = () => {
   const date = new Date().toLocaleDateString("en-GB", {
     day: "2-digit",
@@ -17,6 +19,7 @@ const newDate = () => {
 
 
 const BlogPostForm = () => {
+  const user= useSelector((state)=>state.user.user)
   const [info, setInfo] = useState({
     name: "",
     title: "",
@@ -38,12 +41,9 @@ const BlogPostForm = () => {
     }));
   };
   const handleSubmit = () => {
-    if (info.name.trim() === "") {
-      setInfo((prev) => ({
-        ...prev,
-        nameErr: "Enter Your Name",
-      }));
-    } else if (info.title.trim() === "") {
+    console.log("click");
+    
+    if (info.title.trim() === "") {
       setInfo((prev) => ({
         ...prev,
         titleErr: "Enter a Title",
@@ -54,6 +54,8 @@ const BlogPostForm = () => {
         descriptionErr: "Enter your Description",
       }));
     } else {
+      console.log("success");
+      
       setInfo((prev) => ({
         ...prev,
         loading: true,
@@ -61,10 +63,11 @@ const BlogPostForm = () => {
       const date = newDate();
       const db = getDatabase();
       set(push(ref(db, "blogs/")), {
-        name: info.name,
+        name: user.displayName,
         title: info.title,
         description: info.description,
         date: date,
+        bloggerId: user.uid
       }).then(() => {
         toast.success("Blog Published Successfully!");
         setInfo({
@@ -91,20 +94,6 @@ const BlogPostForm = () => {
             Write Your Blog
           </h2>
           <Flex className="gap-x-2 pt-3 pb-2">
-            <div className="xl:w-[49%] w-full">
-              <label className="text-[18px] font-medium" htmlFor="Name">
-                Author Name (Anonymous)
-              </label>
-              <input
-                name="name"
-                onChange={(e) => handleChange(e)}
-                value={info.name}
-                className="w-full mt-3 px-4 py-3 border-2 border-gray-300 rounded-lg outline-none"
-                type="text"
-                placeholder="Enter Your Anonymous Name"
-              />
-              <p className="text-red-500">{info.nameErr}</p>
-            </div>
             <div className="xl:w-[49%] w-full">
               <label className="text-[18px] font-medium" htmlFor="title">
                 Title
@@ -133,16 +122,16 @@ const BlogPostForm = () => {
           ></textarea>
           <p className="text-red-500">{info.descriptionErr}</p>
           {info.loading ? (
-            <button className="w-full rounded-lg border-2 mt-5 cursor-pointer py-3 font-bold hover:bg-white hover:border-2 text-center hover:text-black transition-all bg-black text-white">
-              <BeatLoader />
-            </button>
+            <Button className="w-full rounded-lg border-2 mt-5 cursor-pointer py-3 font-bold hover:bg-white hover:border-2 text-center hover:text-black transition-all bg-black text-white">
+              <BeatLoader className="text-white" />
+            </Button>
           ) : (
-            <button
+            <Button
               onClick={handleSubmit}
               className="w-full rounded-lg border-2 mt-5 cursor-pointer py-3 font-bold hover:bg-white hover:border-2 hover:text-black transition-all bg-black text-white"
             >
               Publish
-            </button>
+            </Button>
           )}
         </div>
       </Container>

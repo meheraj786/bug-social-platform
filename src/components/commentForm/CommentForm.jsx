@@ -3,6 +3,7 @@ import Flex from "../../layouts/Flex";
 import { FaPaperPlane, FaRegComment } from "react-icons/fa6";
 import toast, { Toaster } from "react-hot-toast";
 import { getDatabase, ref, set } from "firebase/database";
+import { useSelector } from "react-redux";
 const newDate = () => {
   const date = new Date().toLocaleDateString("en-GB", {
     day: "2-digit",
@@ -13,8 +14,9 @@ const newDate = () => {
 };
 
 const CommentForm = ({blog, commentLength}) => {
+  const user= useSelector((state)=>state.user.user)
+  
   const [commentInfo, setCommentInfo] = useState({
-    name: "",
     comment: "",
     nameErr: "",
     commentErr: "",
@@ -23,19 +25,12 @@ const CommentForm = ({blog, commentLength}) => {
   const handleChange = (e) => {
     setCommentInfo({
       ...commentInfo,
-      nameErr: "",
       commentErr: "",
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = () => {
-    if (commentInfo.name.trim() === "") {
-      setCommentInfo((prev) => ({
-        ...prev,
-        nameErr: "Enter Your Name",
-      }));
-    } else if (commentInfo.comment.trim() === "") {
+  const handleSubmit = () => {if (commentInfo.comment.trim() === "") {
       setCommentInfo((prev) => ({
         ...prev,
         commentErr: "Enter a Title",
@@ -44,15 +39,14 @@ const CommentForm = ({blog, commentLength}) => {
       const date = newDate();
       const db = getDatabase();
       set(ref(db, "comments/" + blog.id), {
-        name: commentInfo.name,
+        name: user.displayName,
         comment: commentInfo.comment,
         date: date,
+        commentId: user.uid
       }).then(() => {
         toast.success("Comment Published Successfully!");
         setCommentInfo({
-          name: "",
           comment: "",
-          nameErr: "",
           commentErr: "",
         });
       });
@@ -67,18 +61,7 @@ const CommentForm = ({blog, commentLength}) => {
         Comments ({commentLength})
       </h3>
       <Flex className="flex-col lg:flex-row">
-        <div className="lg:w-[22%]">
-          <input
-            value={commentInfo.name}
-            onChange={(e) => handleChange(e)}
-            name="name"
-            type="text"
-            className="w-full mt-3 px-4 py-2 text-[14px] border-2 border-gray-300 rounded-lg outline-none"
-            placeholder="Your Name"
-          />
-          <p className="text-red-400 text-[12px]">{commentInfo.nameErr}</p>
-        </div>
-        <div className="lg:w-[72%]">
+        <div className="lg:w-[92%]">
           <input
             value={commentInfo.comment}
             onChange={(e) => handleChange(e)}

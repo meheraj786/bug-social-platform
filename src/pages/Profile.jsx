@@ -7,8 +7,10 @@ import {
   FaEdit,
   FaSignOutAlt,
 } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 const Profile = () => {
+  const user= useSelector((state)=>state.user.user)
   return (
     <div className=" bg-white text-black py-16 px-4 flex justify-center items-center font-sans">
       <div className="w-full max-w-2xl bg-white border border-gray-300 rounded-2xl p-8 shadow-md">
@@ -25,7 +27,7 @@ const Profile = () => {
             <FaUser className="text-gray-500" />
             <div>
               <p className="text-sm text-gray-500">Name</p>
-              <p className="text-base font-medium">johndoe</p>
+              <p className="text-base font-medium">{user.displayName}</p>
             </div>
           </div>
 
@@ -33,7 +35,7 @@ const Profile = () => {
             <FaEnvelope className="text-gray-500" />
             <div>
               <p className="text-sm text-gray-500">Email</p>
-              <p className="text-base font-medium">johndoe@example.com</p>
+              <p className="text-base font-medium">{user.email}</p>
             </div>
           </div>
 
