@@ -6,7 +6,7 @@ import bannerImg from '../../assets/blog.svg'
 
 const Banner = () => {
   return (
-    <div className='py-[50px] pt-[120px] bg-white text-black font-secondary'>
+    <div className='py-[50px] bg-white text-black font-secondary'>
       <Container>
         <Flex className="flex-col lg:flex-row gap-y-5 lg:gap-y-0 text-center lg:text-left justify-center lg:justify-between">
           <div className="left lg:w-1/2">

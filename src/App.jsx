@@ -10,7 +10,6 @@ import BlogList from "./components/blogList/BlogList";
 function App() {
   return (
     <>
-      <Navbar />
       <Banner />
       <BlogPostForm />
       <BlogList />

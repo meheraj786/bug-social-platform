@@ -5,13 +5,12 @@ import { initializeApp } from "firebase/app";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDnxQ2KMNsdl7eWEPMOlzsREvbhNuwWYiA",
-  authDomain: "simple-blog-82fca.firebaseapp.com",
-  databaseURL: "https://simple-blog-82fca-default-rtdb.firebaseio.com",
-  projectId: "simple-blog-82fca",
-  storageBucket: "simple-blog-82fca.firebasestorage.app",
-  messagingSenderId: "446891781819",
-  appId: "1:446891781819:web:1fe08a12928139cfe0039e"
+  apiKey: "AIzaSyBtNqp67AtQQF2cr-pkXP3IQAWjMGW1zPk",
+  authDomain: "blackandwhiteblog-3b393.firebaseapp.com",
+  projectId: "blackandwhiteblog-3b393",
+  storageBucket: "blackandwhiteblog-3b393.firebasestorage.app",
+  messagingSenderId: "338132863759",
+  appId: "1:338132863759:web:f96a02f58a64530e0d4c7a"
 };
 
 // Initialize Firebase

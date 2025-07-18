@@ -4,7 +4,8 @@ import Flex from "../../layouts/Flex";
 import { LuPenLine } from "react-icons/lu";
 import { RiHome2Line } from "react-icons/ri";
 import { CgNotes } from "react-icons/cg";
-import { FaRegQuestionCircle } from "react-icons/fa";
+import { FaRegQuestionCircle, FaRegUserCircle } from "react-icons/fa";
+import { Link } from "react-router";
 
 const Navbar = () => {
   return (
@@ -15,19 +16,20 @@ const Navbar = () => {
             <LuPenLine size={30} />
             Anonymous Blog
           </div>
-          <ul>
-            <Flex>
-              <li className="flex items-center gap-x-1 mx-5">
-                <RiHome2Line /> Home
-              </li>
-              <li className="flex items-center gap-x-1 mx-5">
-                <CgNotes />
-                Blogs
-              </li>
-              <li className="flex items-center gap-x-1 mx-5"><FaRegQuestionCircle />
-About</li>
-            </Flex>
-          </ul>
+
+          <Flex>
+            <Link to="/" className="flex items-center gap-x-1 mx-5">
+              <RiHome2Line /> Home
+            </Link>
+            <Link to="/blogs" className="flex items-center gap-x-1 mx-5">
+              <CgNotes />
+              Blogs
+            </Link>
+            <Link to="/profile" className="flex items-center gap-x-1 mx-5">
+              <FaRegUserCircle />
+              Profile
+            </Link>
+          </Flex>
         </Flex>
       </Container>
     </div>
