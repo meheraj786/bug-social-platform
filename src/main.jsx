@@ -10,6 +10,7 @@ import Profile from "./pages/Profile.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import { store } from "./app/store";
 import { Provider } from "react-redux";
+import AuthProtect from "./components/routeProtection/authProtect.jsx";
 
 const router = createBrowserRouter([
   {
@@ -17,8 +18,8 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { index: true, Component: App },
-      { path: "/blogs", Component: Blogs },
-      { path: "/profile", Component: Profile },
+      { path: "/blogs", element: <AuthProtect><Blogs/></AuthProtect>  },
+      { path: "/profile", element: <AuthProtect><Profile/></AuthProtect>  },
       { path: "/auth", Component: AuthPage },
     ],
   },
