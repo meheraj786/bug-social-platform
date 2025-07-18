@@ -6,16 +6,14 @@ import { RiHome2Line } from "react-icons/ri";
 import { CgNotes } from "react-icons/cg";
 import { FaRegQuestionCircle, FaRegUserCircle } from "react-icons/fa";
 import { Link } from "react-router";
+import Logo from "../../layouts/Logo";
 
 const Navbar = () => {
   return (
     <div className="bg-black fixed w-full  z-[999] font-primary text-white py-4">
       <Container>
         <Flex className="justify-center lg:justify-between gap-y-5 lg:gap-y-0">
-          <div className="logo flex  items-center gap-x-2 text-[20px] font-semibold">
-            <LuPenLine size={30} />
-            Anonymous Blog
-          </div>
+          <Logo/>
 
           <Flex>
             <Link to="/" className="flex items-center gap-x-1 mx-5">
