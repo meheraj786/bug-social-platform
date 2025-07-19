@@ -24,7 +24,7 @@ const BlogList = () => {
       setIsLoading(false)
       setBlogList(arr);
     });
-  }, []);
+  }, [db]);
   
 
   return (

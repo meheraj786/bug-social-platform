@@ -129,7 +129,7 @@ const signupSubmitHandler = () => {
     <div className="font-secondary">
       <Toaster position="top-right" reverseOrder={false} duration={2000} />
       <Container>
-        <Flex className="relative overflow-hidden rounded-4xl border">
+        <Flex className="relative overflow-hidden rounded-4xl shadow-lg">
           {/* Left Block */}
           <div className="w-1/2 py-[100px]  flex  flex-col gap-y-3 p-10  z-10 text-left">
             <div className="text-center text-[32px] font-bold font-primary">

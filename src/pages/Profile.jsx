@@ -13,12 +13,14 @@ import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { getDatabase, ref, onValue, update, set } from "firebase/database";
 import { setUser } from "../features/user/userSlice";
 import toast from "react-hot-toast";
+import {MoonLoader} from 'react-spinners'
 
 const Profile = () => {
-  const dispatch= useDispatch()
+  const dispatch = useDispatch();
+  const [imgLoading, setImgLoading]= useState(false)
   const auth = getAuth();
   const user = useSelector((state) => state.user.user);
-  
+
   const db = getDatabase();
 
   const [editMode, setEditMode] = useState(false);
@@ -34,7 +36,7 @@ const Profile = () => {
   useEffect(() => {
     if (!user?.uid) return;
     const userRef = ref(db, `users/${user.uid}`);
-    onValue(userRef, (snapshot) => {
+    const unsubscribe = onValue(userRef, (snapshot) => {
       const res = snapshot.val();
       if (res) {
         setUserProfile({
@@ -47,9 +49,12 @@ const Profile = () => {
         });
       }
     });
+
+    return () => unsubscribe();
   }, [user?.uid, db, user.displayName, user.email]);
 
   const handleChangeImage = async (e) => {
+    setImgLoading(true)
     const file = e.target.files[0];
     const data = new FormData();
     data.append("file", file);
@@ -72,12 +77,13 @@ const Profile = () => {
     await update(ref(db, `users/${user.uid}`), {
       imageUrl: result.secure_url,
     });
-    toast.success("Image Successfully Uploaded")
+    toast.success("Image Successfully Uploaded");
 
     setUserProfile((prev) => ({
       ...prev,
       imageUrl: result.secure_url,
     }));
+    setImgLoading(false)
   };
 
   const handleSave = async () => {
@@ -93,26 +99,46 @@ const Profile = () => {
     await updateProfile(auth.currentUser, {
       displayName: userProfile.name,
     });
-    onAuthStateChanged(auth, (user) => {
-      console.log(user);
-      dispatch(setUser(user))
-      localStorage.setItem("user", JSON.stringify(user));
-      const blogRef = ref(db, 'blogs/');
-onValue(blogRef, (snapshot) => {
-  snapshot.forEach((blog)=>{
-    const data= blog.val()
-    if (data.bloggerId==user.uid) {
-      set(ref(db, 'blogs/' + blog.key), {
-        ...data,
-    name: userProfile.name,
-    imageUrl: user.photoURL
-  });
-    }
-  })
-  
-});
-  });
-    setEditMode(false); 
+
+    const updatedUser = {
+      uid: auth.currentUser.uid,
+      email: auth.currentUser.email,
+      displayName: userProfile.name,
+      photoURL: auth.currentUser.photoURL,
+      emailVerified: auth.currentUser.emailVerified,
+    };
+    dispatch(setUser(updatedUser));
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    const blogRef = ref(db, "blogs/");
+    onValue(blogRef, (snapshot) => {
+      snapshot.forEach((blog) => {
+        const data = blog.val();
+        if (data.bloggerId == user.uid) {
+          set(ref(db, "blogs/" + blog.key), {
+            ...data,
+            name: userProfile.name,
+            imageUrl: auth.currentUser.photoURL,
+          });
+        }
+      });
+    });
+
+    // Update comments
+    const commentRef = ref(db, "comments/");
+    onValue(commentRef, (snapshot) => {
+      snapshot.forEach((comment) => {
+        const data = comment.val();
+        if (data.commenterId == user.uid) {
+          set(ref(db, "comments/" + comment.key), {
+            ...data,
+            name: userProfile.name,
+            imageUrl: auth.currentUser.photoURL,
+          });
+        }
+      });
+    });
+    setEditMode(false);
   };
 
   return (
@@ -120,36 +146,38 @@ onValue(blogRef, (snapshot) => {
       <div className="w-full max-w-2xl bg-white border border-gray-300 rounded-2xl p-8 shadow-md">
         {/* Profile Header */}
         <div className="flex flex-col items-center text-center">
-          <div className="w-28 h-28 rounded-full bg-gray-300 mb-2 overflow-hidden relative border-2 border-black">
-    <img
-      src={userProfile.imageUrl}
-      className="w-full h-full object-cover"
-      alt="profile"
-    />
-  {/* Upload File Label */}
-  {editMode && (
-    <div className="absolute bg-gray-400/5 backdrop-blur w-full bottom-0">
-      <label
-        htmlFor="file-upload"
-        className="block text-center text-sm cursor-pointer text-black px-4 py-2 rounded-lg  hover:bg-black hover:text-white font-semibold transition-all duration-300"
-      >
-        Upload
-      </label>
-      <input
-        id="file-upload"
-        type="file"
-        onChange={handleChangeImage}
-        className="hidden"
-      />
-    </div>
-  )}
-  </div>
+          <div className="w-28 h-28 rounded-full bg-gray-300 mb-2 overflow-hidden flex justify-center items-center relative border-2 border-black">
+            {
+              imgLoading ? <MoonLoader /> : <img
+              src={userProfile.imageUrl}
+              className="w-full h-full object-cover"
+              alt="profile"
+            />
+            }
+            
+            {/* Upload File Label */}
+            {editMode && (
+              <div className="absolute bg-gray-400/5 backdrop-blur w-full bottom-0">
+                <label
+                  htmlFor="file-upload"
+                  className="block text-center text-sm cursor-pointer text-black px-4 py-2 rounded-lg  hover:bg-black hover:text-white font-semibold transition-all duration-300"
+                >
+                  Upload
+                </label>
+                <input
+                  id="file-upload"
+                  type="file"
+                  onChange={handleChangeImage}
+                  className="hidden"
+                />
+              </div>
+            )}
+          </div>
 
-
-  {/* Name & Email */}
-  <h2 className="text-xl font-semibold">{userProfile.name}</h2>
-  <p className="text-gray-600 text-sm">{userProfile.email}</p>
-</div>
+          {/* Name & Email */}
+          <h2 className="text-xl font-semibold">{userProfile.name}</h2>
+          <p className="text-gray-600 text-sm">{userProfile.email}</p>
+        </div>
 
         {/* Info */}
         <div className="mt-10 space-y-4">

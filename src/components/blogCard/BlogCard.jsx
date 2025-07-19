@@ -11,7 +11,7 @@ import CommentList from "../commentList/CommentList";
 import { useSelector } from "react-redux";
 
 const BlogCard = ({ blog }) => {
-  const user= useSelector((state)=>state.user.user)
+  const user = useSelector((state) => state.user.user);
   const db = getDatabase();
   const [commentList, setCommentList] = useState([]);
   const deleteHandler = (id) => {
@@ -27,7 +27,7 @@ const BlogCard = ({ blog }) => {
       snapshot.forEach((comment) => {
         const content = comment.val();
         const id = comment.key;
-        if (content.blogId==blog.id) {
+        if (content.blogId == blog.id) {
           arr.unshift({ ...content, id: id });
         }
       });
@@ -43,9 +43,15 @@ const BlogCard = ({ blog }) => {
           <Flex className="gap-x-2">
             <p className="text-gray-500 flex items-center gap-x-1">
               {" "}
-              {
-                blog.imageUrl ? <img src={blog.imageUrl} className="w-[40px] h-[40px] rounded-full" alt="" /> : <FaUser />
-              }
+              {blog.imageUrl ? (
+                <img
+                  src={blog.imageUrl}
+                  className="w-[40px] h-[40px] rounded-full"
+                  alt=""
+                />
+              ) : (
+                <FaUser />
+              )}
               {blog.name}
             </p>
             <span className="text-gray-500 ">
@@ -57,15 +63,14 @@ const BlogCard = ({ blog }) => {
               Published {blog.date}
             </p>
           </Flex>
-          {
-            user?.uid == blog.bloggerId && <button
-            className="cursor-pointer"
-            onClick={() => deleteHandler(blog.id)}
-          >
-            <RiDeleteBin6Line color="red" size={26} />
-          </button>
-          }
-          
+          {user?.uid == blog.bloggerId && (
+            <button
+              className="cursor-pointer"
+              onClick={() => deleteHandler(blog.id)}
+            >
+              <RiDeleteBin6Line color="red" size={26} />
+            </button>
+          )}
         </Flex>
         <h3 className="mt-5 mb-3 font-primary text-[24px] font-semibold">
           {blog.title}
@@ -78,11 +83,9 @@ const BlogCard = ({ blog }) => {
           <span className="text-gray-500">Published {blog.date}</span>
         </Flex>
         <CommentForm blog={blog} commentLength={commentList.length} />
-        {
-          commentList.map((comment)=>(
-            <CommentList comment={comment} />
-          ))
-        }
+        {commentList.map((comment) => (
+          <CommentList comment={comment} />
+        ))}
       </div>
     </div>
   );
