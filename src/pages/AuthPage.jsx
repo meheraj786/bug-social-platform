@@ -53,39 +53,47 @@ const AuthPage = () => {
       [e.target.name]: e.target.value,
     });
   };
-  const signupSubmitHandler = () => {
-    const auth = getAuth();
+const signupSubmitHandler = () => {
+  const auth = getAuth();
 
-    // Validation check (optional but recommended)
-    if (!signupInfo.name || !signupInfo.email || !signupInfo.password) {
-      toast.error("Please fill in all fields");
-      return;
-    }
+  if (!signupInfo.name || !signupInfo.email || !signupInfo.password) {
+    toast.error("Please fill in all fields");
+    return;
+  }
 
-    createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password)
-      .then((userCredential) => {
-        return updateProfile(userCredential.user, {
-          displayName: signupInfo.name,
-        });
-      })
-      .then((user) => {
-        toast.success("Signup Successful", { duration: 2000 });
-        const db = getDatabase();
-        set(ref(db, "users/" + user.user.uid), {
-          username: user.user.displayName,
-          email: user.user.email,
-        });
-        setSignupInfo({
-          name: "",
-          email: "",
-          password: "",
-        });
-        setIsLogin(true);
-      })
-      .catch((error) => {
-        toast.error(error.message);
+  createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password)
+    .then(() => {
+      return updateProfile(auth.currentUser, {
+        displayName: signupInfo.name,
       });
-  };
+    })
+    .then(() => {
+      toast.success("Signup Successful", { duration: 2000 });
+
+      const user = auth.currentUser; 
+      const db = getDatabase();
+
+      set(ref(db, "users/" + user.uid), {
+        username: user.displayName,
+        email: user.email,
+      phone:"",
+      location:"",
+      bio:"",
+      imageUrl:""
+      });
+
+      setSignupInfo({
+        name: "",
+        email: "",
+        password: "",
+      });
+      setIsLogin(true);
+    })
+    .catch((error) => {
+      toast.error(error.message);
+    });
+};
+
 
   const loginSubmitHandler = () => {
     const auth = getAuth();
@@ -98,15 +106,9 @@ const AuthPage = () => {
     signInWithEmailAndPassword(auth, loginInfo.email, loginInfo.password)
       .then((userCredential) => {
         const user = userCredential.user;
+        localStorage.setItem("user", JSON.stringify(user));
 
-        const userData = {
-          uid: user.uid,
-          email: user.email,
-          name: user.displayName,
-        };
-        localStorage.setItem("user", JSON.stringify(userCredential.user));
-
-        dispatch(setUser(userData));
+        dispatch(setUser(user));
 
         toast.success("Login Successful");
         setLoginInfo({

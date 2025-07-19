@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import Flex from "../../layouts/Flex";
 import { FaPaperPlane, FaRegComment } from "react-icons/fa6";
 import toast, { Toaster } from "react-hot-toast";
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, push, ref, set } from "firebase/database";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
+import Button from "../../layouts/Button";
 const newDate = () => {
   const date = new Date().toLocaleDateString("en-GB", {
     day: "2-digit",
@@ -14,6 +16,7 @@ const newDate = () => {
 };
 
 const CommentForm = ({blog, commentLength}) => {
+  const navigate= useNavigate()
   const user= useSelector((state)=>state.user.user)
   
   const [commentInfo, setCommentInfo] = useState({
@@ -30,7 +33,10 @@ const CommentForm = ({blog, commentLength}) => {
     });
   };
 
-  const handleSubmit = () => {if (commentInfo.comment.trim() === "") {
+  const handleSubmit = () => {
+    if (!user) {
+      navigate("/auth")
+    }else if (commentInfo.comment.trim() === "") {
       setCommentInfo((prev) => ({
         ...prev,
         commentErr: "Enter a Title",
@@ -38,11 +44,12 @@ const CommentForm = ({blog, commentLength}) => {
     } else {
       const date = newDate();
       const db = getDatabase();
-      set(ref(db, "comments/" + blog.id), {
+      set(push(ref(db, "comments/")), {
         name: user.displayName,
         comment: commentInfo.comment,
         date: date,
-        commentId: user.uid
+        commenterId: user.uid,
+        blogId: blog.id
       }).then(() => {
         toast.success("Comment Published Successfully!");
         setCommentInfo({
@@ -62,7 +69,9 @@ const CommentForm = ({blog, commentLength}) => {
       </h3>
       <Flex className="flex-col lg:flex-row">
         <div className="lg:w-[92%]">
-          <input
+          {
+            user ? (<>
+                      <input
             value={commentInfo.comment}
             onChange={(e) => handleChange(e)}
             type="text"
@@ -71,11 +80,20 @@ const CommentForm = ({blog, commentLength}) => {
             placeholder="Add a Comment..."
           />
           <p className="text-red-400 text-[12px]">{commentInfo.commentErr}</p>
+            </>): (<>
+            <div className="w-full mt-3 px-4 py-2 text-[14px] border-2 border-gray-300 rounded-lg outline-none">
+Please Signup or Login to Comment
+            </div>
+            </>)
+          }
+
         </div>
         <div className="lg:w-[5%] text-center">
+          
           <button
             onClick={handleSubmit}
             className="rounded-lg bg-black text-white border-2 hover:bg-white hover:text-black px-4 py-[10px] text-[14px] cursor-pointer transition-all  mt-3"
+          
           >
             <FaPaperPlane className="ms-auto" size={20} />
           </button>

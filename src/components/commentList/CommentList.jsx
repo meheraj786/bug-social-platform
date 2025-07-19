@@ -35,7 +35,7 @@ const CommentList = ({ comment }) => {
             Published {comment.date}
           </p>
         </Flex>
-        {user?.uid == comment.commentId && (
+        {user?.uid == comment.commenterId && (
           <button
             className="cursor-pointer"
             onClick={() => deleteHandler(comment.id)}

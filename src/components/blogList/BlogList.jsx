@@ -19,7 +19,7 @@ const BlogList = () => {
       snapshot.forEach((blog) => {
         const content = blog.val();
         const id = blog.key;
-        arr.push({ ...content, id: id });
+        arr.unshift({ ...content, id: id });
       })
       setIsLoading(false)
       setBlogList(arr);

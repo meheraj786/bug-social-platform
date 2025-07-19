@@ -27,13 +27,13 @@ const BlogCard = ({ blog }) => {
       snapshot.forEach((comment) => {
         const content = comment.val();
         const id = comment.key;
-        if (id==blog.id) {
-          arr.push({ ...content, id: id });
+        if (content.blogId==blog.id) {
+          arr.unshift({ ...content, id: id });
         }
       });
       setCommentList(arr);
     });
-  }, []);
+  }, [blog.id, db]);
 
   return (
     <div className="blogCard mb-5 bg-white rounded-lg ">
@@ -72,7 +72,7 @@ const BlogCard = ({ blog }) => {
       </div>
       <div className="p-6 bg-gray-50 rounded-b-lg border-t border-gray-200">
         <Flex>
-          <h4 className="text-gray-500">Anonymous Blog Post</h4>
+          <h4 className="text-gray-500">Published By {blog.name}</h4>
           <span className="text-gray-500">Published {blog.date}</span>
         </Flex>
         <CommentForm blog={blog} commentLength={commentList.length} />
