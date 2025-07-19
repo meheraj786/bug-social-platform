@@ -10,7 +10,7 @@ import {
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
-import { getDatabase, ref, onValue, update } from "firebase/database";
+import { getDatabase, ref, onValue, update, set } from "firebase/database";
 import { setUser } from "../features/user/userSlice";
 import toast from "react-hot-toast";
 
@@ -23,8 +23,8 @@ const Profile = () => {
 
   const [editMode, setEditMode] = useState(false);
   const [userProfile, setUserProfile] = useState({
-    name: "",
-    email: "",
+    name: user.displayName,
+    email: user.email,
     phone: "",
     location: "",
     imageUrl: "",
@@ -38,8 +38,8 @@ const Profile = () => {
       const res = snapshot.val();
       if (res) {
         setUserProfile({
-          name: res.name || "",
-          email: res.email || "",
+          name: user.displayName || "",
+          email: user.email || "",
           phone: res.phone || "",
           location: res.location || "",
           imageUrl: res.imageUrl || "",
@@ -47,7 +47,7 @@ const Profile = () => {
         });
       }
     });
-  }, [user?.uid, db]);
+  }, [user?.uid, db, user.displayName, user.email]);
 
   const handleChangeImage = async (e) => {
     const file = e.target.files[0];
@@ -97,6 +97,20 @@ const Profile = () => {
       console.log(user);
       dispatch(setUser(user))
       localStorage.setItem("user", JSON.stringify(user));
+      const blogRef = ref(db, 'blogs/');
+onValue(blogRef, (snapshot) => {
+  snapshot.forEach((blog)=>{
+    const data= blog.val()
+    if (data.bloggerId==user.uid) {
+      set(ref(db, 'blogs/' + blog.key), {
+        ...data,
+    name: userProfile.name,
+    imageUrl: user.photoURL
+  });
+    }
+  })
+  
+});
   });
     setEditMode(false); 
   };
@@ -106,20 +120,36 @@ const Profile = () => {
       <div className="w-full max-w-2xl bg-white border border-gray-300 rounded-2xl p-8 shadow-md">
         {/* Profile Header */}
         <div className="flex flex-col items-center text-center">
-          <div className="w-28 h-28 rounded-full bg-gray-300 mb-4 overflow-hidden">
-            <img
-              src={userProfile.imageUrl}
-              className="w-28 h-28 object-cover rounded-full"
-              alt="profile"
-            />
-          </div>
-          {
-          editMode && <input type="file" onChange={handleChangeImage} className="border mx-auto text-center w-full" />
-          }
-          
-          <h2 className="text-2xl font-bold">{userProfile.name}</h2>
-          <p className="text-gray-600">{userProfile.email}</p>
-        </div>
+          <div className="w-28 h-28 rounded-full bg-gray-300 mb-2 overflow-hidden relative border-2 border-black">
+    <img
+      src={userProfile.imageUrl}
+      className="w-full h-full object-cover"
+      alt="profile"
+    />
+  {/* Upload File Label */}
+  {editMode && (
+    <div className="absolute bg-gray-400/5 backdrop-blur w-full bottom-0">
+      <label
+        htmlFor="file-upload"
+        className="block text-center text-sm cursor-pointer text-black px-4 py-2 rounded-lg  hover:bg-black hover:text-white font-semibold transition-all duration-300"
+      >
+        Upload
+      </label>
+      <input
+        id="file-upload"
+        type="file"
+        onChange={handleChangeImage}
+        className="hidden"
+      />
+    </div>
+  )}
+  </div>
+
+
+  {/* Name & Email */}
+  <h2 className="text-xl font-semibold">{userProfile.name}</h2>
+  <p className="text-gray-600 text-sm">{userProfile.email}</p>
+</div>
 
         {/* Info */}
         <div className="mt-10 space-y-4">
