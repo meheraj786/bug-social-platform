@@ -10,8 +10,8 @@ import Profile from "./pages/Profile.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import { store } from "./app/store";
 import { Provider } from "react-redux";
-import AuthProtect from "./components/routeProtection/authProtect.jsx";
 import ForgotPassPage from './pages/ForgotPassPage.jsx'
+import AuthProtect from "./components/routeProtection/authProtect.jsx";
 
 const router = createBrowserRouter([
   {
