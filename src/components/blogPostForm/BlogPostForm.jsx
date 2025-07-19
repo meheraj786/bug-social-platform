@@ -84,6 +84,7 @@ const BlogPostForm = () => {
       description: info.description,
       date: date,
       bloggerId: user.uid,
+      imageUrl: user.photoURL
     })
       .then(() => {
         toast.success("Blog Published Successfully!");

@@ -8,13 +8,17 @@ import {
   FaSignOutAlt,
   FaSave,
 } from "react-icons/fa";
-import { useSelector } from "react-redux";
-import { getAuth, updateProfile } from "firebase/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { getDatabase, ref, onValue, update } from "firebase/database";
+import { setUser } from "../features/user/userSlice";
+import toast from "react-hot-toast";
 
 const Profile = () => {
+  const dispatch= useDispatch()
   const auth = getAuth();
   const user = useSelector((state) => state.user.user);
+  
   const db = getDatabase();
 
   const [editMode, setEditMode] = useState(false);
@@ -43,7 +47,7 @@ const Profile = () => {
         });
       }
     });
-  }, [user?.uid]);
+  }, [user?.uid, db]);
 
   const handleChangeImage = async (e) => {
     const file = e.target.files[0];
@@ -68,6 +72,7 @@ const Profile = () => {
     await update(ref(db, `users/${user.uid}`), {
       imageUrl: result.secure_url,
     });
+    toast.success("Image Successfully Uploaded")
 
     setUserProfile((prev) => ({
       ...prev,
@@ -85,12 +90,15 @@ const Profile = () => {
 
     await update(ref(db, `users/${user.uid}`), updatedData);
 
-    // Also update Firebase Auth displayName if name is updated
     await updateProfile(auth.currentUser, {
       displayName: userProfile.name,
     });
-
-    setEditMode(false); // exit edit mode
+    onAuthStateChanged(auth, (user) => {
+      console.log(user);
+      dispatch(setUser(user))
+      localStorage.setItem("user", JSON.stringify(user));
+  });
+    setEditMode(false); 
   };
 
   return (
@@ -142,7 +150,7 @@ const Profile = () => {
               <p className="text-sm text-gray-500">Phone</p>
               {editMode ? (
                 <input
-                  type="text"
+                  type="tel"
                   className="border p-1 rounded-md w-full"
                   value={userProfile.phone}
                   onChange={(e) =>

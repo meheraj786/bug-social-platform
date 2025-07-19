@@ -23,7 +23,9 @@ const CommentList = ({ comment }) => {
         <Flex className="gap-x-2">
           <p className="text-gray-500 text-[14px] flex items-center gap-x-1">
             {" "}
-            <FaUser />
+            {
+                            comment.imageUrl ? <img src={comment.imageUrl} className="w-[20px] h-[20px] rounded-full" alt="" /> : <FaUser />
+                          }
             {comment.name}
           </p>
           <span className="text-gray-500 ">

@@ -49,7 +49,8 @@ const CommentForm = ({blog, commentLength}) => {
         comment: commentInfo.comment,
         date: date,
         commenterId: user.uid,
-        blogId: blog.id
+        blogId: blog.id,
+        imageUrl: user.photoURL
       }).then(() => {
         toast.success("Comment Published Successfully!");
         setCommentInfo({

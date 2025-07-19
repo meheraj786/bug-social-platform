@@ -43,7 +43,9 @@ const BlogCard = ({ blog }) => {
           <Flex className="gap-x-2">
             <p className="text-gray-500 flex items-center gap-x-1">
               {" "}
-              <FaUser />
+              {
+                blog.imageUrl ? <img src={blog.imageUrl} className="w-[40px] h-[40px] rounded-full" alt="" /> : <FaUser />
+              }
               {blog.name}
             </p>
             <span className="text-gray-500 ">
