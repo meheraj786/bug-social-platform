@@ -9,15 +9,23 @@ import {
   FaSave,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut,
+  updateProfile,
+} from "firebase/auth";
 import { getDatabase, ref, onValue, update, set } from "firebase/database";
-import { setUser } from "../features/user/userSlice";
+import { clearUser, setUser } from "../features/user/userSlice";
 import toast from "react-hot-toast";
-import {MoonLoader} from 'react-spinners'
+import { MoonLoader } from "react-spinners";
+import { useNavigate } from "react-router";
 
 const Profile = () => {
+  const coudinaryApi = import.meta.env.VITE_CLOUDINARY_API;
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [imgLoading, setImgLoading]= useState(false)
+  const [imgLoading, setImgLoading] = useState(false);
   const auth = getAuth();
   const user = useSelector((state) => state.user.user);
 
@@ -32,6 +40,22 @@ const Profile = () => {
     imageUrl: "",
     bio: "",
   });
+
+  const signOutHandler = () => {
+    const auth = getAuth();
+    signOut(auth)
+      .then(() => {
+        {
+          dispatch(clearUser());
+          navigate("/");
+          toast.success("Logout Success");
+          localStorage.removeItem("user");
+        }
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  };
 
   useEffect(() => {
     if (!user?.uid) return;
@@ -54,20 +78,17 @@ const Profile = () => {
   }, [user?.uid, db, user.displayName, user.email]);
 
   const handleChangeImage = async (e) => {
-    setImgLoading(true)
+    setImgLoading(true);
     const file = e.target.files[0];
     const data = new FormData();
     data.append("file", file);
     data.append("upload_preset", "e-com app with firebase");
     data.append("cloud_name", "dlrycnxnh");
 
-    const res = await fetch(
-      "https://api.cloudinary.com/v1_1/dlrycnxnh/image/upload",
-      {
-        method: "POST",
-        body: data,
-      }
-    );
+    const res = await fetch(coudinaryApi, {
+      method: "POST",
+      body: data,
+    });
     const result = await res.json();
 
     await updateProfile(auth.currentUser, {
@@ -83,7 +104,7 @@ const Profile = () => {
       ...prev,
       imageUrl: result.secure_url,
     }));
-    setImgLoading(false)
+    setImgLoading(false);
   };
 
   const handleSave = async () => {
@@ -147,14 +168,16 @@ const Profile = () => {
         {/* Profile Header */}
         <div className="flex flex-col items-center text-center">
           <div className="w-28 h-28 rounded-full bg-gray-300 mb-2 overflow-hidden flex justify-center items-center relative border-2 border-black">
-            {
-              imgLoading ? <MoonLoader /> : <img
-              src={userProfile.imageUrl}
-              className="w-full h-full object-cover"
-              alt="profile"
-            />
-            }
-            
+            {imgLoading ? (
+              <MoonLoader />
+            ) : (
+              <img
+                src={userProfile.imageUrl}
+                className="w-full h-full object-cover"
+                alt="profile"
+              />
+            )}
+
             {/* Upload File Label */}
             {editMode && (
               <div className="absolute bg-gray-400/5 backdrop-blur w-full bottom-0">
@@ -278,7 +301,10 @@ const Profile = () => {
               Edit Profile
             </button>
           )}
-          <button className="w-full flex items-center justify-center gap-2 py-2 border border-black text-black rounded-md hover:bg-gray-100 transition">
+          <button
+            onClick={signOutHandler}
+            className="w-full flex items-center justify-center gap-2 py-2 border border-black text-black rounded-md hover:bg-gray-100 transition"
+          >
             <FaSignOutAlt />
             Logout
           </button>

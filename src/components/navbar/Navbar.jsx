@@ -11,18 +11,27 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearUser } from "../../features/user/userSlice";
 import { BiLogOutCircle } from "react-icons/bi";
 import toast, { Toaster } from "react-hot-toast";
+import { getAuth, signOut } from "firebase/auth";
 
 const Navbar = () => {
   const dispatch= useDispatch()
   const navigate= useNavigate()
-  // const [user,setUser]= useState(null)
   const user= useSelector((state)=>state.user.user)
-  
-  // useEffect(() => {
-  // setUser(data)
- 
-  // }, [data])
-  
+
+    const signOutHandler=()=>{
+      const auth = getAuth();
+  signOut(auth).then(() => {
+  {dispatch(clearUser())
+                navigate("/")
+                toast.success("Logout Success");
+                localStorage.removeItem("user")
+              }
+  }).catch((error) => {
+    console.log(error.message);
+    
+  });
+    }
+
   
   return (
     <div className="bg-black fixed w-full  z-[999] font-primary text-white py-4">
@@ -45,10 +54,7 @@ const Navbar = () => {
               <FaRegUserCircle />
               Profile
             </Link>
-              <div onClick={()=>{dispatch(clearUser())
-                navigate("/")
-                toast.success("Logout Success");
-              }} className="flex cursor-pointer items-center gap-x-1 mx-5">
+              <div onClick={signOutHandler} className="flex cursor-pointer items-center gap-x-1 mx-5">
               <BiLogOutCircle />
               Logout
             </div>

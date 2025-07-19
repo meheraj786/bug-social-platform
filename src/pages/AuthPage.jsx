@@ -10,7 +10,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import toast, { Toaster } from "react-hot-toast";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import { setUser } from "../features/user/userSlice";
 import { getDatabase, ref, set } from "firebase/database";
@@ -163,6 +163,9 @@ const signupSubmitHandler = () => {
                 Sign up
               </span>
             </p>
+                        <Link to="/forgotpassword"  className="text-center text-red-500 text-medium">
+              Forgot Password
+            </Link>
           </div>
 
           {/* Sliding Black Panel */}

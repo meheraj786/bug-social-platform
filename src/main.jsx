@@ -11,6 +11,7 @@ import AuthPage from "./pages/AuthPage.jsx";
 import { store } from "./app/store";
 import { Provider } from "react-redux";
 import AuthProtect from "./components/routeProtection/authProtect.jsx";
+import ForgotPassPage from './pages/ForgotPassPage.jsx'
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
       { path: "/blogs", element: <AuthProtect><Blogs/></AuthProtect>  },
       { path: "/profile", element: <AuthProtect><Profile/></AuthProtect>  },
       { path: "/auth", Component: AuthPage },
+      { path: "/forgotpassword", Component: ForgotPassPage },
     ],
   },
 ]);
