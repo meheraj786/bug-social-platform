@@ -10,7 +10,7 @@ import NoBlog from "../noBlog/NoBlog";
 const BlogList = () => {
   const db = getDatabase();
   const [blogList, setBlogList] = useState([]);
-  const [isLoading, setIsLoading]= useState(true)
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const blogsRef = ref(db, "blogs/");
@@ -20,12 +20,11 @@ const BlogList = () => {
         const content = blog.val();
         const id = blog.key;
         arr.unshift({ ...content, id: id });
-      })
-      setIsLoading(false)
+      });
+      setIsLoading(false);
       setBlogList(arr);
     });
   }, [db]);
-  
 
   return (
     <div className="py-5 font-secondary bg-black">
@@ -34,14 +33,15 @@ const BlogList = () => {
           <CgNotes size={40} />
           Recent Blogs ({blogList.length})
         </h2>
-{isLoading ? (
-  <>
-    <BlogCardSkeleton />
-  </>
-) : blogList.length==0 ? <NoBlog/> : (
-  blogList.map((blog) => <BlogCard blog={blog} key={blogList.id} />
-)
-)}
+        {isLoading ? (
+          <>
+            <BlogCardSkeleton />
+          </>
+        ) : blogList.length == 0 ? (
+          <NoBlog />
+        ) : (
+          blogList.map((blog) => <BlogCard blog={blog} key={blogList.id} />)
+        )}
       </Container>
     </div>
   );

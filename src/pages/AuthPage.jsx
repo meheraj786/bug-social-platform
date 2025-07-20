@@ -3,6 +3,7 @@ import Container from "../layouts/Container";
 import Flex from "../layouts/Flex";
 import Button from "../layouts/Button";
 import Logo from "../layouts/Logo";
+import { BeatLoader } from "react-spinners";
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -14,15 +15,23 @@ import { Link, useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import { setUser } from "../features/user/userSlice";
 import { getDatabase, ref, set } from "firebase/database";
+import { MoonLoader } from "react-spinners";
 
 const AuthPage = () => {
+  const coudinaryApi = import.meta.env.VITE_CLOUDINARY_API;
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading]= useState(false)
+  const [imgLoading, setImgLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
   const [signupInfo, setSignupInfo] = useState({
     name: "",
     email: "",
     password: "",
+    imageUrl: "",
+    phone: "",
+    location: "",
+    bio: "",
   });
   const [loginInfo, setLoginInfo] = useState({
     email: "",
@@ -53,52 +62,81 @@ const AuthPage = () => {
       [e.target.name]: e.target.value,
     });
   };
-const signupSubmitHandler = () => {
-  const auth = getAuth();
+  const handleChangeImage = async (e) => {
+    setImgLoading(true);
+    const file = e.target.files[0];
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "e-com app with firebase");
+    data.append("cloud_name", "dlrycnxnh");
 
-  if (!signupInfo.name || !signupInfo.email || !signupInfo.password) {
-    toast.error("Please fill in all fields");
-    return;
-  }
-
-  createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password)
-    .then(() => {
-      return updateProfile(auth.currentUser, {
-        displayName: signupInfo.name,
-      });
-    })
-    .then(() => {
-      toast.success("Signup Successful", { duration: 2000 });
-
-      const user = auth.currentUser; 
-      const db = getDatabase();
-
-      set(ref(db, "users/" + user.uid), {
-        username: user.displayName,
-        email: user.email,
-      phone:"",
-      location:"",
-      bio:"",
-      imageUrl:""
-      });
-
-      setSignupInfo({
-        name: "",
-        email: "",
-        password: "",
-      });
-      setIsLogin(true);
-    })
-    .catch((error) => {
-      toast.error(error.message);
+    const res = await fetch(coudinaryApi, {
+      method: "POST",
+      body: data,
     });
-};
+    const result = await res.json();
+    setSignupInfo({
+      ...signupInfo,
+      imageUrl: result.secure_url,
+    });
+    setImgLoading(false);
+  };
+  const signupSubmitHandler = () => {
+    const auth = getAuth();
+    setIsLoading(true)
 
+    if (!signupInfo.name || !signupInfo.email || !signupInfo.password) {
+      toast.error("Please fill in all fields");
+      setIsLoading(false)
+      return;
+    }
+
+    createUserWithEmailAndPassword(auth, signupInfo.email, signupInfo.password)
+      .then(() => {
+        return updateProfile(auth.currentUser, {
+          displayName: signupInfo.name,
+          photoURL: signupInfo.imageUrl,
+        });
+      })
+      .then(() => {
+        toast.success("Signup Successful", { duration: 2000 });
+
+        const user = auth.currentUser;
+        const db = getDatabase();
+
+        set(ref(db, "users/" + user.uid), {
+          username: user.displayName,
+          email: user.email,
+          phone: signupInfo.phone,
+          location: signupInfo.location,
+          bio: signupInfo.bio,
+          imageUrl: signupInfo.imageUrl,
+        });
+
+        setSignupInfo({
+          name: "",
+          email: "",
+          password: "",
+          imageUrl: "",
+          phone: "",
+          location: "",
+          bio: "",
+        });
+        setIsLogin(true);
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        toast.error(error.message);
+        setIsLoading(false)
+      });
+  };
 
   const loginSubmitHandler = () => {
+    setIsLoading(true)
     const auth = getAuth();
 
     if (!loginInfo.email || !loginInfo.password) {
+      setIsLoading(false)
       toast.error("Please enter email and password");
       return;
     }
@@ -117,11 +155,13 @@ const signupSubmitHandler = () => {
         });
 
         setTimeout(() => {
-          navigate("/profile");
+          navigate("/");
         }, 2000);
+        setIsLoading(false)
       })
       .catch((error) => {
         toast.error(error.message);
+        setIsLoading(false)
       });
   };
 
@@ -153,7 +193,10 @@ const signupSubmitHandler = () => {
               placeholder="Enter Your Password"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
             />
-            <Button onClick={loginSubmitHandler}>Log in</Button>
+            {
+              isLoading ? <BeatLoader className="text-center mx-auto"/> : <Button onClick={loginSubmitHandler}>Log in</Button>
+            }
+            
             <p className="text-center text-medium">
               Don't have Account?{" "}
               <span
@@ -163,7 +206,10 @@ const signupSubmitHandler = () => {
                 Sign up
               </span>
             </p>
-                        <Link to="/forgotpassword"  className="text-center text-red-500 text-medium">
+            <Link
+              to="/forgotpassword"
+              className="text-center text-red-500 text-medium"
+            >
               Forgot Password
             </Link>
           </div>
@@ -201,6 +247,34 @@ const signupSubmitHandler = () => {
             <div className="text-center text-[32px] font-bold font-primary">
               Sign Up
             </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-28 h-28 rounded-full bg-gray-300 mb-2 overflow-hidden flex justify-center items-center relative border-2 border-black">
+                {imgLoading ? (
+                  <MoonLoader />
+                ) : (
+                  <img
+                    src={signupInfo.imageUrl}
+                    className="w-full h-full object-cover"
+                  />
+                )}
+
+                {/* Upload File Label */}
+                <div className="absolute overflow-hidden backdrop-blur bottom-2">
+                  <label
+                    htmlFor="file-upload"
+                    className="block text-center text-sm cursor-pointer text-black  rounded-lg   hover:text-white font-semibold transition-all duration-300"
+                  >
+                    Upload
+                  </label>
+                  <input
+                    id="file-upload"
+                    type="file"
+                    onChange={handleChangeImage}
+                    className="hidden"
+                  />
+                </div>
+              </div>
+            </div>
             <label htmlFor="">Your Name</label>
             <input
               value={signupInfo.name}
@@ -228,7 +302,36 @@ const signupSubmitHandler = () => {
               placeholder="Enter Your Password"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
             />
-            <Button onClick={signupSubmitHandler}>Sign Up</Button>
+            <label htmlFor="">Your Phone</label>
+            <input
+              value={signupInfo.phone}
+              onChange={(e) => signupChangeHandler(e)}
+              type="tel"
+              name="phone"
+              placeholder="Enter Your Phone"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+            />
+            <label htmlFor="">Your Location</label>
+            <input
+              value={signupInfo.location}
+              onChange={(e) => signupChangeHandler(e)}
+              type="text"
+              name="location"
+              placeholder="Enter Your Location"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+            />
+            <label htmlFor="">Your Bio</label>
+            <input
+              value={signupInfo.bio}
+              onChange={(e) => signupChangeHandler(e)}
+              type="text"
+              name="bio"
+              placeholder="Enter Your Short Bio"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+            />
+            {
+              isLoading ? <BeatLoader className="text-center mx-auto"/> :  <Button onClick={signupSubmitHandler}>Sign Up</Button>
+            }
             <p className="text-center text-medium">
               Already Have Account?{" "}
               <span

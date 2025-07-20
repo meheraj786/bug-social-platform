@@ -3,8 +3,12 @@ import Container from '../../layouts/Container'
 import Flex from '../../layouts/Flex'
 import { LuPenLine } from "react-icons/lu";
 import bannerImg from '../../assets/blog.svg'
+import { useSelector } from 'react-redux';
+import getGreeting from '../getGreetings/getGrettings';
 
 const Banner = () => {
+  
+  const user = useSelector((state) => state.user.user);
   return (
     <div className='py-[50px] bg-white text-black font-secondary'>
       <Container>
@@ -20,6 +24,7 @@ const Banner = () => {
           <img className='floating' src={bannerImg} alt="" />
           </div>
         </Flex>
+        <p className='text-gray-400 text-[14px] lg:text-left text-center'>{getGreeting(user.displayName)}</p>
       </Container>
     </div>
   )

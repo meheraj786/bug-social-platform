@@ -9,6 +9,7 @@ import toast, { Toaster } from "react-hot-toast";
 import CommentForm from "../commentForm/CommentForm";
 import CommentList from "../commentList/CommentList";
 import { useSelector } from "react-redux";
+import { Link } from "react-router";
 
 const BlogCard = ({ blog }) => {
   const user = useSelector((state) => state.user.user);
@@ -41,7 +42,7 @@ const BlogCard = ({ blog }) => {
       <div className="p-6">
         <Flex>
           <Flex className="gap-x-2">
-            <p className="text-gray-500 flex items-center gap-x-1">
+            <Link to={`profile/${blog.bloggerId}`} className="text-gray-500 flex items-center gap-x-1">
               {" "}
               {blog.imageUrl ? (
                 <img
@@ -53,7 +54,7 @@ const BlogCard = ({ blog }) => {
                 <FaUser />
               )}
               {blog.name}
-            </p>
+            </Link>
             <span className="text-gray-500 ">
               <GoDotFill size={24} />
             </span>

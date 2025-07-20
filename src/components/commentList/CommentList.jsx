@@ -7,6 +7,7 @@ import Flex from "../../layouts/Flex";
 import { getDatabase, ref, remove } from "firebase/database";
 import toast, { Toaster } from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { Link } from "react-router";
 
 const CommentList = ({ comment }) => {
   const user = useSelector((state) => state.user.user);
@@ -21,13 +22,13 @@ const CommentList = ({ comment }) => {
       <Toaster position="top-right" reverseOrder={false} duration={2000} />
       <Flex className="mt-5 font-secondary">
         <Flex className="gap-x-2">
-          <p className="text-gray-500 text-[14px] flex items-center gap-x-1">
+          <Link to={`/profile/${comment.commenterId}`} className="text-gray-500 text-[14px] flex items-center gap-x-1">
             {" "}
             {
                             comment.imageUrl ? <img src={comment.imageUrl} className="w-[20px] h-[20px] rounded-full" alt="" /> : <FaUser />
                           }
             {comment.name}
-          </p>
+          </Link>
           <span className="text-gray-500 ">
             <GoDotFill size={20} />
           </span>

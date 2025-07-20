@@ -5,7 +5,7 @@ import { LuPenLine } from "react-icons/lu";
 import { RiHome2Line, RiLoginCircleFill } from "react-icons/ri";
 import { CgNotes } from "react-icons/cg";
 import { FaRegQuestionCircle, FaRegUserCircle } from "react-icons/fa";
-import { Link, useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import Logo from "../../layouts/Logo";
 import { useDispatch, useSelector } from "react-redux";
 import { clearUser } from "../../features/user/userSlice";
@@ -41,27 +41,27 @@ const Navbar = () => {
           <Logo/>
 
           <Flex>
-            <Link to="/" className="flex items-center gap-x-1 mx-5">
+            <NavLink to="/" className="flex items-center gap-x-1 mx-5">
               <RiHome2Line /> Home
-            </Link>
-            <Link to="/blogs" className="flex items-center gap-x-1 mx-5">
+            </NavLink>
+            <NavLink to="/blogs" className="flex items-center gap-x-1 mx-5">
               <CgNotes />
-              Blogs
-            </Link>
+              My Blogs
+            </NavLink>
             {
               user ? (<>
-              <Link to="/profile" className="flex items-center gap-x-1 mx-5">
+              <NavLink to={`/profile/${user.uid}`} className="flex items-center gap-x-1 mx-5">
               <FaRegUserCircle />
               Profile
-            </Link>
+            </NavLink>
               <div onClick={signOutHandler} className="flex cursor-pointer items-center gap-x-1 mx-5">
               <BiLogOutCircle />
               Logout
             </div>
-              </>) : <Link to="/auth" className="flex items-center gap-x-1 mx-5">
+              </>) : <NavLink to="/auth" className="flex items-center gap-x-1 mx-5">
               <RiLoginCircleFill />
               Signup
-            </Link>
+            </NavLink>
             }
             
           </Flex>

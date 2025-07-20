@@ -20,7 +20,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, Component: App },
       { path: "/blogs", element: <AuthProtect><Blogs/></AuthProtect>  },
-      { path: "/profile", element: <AuthProtect><Profile/></AuthProtect>  },
+      { path: "/profile/:id", element: <AuthProtect><Profile/></AuthProtect>  },
       { path: "/auth", Component: AuthPage },
       { path: "/forgotpassword", Component: ForgotPassPage },
     ],
