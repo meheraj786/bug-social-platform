@@ -24,7 +24,10 @@ const Banner = () => {
           <img className='floating' src={bannerImg} alt="" />
           </div>
         </Flex>
-        <p className='text-gray-400 text-[14px] lg:text-left text-center'>{getGreeting(user.displayName)}</p>
+        {
+          user && (<p className='text-gray-400 text-[14px] lg:text-left text-center'>{getGreeting(user?.displayName)}</p>)
+        }
+        
       </Container>
     </div>
   )
