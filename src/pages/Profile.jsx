@@ -78,14 +78,13 @@ const Profile = () => {
         <div className="w-full max-w-2xl bg-white border border-gray-300 rounded-2xl p-8 shadow-md">
           {/* Profile Header */}
           <div className="flex flex-col items-center text-center">
-            <div className="w-28 h-28 rounded-full bg-gray-300 mb-2 overflow-hidden flex justify-center items-center relative border-2 border-black">
+            <div className="w-38 h-38 aspect-square rounded-full bg-gray-300 mb-2 overflow-hidden flex justify-center items-center relative border-2 border-black">
               <img
                 src={userProfile?.imageUrl}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
                 alt="profile"
               />
             </div>
-
             {/* Name & Email */}
             <h2 className="text-xl font-semibold">{userProfile?.username}</h2>
             <p className="text-gray-600 text-sm">{userProfile?.email}</p>
@@ -107,7 +106,9 @@ const Profile = () => {
               <FaPhone className="text-gray-500" />
               <div>
                 <p className="text-sm text-gray-500">Phone</p>
-                <p className="text-base font-medium">{userProfile?.phone}</p>
+                <p className="text-base font-medium">
+                  {userProfile?.phone || "Not Provided"}
+                </p>
               </div>
             </div>
 
@@ -126,17 +127,18 @@ const Profile = () => {
               <p className="text-base text-gray-700">{userProfile?.bio}</p>
             </div>
           </div>
-
+          {id == user.uid && (
+            <div className="mt-8 flex gap-4">
+              <button
+                onClick={signOutHandler}
+                className="w-full flex items-center justify-center gap-2 py-2 border border-black text-black rounded-md hover:bg-gray-100 transition"
+              >
+                <FaSignOutAlt />
+                Logout
+              </button>
+            </div>
+          )}
           {/* Buttons */}
-          <div className="mt-8 flex gap-4">
-            <button
-              onClick={signOutHandler}
-              className="w-full flex items-center justify-center gap-2 py-2 border border-black text-black rounded-md hover:bg-gray-100 transition"
-            >
-              <FaSignOutAlt />
-              Logout
-            </button>
-          </div>
         </div>
       </div>
       {user?.uid !== id && (

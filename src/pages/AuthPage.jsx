@@ -85,7 +85,7 @@ const AuthPage = () => {
     const auth = getAuth();
     setIsLoading(true)
 
-    if (!signupInfo.name || !signupInfo.email || !signupInfo.password) {
+    if (!signupInfo.name || !signupInfo.email || !signupInfo.password || !signupInfo.imageUrl || !signupInfo.bio || !signupInfo.location) {
       toast.error("Please fill in all fields");
       setIsLoading(false)
       return;
@@ -249,6 +249,7 @@ const AuthPage = () => {
             </div>
             <div className="flex flex-col items-center text-center">
               <div className="w-28 h-28 rounded-full bg-gray-300 mb-2 overflow-hidden flex justify-center items-center relative border-2 border-black">
+                
                 {imgLoading ? (
                   <MoonLoader />
                 ) : (
@@ -271,12 +272,17 @@ const AuthPage = () => {
                     type="file"
                     onChange={handleChangeImage}
                     className="hidden"
+                    required
                   />
+                  
                 </div>
+                
               </div>
+              <p className="text-red-600 text-[14px] my-3">*You can not change those info later</p>
             </div>
             <label htmlFor="">Your Name</label>
             <input
+            required
               value={signupInfo.name}
               onChange={(e) => signupChangeHandler(e)}
               type="text"
@@ -286,6 +292,7 @@ const AuthPage = () => {
             />
             <label htmlFor="">Your Email</label>
             <input
+            required
               value={signupInfo.email}
               onChange={(e) => signupChangeHandler(e)}
               type="text"
@@ -295,6 +302,7 @@ const AuthPage = () => {
             />
             <label htmlFor="">Your Password</label>
             <input
+            required
               value={signupInfo.password}
               onChange={(e) => signupChangeHandler(e)}
               type="text"
@@ -313,6 +321,7 @@ const AuthPage = () => {
             />
             <label htmlFor="">Your Location</label>
             <input
+            required
               value={signupInfo.location}
               onChange={(e) => signupChangeHandler(e)}
               type="text"
@@ -322,6 +331,7 @@ const AuthPage = () => {
             />
             <label htmlFor="">Your Bio</label>
             <input
+            required
               value={signupInfo.bio}
               onChange={(e) => signupChangeHandler(e)}
               type="text"
