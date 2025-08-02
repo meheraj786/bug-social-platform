@@ -3,7 +3,7 @@ import Flex from "../../layouts/Flex";
 
 const BlogCardSkeleton = () => {
   return (
-    <div className="blogCard mb-5 bg-white rounded-lg animate-pulse">
+    <div className="blogCard mx-20 mb-5 bg-white rounded-lg animate-pulse">
       <div className="p-6">
         <Flex className="justify-between items-center">
           <Flex className="gap-x-3 items-center">

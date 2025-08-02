@@ -8,6 +8,8 @@ import { BeatLoader } from "react-spinners";
 import { useSelector } from "react-redux";
 import Button from "../../layouts/Button";
 import { useNavigate } from "react-router";
+import AllUserList from "../allUserList/AllUserList";
+import FriendReq from "../friendReq/FriendReq";
 const newDate = () => {
   const date = new Date().toLocaleDateString("en-GB", {
     day: "2-digit",
@@ -111,10 +113,12 @@ const BlogPostForm = () => {
 
 
   return (
-    <div className="py-10 bg-black font-secondary">
+    <div className="py-10 relative bg-black font-secondary">
       <Toaster position="top-right" reverseOrder={false} duration={2000} />
+      <AllUserList/>
+      <FriendReq/>
       <Container>
-        <div className="p-8 bg-white rounded-lg">
+        <div className="p-8 mx-20 bg-white rounded-lg">
           <h2 className="text-[26px] lg:text-[32px] font-primary font-semibold mb-4 flex items-center gap-x-1">
             <LuPenLine size={30} />
             Write Your Blog

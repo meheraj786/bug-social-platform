@@ -27,9 +27,9 @@ const BlogList = () => {
   }, [db]);
 
   return (
-    <div className="py-5 font-secondary bg-black">
+    <div className="py-5  font-secondary bg-black">
       <Container>
-        <h2 className="text-[32px] font-primary font-bold mb-4 text-white flex items-center gap-x-2">
+        <h2 className="text-[32px] mx-20 font-primary font-bold mb-4 text-white flex items-center gap-x-2">
           <CgNotes size={40} />
           Recent Blogs ({blogList.length})
         </h2>

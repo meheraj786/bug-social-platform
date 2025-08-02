@@ -37,7 +37,7 @@ const BlogCard = ({ blog }) => {
   }, [blog.id, db]);
 
   return (
-    <div className="blogCard mb-5 bg-white rounded-lg ">
+    <div className="blogCard mx-20 mb-5 bg-white rounded-lg ">
       <Toaster position="top-right" reverseOrder={false} duration={2000} />
       <div className="p-6">
         <Flex>
