@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAuth, signOut } from "firebase/auth";
 import { getDatabase, ref, onValue } from "firebase/database";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { setUser } from "../../features/user/userSlice";
-import FollowerSuggestionSidebar from "../follower/FollowerSuggestionSidebar";
+import FollowerSuggestionSidebar from "../friends/Friends";
 
 const ProfileSidebar = () => {
   const db = getDatabase();
@@ -42,7 +42,7 @@ const ProfileSidebar = () => {
   };
   return (
     <>
-    <aside className="w-full lg:w-[400px]  bg-white border-r border-gray-200 p-6 shadow-md font-sans fixed mt-[80px] top-0 h-1/2 overflow-y-auto">
+    <aside className="w-full lg:w-[400px]  bg-gray-100 mb-10 border-r border-gray-200 p-6 rounded-lg shadow-md font-sans fixed mt-[80px] top-0 h-1/2 overflow-y-auto">
       <div className="flex flex-col items-center text-center">
         <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-purple-500 shadow-md">
           <img
@@ -76,6 +76,7 @@ const ProfileSidebar = () => {
           <p>{userProfile?.bio || "No bio added."}</p>
         </div>
       </div>
+      <Link to={`/profile/${user?.uid}`} > <button className="mt-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white w-full py-2 rounded-xl text-sm font-medium transition-all">View Profile</button></Link>
     </aside>
     <FollowerSuggestionSidebar/>
     </>

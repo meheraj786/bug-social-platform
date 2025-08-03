@@ -75,19 +75,6 @@ const Navbar = () => {
               <RiHome2Line /> Home
             </NavLink>
 
-            <NavLink
-              to="/blogs"
-              className={({ isActive }) =>
-                `flex items-center gap-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:scale-105 ${
-                  isActive
-                    ? "bg-white text-purple-700 shadow-lg"
-                    : "text-white hover:bg-white/10"
-                }`
-              }
-            >
-              <CgNotes /> My Blogs
-            </NavLink>
-
             {user ? (
               <>
                 <NavLink
@@ -95,23 +82,22 @@ const Navbar = () => {
                   className="flex relative items-center gap-x-2 px-4 py-2 rounded-full text-sm font-medium text-white hover:bg-white/10 transition-all duration-200 hover:scale-105"
                 >
                   {notification.length > 0 && (
-                    <span className="w-5 h-5 flex justify-center items-center bg-red-600 text-white rounded-full absolute -top-2 -right-2 text-[11px] z-10">
+                    <span className="w-4 h-4 flex justify-center items-center bg-red-600 text-white rounded-full absolute top-0 right-0 text-[11px] z-10">
                       {notification.length}
                     </span>
                   )}
-                  <IoNotificationsOutline />
-                  Notification
+                  <IoNotificationsOutline size={25} />
                 </NavLink>
 
                 <NavLink
                   to="/messages"
                   className="flex items-center gap-x-2 px-4 py-2 rounded-full text-sm font-medium text-white hover:bg-white/10 transition-all duration-200 hover:scale-105"
                 >
-                  <AiOutlineMessage /> Messages
+                  <AiOutlineMessage size={25} />
                 </NavLink>
 
                 <NavLink
-                  to={`/profile/${user.uid}`}
+                  to={`/profile/${user?.uid}`}
                   className={({ isActive }) =>
                     `flex items-center gap-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:scale-105 ${
                       isActive
@@ -120,7 +106,7 @@ const Navbar = () => {
                     }`
                   }
                 >
-                  <FaRegUserCircle /> Profile
+                  <img className="w-8 h-8 rounded-full border" src={user?.photoURL} alt="" />
                 </NavLink>
 
                 <div

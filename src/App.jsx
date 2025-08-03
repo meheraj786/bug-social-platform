@@ -7,7 +7,7 @@ import Banner from "./components/banner/Banner";
 import BlogPostForm from "./components/blogPostForm/BlogPostForm";
 import BlogList from "./components/blogList/BlogList";
 import ProfileSidebar from "./components/profileSidebar/ProfileSidebar";
-import FriendList from "./components/friendList/FriendList";
+import FriendList from "./components/userList/UserList";
 
 function App() {
   return (

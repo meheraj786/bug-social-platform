@@ -93,7 +93,7 @@ const BlogPostForm = () => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-2xl shadow-md  border-transparent hover:border-purple-400 transition duration-300 w-full max-w-xl mx-auto">
+    <div className="bg-white p-4 mt-10 rounded-2xl shadow-md  border-transparent hover:border-purple-400 transition duration-300 w-full max-w-xl mx-auto">
       {
         user ?       <textarea
         className="w-full resize-none border-none outline-none text-gray-800 placeholder-gray-500 p-2 text-sm focus:ring-0"

@@ -1,18 +1,11 @@
+import { getDatabase, onValue, ref } from "firebase/database";
 import React, { useEffect, useState } from "react";
-import { FaUser, FaPhone, FaMapMarkerAlt, FaSignOutAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { getAuth, signOut } from "firebase/auth";
-import { getDatabase, ref, onValue } from "firebase/database";
-import { clearUser } from "../features/user/userSlice";
-import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router";
 import Container from "../layouts/Container";
-import NoBlog from "../components/noBlog/NoBlog";
 import BlogCard from "../components/blogCard/BlogCard";
-import { CgNotes } from "react-icons/cg";
-import ProfileSkeleton from "../components/profileSkeleton/ProfileSkeleton";
 
-const Profile = () => {
+export default function Profile() {
   const db = getDatabase();
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -22,34 +15,21 @@ const Profile = () => {
   const [blogList, setBlogList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+
+    useEffect(() => {
     const userRef = ref(db, "users/");
     onValue(userRef, (snapshot) => {
       snapshot.forEach((data) => {
-        const user = data.val();
-        if (id == data.key) {
-          setUserProfile(user);
+        const userdb = data.val();
+        if (id== data.key) {
+          setUserProfile({...userdb, id:data.key});
+          setIsLoading(false)
         }
       });
     });
-  }, [db, id]);
-  const signOutHandler = () => {
-    const auth = getAuth();
-    signOut(auth)
-      .then(() => {
-        {
-          dispatch(clearUser());
-          navigate("/");
-          toast.success("Logout Success");
-          localStorage.removeItem("user");
-        }
-      })
-      .catch((error) => {
-        console.log(error.message);
-      });
-  };
+  }, [db, id, user]);
 
-  useEffect(() => {
+    useEffect(() => {
     const blogsRef = ref(db, "blogs/");
     onValue(blogsRef, (snapshot) => {
       let arr = [];
@@ -65,99 +45,104 @@ const Profile = () => {
     });
   }, [db, id]);
 
-  if (isLoading)
-    return (
-      <div className="bg-white text-black py-16 px-4 flex justify-center items-center font-sans">
-        <ProfileSkeleton />;
-      </div>
-    );
-
   return (
-    <>
-      <div className="bg-white text-black py-16 px-4 flex justify-center items-center font-sans">
-        <div className="w-full max-w-2xl bg-white border border-gray-300 rounded-2xl p-8 shadow-md">
-          {/* Profile Header */}
-          <div className="flex flex-col items-center text-center">
-            <div className="w-38 h-38 aspect-square rounded-full bg-gray-300 mb-2 overflow-hidden flex justify-center items-center relative border-2 border-black">
-              <img
-                src={userProfile?.imageUrl}
-                className="w-full h-full object-contain"
-                alt="profile"
-              />
-            </div>
-            {/* Name & Email */}
-            <h2 className="text-xl font-semibold">{userProfile?.username}</h2>
-            <p className="text-gray-600 text-sm">{userProfile?.email}</p>
+    <div className="bg-[#F0F2F5] min-h-screen">
+      {/* Cover Photo */}
+      <div className="w-full h-60 bg-gradient-to-r from-blue-500 to-purple-500">
+        {/* Profile Image */}
+        <Container>
+          <div className="relative h-60">
+        <div className="absolute -bottom-12 left-8">
+          <img
+            src={userProfile?.imageUrl}
+            alt="profile"
+            className="w-32 h-32 rounded-full border-4 border-white shadow-xl"
+          />
+        </div>
+
           </div>
 
-          {/* Info */}
-          <div className="mt-10 space-y-4">
-            {/* Name */}
-            <div className="flex items-center gap-3">
-              <FaUser className="text-gray-500" />
-              <div>
-                <p className="text-sm text-gray-500">Name</p>
-                <p className="text-base font-medium">{userProfile?.username}</p>
-              </div>
-            </div>
+        </Container>
+      </div>
+      <Container>
+      {/* Profile Header Info */}
+      <div className="pt-16 pb-8 rounded-lg px-8 bg-white shadow-md">
+        <div className="flex justify-between items-center flex-wrap">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">{userProfile?.username}</h2>
+            <p className="text-sm text-gray-600">@{userProfile?.username}</p>
+          </div>
+          {
+            !isLoading && user?.uid !== id && (<div className="flex gap-3">
+            <button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-700 transition">
+              Follow
+            </button>
+            <button className="border border-gray-300 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition">
+              Message
+            </button>
+          </div>)
+          }
+          
+        </div>
+      </div>
 
-            {/* Phone */}
-            <div className="flex items-center gap-3">
-              <FaPhone className="text-gray-500" />
-              <div>
-                <p className="text-sm text-gray-500">Phone</p>
-                <p className="text-base font-medium">
-                  {userProfile?.phone || "Not Provided"}
-                </p>
-              </div>
-            </div>
 
-            {/* Location */}
-            <div className="flex items-center gap-3">
-              <FaMapMarkerAlt className="text-gray-500" />
-              <div>
-                <p className="text-sm text-gray-500">Location</p>
-                <p className="text-base font-medium">{userProfile?.location}</p>
-              </div>
-            </div>
+      {/* Main Section */}
+      <div className="flex flex-col lg:flex-row gap-6 p-8">
+        {/* Left Sidebar */}
+        <div className="w-full lg:w-1/3 space-y-4">
+          {/* Intro/About */}
+          <div className="bg-white p-4 rounded-md shadow-sm">
+            <h3 className="text-lg font-semibold mb-2">Info</h3>
+            <p className="text-sm font-medium text-gray-600">{userProfile?.bio}</p>
+            <p className="text-sm text-gray-600">{userProfile?.email}</p>
+            <p className="text-sm text-gray-600">{userProfile?.location}</p>
+          </div>
 
-            {/* Bio */}
-            <div className="bg-gray-100 p-4 rounded-md">
-              <p className="text-sm text-gray-500 mb-1">Bio</p>
-              <p className="text-base text-gray-700">{userProfile?.bio}</p>
+          {/* Friends Preview */}
+          <div className="bg-white p-4 rounded-md shadow-sm">
+            <h3 className="text-lg font-semibold mb-2">Friends</h3>
+            <div className="grid grid-cols-3 gap-2">
+              {/* {blogList.map((i) => (
+                <img
+                  key={i}
+                  src={`https://i.pravatar.cc/100?img=${i}`}
+                  alt="friend"
+                  className="w-full rounded-md"
+                />
+              ))} */}
             </div>
           </div>
-          {id == user.uid && (
-            <div className="mt-8 flex gap-4">
-              <button
-                onClick={signOutHandler}
-                className="w-full flex items-center justify-center gap-2 py-2 border border-black text-black rounded-md hover:bg-gray-100 transition"
-              >
-                <FaSignOutAlt />
-                Logout
+        </div>
+
+        {/* Right Main Posts */}
+        <div className="w-full lg:w-2/3 space-y-4">
+          {/* Create Post Box */}
+          <div className="bg-white p-4 rounded-md shadow-sm">
+            <textarea
+              rows={3}
+              placeholder="What's on your mind?"
+              className="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <div className="mt-2 flex justify-between items-center">
+              <div className="flex gap-4 text-blue-600">
+                <button>📸 Photo</button>
+              </div>
+              <button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-700">
+                Post
               </button>
             </div>
-          )}
-          {/* Buttons */}
+          </div>
+
+          {/* Post Cards */}
+          {blogList.map((blog) => (
+            <BlogCard blog={blog} key={blogList.id} />
+          ))}
         </div>
       </div>
-      {user?.uid !== id && (
-        <div className="py-5 font-secondary bg-black">
-          <Container>
-            <h2 className="text-[32px] font-primary font-bold mb-4 text-white flex items-center gap-x-2">
-              <CgNotes size={40} />
-              Recent Blogs ({blogList.length})
-            </h2>
-            {blogList.length === 0 ? (
-              <NoBlog />
-            ) : (
-              blogList.map((blog) => <BlogCard blog={blog} key={blog.id} />)
-            )}
-          </Container>
-        </div>
-      )}
-    </>
-  );
-};
 
-export default Profile;
+      </Container>
+
+    </div>
+  );
+}
