@@ -14,6 +14,8 @@ import ForgotPassPage from './pages/ForgotPassPage.jsx'
 import AuthProtect from "./components/routeProtection/AuthProtect.jsx";
 import Notification from "./pages/Notification.jsx";
 import Messages from "./pages/Messages.jsx";
+import Login from "./pages/Login.jsx";
+import Signup from "./pages/Signup.jsx";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +26,8 @@ const router = createBrowserRouter([
       { path: "/blogs", element: <AuthProtect><Blogs/></AuthProtect>  },
       { path: "/profile/:id", element: <AuthProtect><Profile/></AuthProtect>  },
       { path: "/auth", Component: AuthPage },
+      { path: "/login", Component: Login },
+      { path: "/signup", Component: Signup },
       { path: "/forgotpassword", Component: ForgotPassPage },
       { path: "/notification", Component: Notification },
       { path: "/messages", Component: Messages },

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Flex from "../../layouts/Flex";
 import { GoDotFill } from "react-icons/go";
 import { FaUser } from "react-icons/fa6";
 import { MdOutlineDateRange } from "react-icons/md";
@@ -10,26 +9,29 @@ import CommentForm from "../commentForm/CommentForm";
 import CommentList from "../commentList/CommentList";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
+import Flex from "../../layouts/Flex";
 
 const BlogCard = ({ blog }) => {
   const user = useSelector((state) => state.user.user);
   const db = getDatabase();
   const [commentList, setCommentList] = useState([]);
+  const [expandComments, setExpandComments]= useState(false)
+
   const deleteHandler = (id) => {
-    const db = getDatabase();
     remove(ref(db, "blogs/" + id)).then(() => {
       toast.success("Blog Successfully Deleted");
     });
   };
+
   useEffect(() => {
-    const blogsRef = ref(db, "comments/");
-    onValue(blogsRef, (snapshot) => {
+    const commentsRef = ref(db, "comments/");
+    onValue(commentsRef, (snapshot) => {
       let arr = [];
       snapshot.forEach((comment) => {
         const content = comment.val();
         const id = comment.key;
-        if (content.blogId == blog.id) {
-          arr.unshift({ ...content, id: id });
+        if (content.blogId === blog.id) {
+          arr.unshift({ ...content, id });
         }
       });
       setCommentList(arr);
@@ -37,56 +39,82 @@ const BlogCard = ({ blog }) => {
   }, [blog.id, db]);
 
   return (
-    <div className="blogCard mx-20 mb-5 bg-white rounded-lg ">
+    <div className="w-full max-w-4xl mx-auto mb-6 bg-white rounded-2xl shadow hover:shadow-lg transition duration-300 border border-gray-200">
       <Toaster position="top-right" reverseOrder={false} duration={2000} />
-      <div className="p-6">
-        <Flex>
-          <Flex className="gap-x-2">
-            <Link to={`profile/${blog.bloggerId}`} className="text-gray-500 flex items-center gap-x-1">
-              {" "}
+
+      <div className="p-5">
+        <Flex className="justify-between items-start">
+          <Flex className="gap-3 items-center">
+            <Link
+              to={`profile/${blog.bloggerId}`}
+              className="flex items-center gap-2 text-gray-800 hover:text-purple-600 transition"
+            >
               {blog.imageUrl ? (
                 <img
                   src={blog.imageUrl}
-                  className="w-[40px] h-[40px] rounded-full"
-                  alt=""
+                  className="w-10 h-10 rounded-full object-cover"
+                  alt="Profile"
                 />
               ) : (
-                <FaUser />
+                <FaUser className="w-10 h-10 text-gray-400" />
               )}
-              {blog.name}
+              <div>
+                <p className="font-semibold text-sm">{blog.name}</p>
+                <Flex className="gap-1 items-center text-xs text-gray-500">
+                  <MdOutlineDateRange size={14} />
+                  <span>{blog.time}</span>
+                </Flex>
+              </div>
             </Link>
-            <span className="text-gray-500 ">
-              <GoDotFill size={24} />
-            </span>
-            <p className="text-gray-500 flex items-center gap-x-1">
-              {" "}
-              <MdOutlineDateRange size={24} />
-              Published {blog.date}
-            </p>
           </Flex>
-          {user?.uid == blog.bloggerId && (
+
+          {user?.uid === blog.bloggerId && (
             <button
-              className="cursor-pointer"
+              className="text-red-500 hover:text-red-600 transition"
               onClick={() => deleteHandler(blog.id)}
             >
-              <RiDeleteBin6Line color="red" size={26} />
+              <RiDeleteBin6Line size={20} />
             </button>
           )}
         </Flex>
-        <h3 className="mt-5 mb-3 font-primary text-[24px] font-semibold">
-          {blog.title}
-        </h3>
-        <p className="text-gray-800">{blog.description}</p>
+
+        <div className="mt-4 text-gray-800 text-sm whitespace-pre-wrap">
+          {blog.description}
+        </div>
+
+        {blog.postImage && (
+          <div className="mt-4">
+            <img
+              src={blog.postImage}
+              alt="Post"
+              className="rounded-lg w-full max-h-96 object-cover"
+            />
+          </div>
+        )}
       </div>
-      <div className="p-6 bg-gray-50 rounded-b-lg border-t border-gray-200">
-        <Flex>
-          <h4 className="text-gray-500">Published By {blog.name}</h4>
-          <span className="text-gray-500">Published {blog.date}</span>
-        </Flex>
-        <CommentForm blog={blog} commentLength={commentList.length} />
-        {commentList.map((comment) => (
-          <CommentList comment={comment} />
-        ))}
+
+      <div className="p-5 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+
+        <CommentForm post={blog} commentLength={commentList.length} />
+{
+  expandComments ? (        <div className="mt-3 space-y-3">
+          {commentList.map((comment) => (
+            <CommentList key={comment.id} comment={comment} />
+          ))}
+        <p onClick={()=>setExpandComments(false)} className="text-xs cursor-pointer text-purple-500"> Show Less...</p>
+        </div>): commentList.length <=1 ?  (        <div className="mt-3 space-y-3">
+          {commentList.map((comment) => (
+            <CommentList key={comment.id} comment={comment} />
+          ))}
+        </div>) : (<div className="mt-3 space-y-3">
+          {commentList.slice(0,1).map((comment) => (
+            <CommentList key={comment.id} comment={comment} />
+          )
+          )}
+        <p onClick={()=>setExpandComments(true)} className="text-xs cursor-pointer text-purple-500"> Show More Comments...</p>
+        </div>)
+}
+
       </div>
     </div>
   );

@@ -1,186 +1,173 @@
-import React, { useEffect, useState } from "react";
-import Container from "../../layouts/Container";
-import { LuPenLine } from "react-icons/lu";
-import Flex from "../../layouts/Flex";
+import React, { useState } from "react";
+import { FaImage } from "react-icons/fa";
 import { getDatabase, push, ref, set } from "firebase/database";
-import toast, { Toaster } from "react-hot-toast";
-import { BeatLoader } from "react-spinners";
 import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 import Button from "../../layouts/Button";
-import { useNavigate } from "react-router";
-import AllUserList from "../allUserList/AllUserList";
-import FriendReq from "../friendReq/FriendReq";
-const newDate = () => {
-  const date = new Date().toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-  return date;
-};
-
-
+import time from "../../layouts/time";
+import { Link } from "react-router";
 
 const BlogPostForm = () => {
-  const navigate= useNavigate()
-  const data= useSelector((state)=>state.user.user)
-  const [user,setUser]= useState(null)
-
-  useEffect(() => {
-    
-  setUser(data)
-    
-  }, [data])
   
-
-
-
+  const coudinaryApi = import.meta.env.VITE_CLOUDINARY_API;
+  const user = useSelector((state) => state.user.user);
   const [info, setInfo] = useState({
-    name: "",
-    title: "",
     description: "",
-    time: "",
-    nameErr: "",
-    titleErr: "",
     descriptionErr: "",
     loading: false,
+    imageUrl:""
   });
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [imgLoading, setImgLoading]= useState(false)
 
+  const handleChangeImage = async (e) => {
+    setImgLoading(true);
+    const file = e.target.files[0];
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "e-com app with firebase");
+    data.append("cloud_name", "dlrycnxnh");
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setInfo((prev) => ({
-      ...prev,
-      [name]: value,
-      [`${name}Err`]: "",
-    }));
+    const res = await fetch(coudinaryApi, {
+      method: "POST",
+      body: data,
+    });
+    const result = await res.json();
+    setInfo({
+      ...setInfo,
+      imageUrl: result.secure_url,
+    });
+    setPreview(result.secure_url)
+    setImgLoading(false);
   };
+
   const handleSubmit = () => {
     if (!user) {
       toast.error("Please wait while we load your profile.");
-    return;
-  }
+      return;
+    }
 
-  if (info.title.trim() === "") {
-    setInfo((prev) => ({
-      ...prev,
-      titleErr: "Enter a Title",
-    }));
-  } else if (info.description.trim() === "") {
-    setInfo((prev) => ({
-      ...prev,
-      descriptionErr: "Enter your Description",
-    }));
-  } else {
-    setInfo((prev) => ({
-      ...prev,
-      loading: true,
-    }));
+    if (info.description.trim() === "") {
+      setInfo((prev) => ({
+        ...prev,
+        descriptionErr: "Enter your Description",
+      }));
+    } else {
+      setInfo((prev) => ({
+        ...prev,
+        loading: true,
+        descriptionErr: "",
+      }));
 
-    const date = newDate();
-    const db = getDatabase();
+      const db = getDatabase();
 
-    set(push(ref(db, "blogs/")), {
-      name: user.displayName,
-      title: info.title,
-      description: info.description,
-      date: date,
-      bloggerId: user.uid,
-      imageUrl: user.photoURL
-    })
-      .then(() => {
-        toast.success("Blog Published Successfully!");
-        setInfo({
-          name: "",
-          title: "",
-          description: "",
-          time: "",
-          nameErr: "",
-          titleErr: "",
-          descriptionErr: "",
-          loading: false,
+      const blogData = {
+        name: user.displayName,
+        description: info.description,
+        time: time(),
+        bloggerId: user.uid,
+        imageUrl: user.photoURL,
+        postImage: info.imageUrl || "", 
+      };
+
+      set(push(ref(db, "blogs/")), blogData)
+        .then(() => {
+          toast.success("Blog Published Successfully!");
+          setInfo({
+            description: "",
+            descriptionErr: "",
+            loading: false,
+          });
+          setImage(null);
+          setPreview(null);
+        })
+        .catch(() => {
+          toast.error("Something went wrong!");
+          setInfo((prev) => ({
+            ...prev,
+            loading: false,
+          }));
         });
-      })
-      .catch((err) => {
-        toast.error("Something went wrong!");
-        setInfo((prev) => ({
-          ...prev,
-          loading: false,
-        }));
-      });
-  }
-};
-
+    }
+  };
 
   return (
-    <div className="py-10 relative bg-black font-secondary">
-      <Toaster position="top-right" reverseOrder={false} duration={2000} />
-      <AllUserList/>
-      <FriendReq/>
-      <Container>
-        <div className="p-8 mx-20 bg-white rounded-lg">
-          <h2 className="text-[26px] lg:text-[32px] font-primary font-semibold mb-4 flex items-center gap-x-1">
-            <LuPenLine size={30} />
-            Write Your Blog
-          </h2>
-          {
-            user ? (
-              <>
-                        <Flex className="gap-x-2 pt-3 pb-2">
-            <div className="xl:w-[49%] w-full">
-              <label className="text-[18px] font-medium" htmlFor="title">
-                Title
-              </label>
-              <input
-                name="title"
-                onChange={(e) => handleChange(e)}
-                value={info.title}
-                className="w-full mt-3 px-4 py-3 border-2 border-gray-300 rounded-lg outline-none"
-                type="text"
-                placeholder="Enter a Title For Your Blog"
-              />
-              <p className="text-red-500">{info.titleErr}</p>
-            </div>
-          </Flex>
-          <label className="text-[18px] font-medium" htmlFor="description">
-            Description
-          </label>
-          <textarea
-            onChange={(e) => handleChange(e)}
-            value={info.description}
-            className="w-full mt-3 h-[200px] px-4 py-3 border-2 border-gray-300 rounded-lg outline-none"
-            name="description"
-            id=""
-            placeholder="Enter Your Blog Description"
-          ></textarea>
-          <p className="text-red-500">{info.descriptionErr}</p>
-          {info.loading ? (
-            <Button className="w-full rounded-lg border-2 mt-5 cursor-pointer py-3 font-bold hover:bg-white hover:border-2 text-center hover:text-black transition-all bg-black text-white">
-              <BeatLoader className="text-white" />
-            </Button>
-          ) : (
-            <Button
-              onClick={handleSubmit}
-              className="w-full rounded-lg border-2 mt-5 cursor-pointer py-3 font-bold hover:bg-white hover:border-2 hover:text-black transition-all bg-black text-white"
-            >
-              Publish
-            </Button>
-          )}</>
-            ) : (<>
-          <div
-            className="w-full mt-3 h-[200px] px-4 py-3 border-2 border-gray-300 rounded-lg outline-none"
-          >Please Signup or Login to Publish Your Blog </div>
-            <Button
-              onClick={()=>navigate("/auth")}
-              className="w-full rounded-lg border-2 mt-5 cursor-pointer py-3 font-bold hover:bg-white hover:border-2 hover:text-black transition-all bg-black text-white"
-            >
-              Signup or Login
-            </Button>
-            </>)
-          }
+    <div className="bg-white p-4 rounded-2xl shadow-md  border-transparent hover:border-purple-400 transition duration-300 w-full max-w-xl mx-auto">
+      {
+        user ?       <textarea
+        className="w-full resize-none border-none outline-none text-gray-800 placeholder-gray-500 p-2 text-sm focus:ring-0"
+        placeholder="What's on your mind?"
+        maxLength={500}
+        rows={4}
+        value={info.description}
+        onChange={(e) =>
+          setInfo((prev) => ({ ...prev, description: e.target.value }))
+        }
+      /> :       <textarea
+        className="w-full resize-none border-none outline-none text-gray-800 placeholder-gray-500 p-2 text-sm focus:ring-0"
+        placeholder="Please Signup or Login to Post Something"
+        maxLength={500}
+        rows={4}
+        disabled
+        value={info.description}
+        onChange={(e) =>
+          setInfo((prev) => ({ ...prev, description: e.target.value }))
+        }
+      />
+      }
 
+      {info.descriptionErr && (
+        <p className="text-xs text-red-500 mt-1">{info.descriptionErr}</p>
+      )}
+
+      <div className="flex items-center justify-between mt-3">
+        <label className="flex items-center gap-2 cursor-pointer text-blue-600 hover:text-purple-600 transition">
+          <FaImage />
+          <span className="text-sm">Photo</span>
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleChangeImage}
+          />
+        </label>
+
+        <span className="text-xs text-gray-500">
+          {info.description?.length}/500
+        </span>
+      </div>
+
+      {preview && (
+        <div className="mt-3">
+          <img
+            src={preview}
+            alt="Preview"
+            className="rounded-lg w-full max-h-64 object-cover"
+          />
         </div>
-      </Container>
+      )}
+
+      {
+        user ? <button
+        type="button"
+        onClick={handleSubmit}
+        disabled={info.loading}
+        className="mt-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white w-full py-2 rounded-xl text-sm font-medium transition-all"
+      >
+        {info.loading ? "Posting..." : "Post"}
+      </button> : <button 
+        className="mt-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white w-full py-2 rounded-xl text-sm font-medium transition-all">
+<Link
+      to="/login"
+        
+      >
+        Please Login
+      </Link>
+      </button> 
+      }
+
+      
     </div>
   );
 };
