@@ -21,6 +21,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { getDatabase, ref, set } from "firebase/database";
+import { useNavigate } from "react-router";
 
 const Signup = () => {
   const [signupInfo, setSignupInfo] = useState({
@@ -35,6 +36,7 @@ const Signup = () => {
   const [showPass, setShowPass] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(false);
+  const navigate= useNavigate()
   const [errors, setErrors] = useState({});
   const coudinaryApi = import.meta.env.VITE_CLOUDINARY_API;
 
@@ -143,9 +145,6 @@ const Signup = () => {
       });
   };
 
-  const handleNavigateToLogin = () => {
-    alert("Navigate to Login page");
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
@@ -208,9 +207,7 @@ const Signup = () => {
             </p>
           </div>
 
-          {/* Form Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Name Field */}
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Full Name
@@ -243,7 +240,6 @@ const Signup = () => {
               )}
             </div>
 
-            {/* Email Field */}
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Email Address
@@ -282,7 +278,6 @@ const Signup = () => {
               )}
             </div>
 
-            {/* Password Field */}
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Password
@@ -356,7 +351,6 @@ const Signup = () => {
               )}
             </div>
 
-            {/* Phone Field */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Phone Number <span className="text-gray-400">(Optional)</span>
@@ -374,7 +368,6 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Location Field */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Location
@@ -407,7 +400,6 @@ const Signup = () => {
               )}
             </div>
 
-            {/* Bio Field */}
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Bio
@@ -443,8 +435,6 @@ const Signup = () => {
               </p>
             </div>
           </div>
-
-          {/* Submit Button */}
           <div className="mt-8">
             <button
               onClick={signupSubmitHandler}
@@ -462,12 +452,11 @@ const Signup = () => {
             </button>
           </div>
 
-          {/* Login Link */}
           <div className="mt-6 text-center">
             <p className="text-gray-600">
               Already have an account?{" "}
               <button
-                onClick={handleNavigateToLogin}
+                onClick={()=>navigate("/login")}
                 className="text-blue-600 hover:text-blue-700 font-semibold hover:underline transition-colors"
               >
                 Sign In

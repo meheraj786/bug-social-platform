@@ -40,6 +40,8 @@ const ProfileSidebar = () => {
       })
       .catch((error) => console.log(error.message));
   };
+  if (!user) return
+  
   return (
     <>
     <aside className="w-full lg:w-[400px]  bg-gray-100 mb-10 border-r border-gray-200 p-6 rounded-lg shadow-md font-sans fixed mt-[80px] top-0 h-1/2 overflow-y-auto">

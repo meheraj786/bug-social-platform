@@ -13,6 +13,7 @@ import time from "../../layouts/time";
 import { useSelector } from "react-redux";
 import { TbUserCancel } from "react-icons/tb";
 import { IoPersonAddSharp } from "react-icons/io5";
+import { Link } from "react-router";
 
 const followers = [
   {
@@ -193,12 +194,12 @@ export default function UserList() {
               alt={user.sendername}
               className="w-10 h-10 rounded-full"
             />
-            <div>
+            <Link to={`/profile/${user.id}`}>
               <p className="text-gray-900 font-medium text-sm">
                 {user.sendername}
               </p>
               <p className="text-gray-500 text-xs">{user.senderemail}</p>
-            </div>
+            </Link>
           </div>
           <div>
           <button
@@ -226,6 +227,7 @@ export default function UserList() {
       !friendList.includes(currentUser.uid + user.id)
   )
   .map((user, idx) => (
+    
     <div key={idx} className="flex items-center justify-between gap-3">
       <div className="flex items-center gap-3">
         <img
@@ -233,23 +235,27 @@ export default function UserList() {
           alt={user.username}
           className="w-10 h-10 rounded-full"
         />
-        <div>
+        <Link to={`/profile/${user.id}`}>
           <p className="text-gray-900 font-medium text-sm">{user.username}</p>
           <p className="text-gray-500 text-xs">{user.email}</p>
-        </div>
+        </Link>
       </div>
 
       {requestList.includes(user.id + currentUser.uid) ||
       requestList.includes(currentUser.uid + user.id) ? (
         <button
-          onClick={() => cancelRequest(user)}
+          onClick={(e) => {cancelRequest(user)
+            e.stopPropagation()
+          }}
           className="text-sm bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-1 rounded-full shadow-md hover:scale-105 transition duration-200"
         >
           Cancel
         </button>
       ) : (
         <button
-          onClick={() => handleRequest(user)}
+          onClick={(e) => {handleRequest(user)
+            e.stopPropagation()
+          }}
           className="text-sm bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-1 rounded-full shadow-md hover:scale-105 transition duration-200"
         >
           Add

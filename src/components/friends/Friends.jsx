@@ -93,12 +93,13 @@ export default function Friends() {
                   alt={friend.name}
               className="w-10 h-10 rounded-full"
             />
-            <div>
+            
+        <Link to={`/profile/${friend.id}`}>
               <p className="text-gray-900 font-medium text-sm">
                 {friend.name}
               </p>
               <p className="text-gray-500 text-xs">@{friend.name}</p>
-            </div>
+            </Link>
           </div>
           <div>
           <button className="text-sm mr-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-1 rounded-full shadow-md hover:scale-105 transition duration-200">

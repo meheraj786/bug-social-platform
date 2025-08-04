@@ -135,7 +135,7 @@ const CommentForm = ({ post, commentLength }) => {
             onClick={cancelReactHandler}
             className="flex items-center gap-x-1 text-purple-600 hover:scale-105 transition-all duration-200 cursor-pointer"
           >
-            <FaHeart />
+            <FaHeart size={25} />
             {/* <CiHeart /> */}
             <span className="text-sm">{reactLength.length}</span>
           </span>
@@ -145,13 +145,13 @@ const CommentForm = ({ post, commentLength }) => {
             className="flex items-center gap-x-1 text-purple-600 hover:scale-105 transition-all duration-200 cursor-pointer"
           >
             {/* <FaHeart /> */}
-            <CiHeart />
+            <CiHeart size={25} />
             <span className="text-sm">{reactLength.length}</span>
           </span>
         )}
 
         <span className="flex items-center gap-x-1 text-blue-600">
-          <FaRegComments />
+          <FaRegComments size={25} />
           <span className="text-sm">{commentLength}</span>
         </span>
       </h3>
