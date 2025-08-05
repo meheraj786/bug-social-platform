@@ -38,17 +38,25 @@ const Conversation = ({ msgNotification, isFriend }) => {
   const messagesEndRef = useRef(null);
   const scrollContainerRef = useRef(null);
 
-  useEffect(() => {
-    const requestRef = ref(db, 'friendlist/');
-    onValue(requestRef, (snapshot) => {
-      snapshot.forEach((item) => {
-        const request = item.val();
-        if (request.senderid==data.uid && request.reciverid==id || request.reciverid==data.uid || request.senderid==id) {
-          setRoomuser({...request, id: item.key})
-        }
-      });
+useEffect(() => {
+  if (!data?.uid || !id) return;
+
+  const requestRef = ref(db, 'friendlist/');
+  onValue(requestRef, (snapshot) => {
+    snapshot.forEach((item) => {
+      const request = item.val();
+
+      // Proper grouping with ()
+      if (
+        (request.senderid === data.uid && request.reciverid === id) ||
+        (request.reciverid === data.uid && request.senderid === id)
+      ) {
+        setRoomuser({ ...request, id: item.key });
+      }
     });
-  }, []);
+  });
+}, [db, data?.uid, id]);
+
 
   // const scrollToBottom = () => {
   //   if (scrollContainerRef.current) {
@@ -105,20 +113,6 @@ const Conversation = ({ msgNotification, isFriend }) => {
   //   scrollToBottom();
   // }, [messageList]);
 
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (roomuser?.id && isFriend && Array.isArray(isFriend)) {
-        if (!isFriend.includes(roomuser.id)) {
-          console.log("User is not in friend list");
-          dispatch(roomUser(null));
-        } else {
-          console.log("User is friend");
-        }
-      }
-    }, 3000);
-
-    return () => clearTimeout(timeoutId);
-  }, [isFriend, roomuser?.id, dispatch]);
 
   const handleMsgNotificationDelete = () => {
     if (!roomuser || !msgNotification?.length) return;
@@ -224,7 +218,7 @@ const Conversation = ({ msgNotification, isFriend }) => {
 
   if (!roomuser) {
     return (
-      <div className="convo mt-10 xl:mt-0 shadow-shadow flex justify-center items-center rounded-[20px] xl:w-[100%] h-[93vh]">
+      <div className="convo mt-10 xl:mt-0 shadow-shadow flex justify-center items-center rounded-[20px] xl:w-[100%] h-full">
         <div className="text-center">
           <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-gray-400 text-3xl">💬</span>
@@ -240,35 +234,37 @@ const Conversation = ({ msgNotification, isFriend }) => {
     );
   }
 return (
-  <div className="bg-gradient-to-br h-full from-white to-gray-50/50 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/20 max-w-3xl mx-auto  flex flex-col justify-between relative overflow-hidden">
-    {/* User Info */}
-    <div
-                key={roomuser.senderid==data.uid ? roomuser.reciverid : roomuser.senderid}
-                className="flex items-center gap-4 p-3 bg-white/80 rounded-xl border border-white/60 shadow hover:shadow-lg cursor-pointer transition-all hover:scale-[1.02]"
-              >
-                <div className="relative">
-                  <img
-                    src={roomuser.senderid==data.uid ? roomuser.reciverimg : roomuser.senderimg}
-                    alt={roomuser.name}
-                    className="w-12 h-12 rounded-full object-cover ring-2 ring-white"
-                  />
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                </div>
-                <span className="font-medium text-gray-800 truncate">
-                  {roomuser.senderid==data.uid ? roomuser.recivername : roomuser.sendername}
-                </span>
-              </div>
-    
-    {/* Decorative Background Elements */}
-    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl"></div>
-    <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-pink-200/20 to-yellow-200/20 rounded-full blur-2xl"></div>
+  <div className="h-full flex flex-col bg-gradient-to-br from-white to-gray-50/50 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/20 max-w-3xl mx-auto relative overflow-hidden">
 
-    {/* Messages Container */}
-    <div className="overflow-y-auto space-y-6 flex-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pr-2">
+    {/* User Info - Fixed Height */}
+    <div className="flex-shrink-0 mb-4">
+      <div
+        key={roomuser.senderid==data.uid ? roomuser.reciverid : roomuser.senderid}
+        className="flex items-center gap-4 p-3 bg-white/80 rounded-xl border border-white/60 shadow hover:shadow-lg cursor-pointer transition-all hover:scale-[1.02]"
+      >
+        <div className="relative">
+          <img
+            src={roomuser.senderid==data.uid ? roomuser.reciverimg : roomuser.senderimg}
+            alt={roomuser.name}
+            className="w-12 h-12 rounded-full object-cover ring-2 ring-white"
+          />
+          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+        </div>
+        <span className="font-medium text-gray-800 truncate">
+          {roomuser.senderid==data.uid ? roomuser.recivername : roomuser.sendername}
+        </span>
+      </div>
+    </div>
+
+    {/* Decorative Background */}
+    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-pink-200/20 to-yellow-200/20 rounded-full blur-2xl pointer-events-none"></div>
+
+    {/* Messages Container - Flexible and Scrollable */}
+    <div className="flex-1 overflow-y-auto border border-red-500 mb-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent flex flex-col justify-end space-y-6 pr-2">
       {messageList?.map((msg) => (
         <div key={msg.id} className="relative group">
-          
-          {/* Reply Message Indicator */}
+          {/* Reply Indicator */}
           {msg.replyMsg && (
             <div className={`absolute z-10 ${msg.senderid === data.uid ? "-top-3 right-4" : "-top-3 left-4"} 
               px-3 py-1 bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm 
@@ -276,7 +272,7 @@ return (
               {msg.replyMsg === "like" ? (
                 <AiFillLike className="text-2xl text-blue-500 animate-bounce" />
               ) : msg.replyMsg === "love" || msg.replyMsg === "<3" ? (
-                <BsFillBalloonHeartFill className="text-2xl text-red-500 animate-pulse" />
+                <span className="text-2xl text-red-500 animate-pulse">❤️</span>
               ) : (
                 <span className="font-medium">↳ {msg.replyMsg}</span>
               )}
@@ -284,8 +280,7 @@ return (
           )}
 
           <div className={`flex items-end gap-3 ${msg.senderid === data.uid ? "justify-end" : "justify-start"}`}>
-            
-            {/* Delete Button (for own messages) */}
+            {/* Delete Button */}
             {msg.senderid === data.uid && (
               <button 
                 onClick={() => messageDeleteHandler(msg)} 
@@ -305,31 +300,23 @@ return (
                 }`}
               >
                 {/* Message Content */}
-                <div className="text-sm leading-relaxed">
+                <div className="text-sm leading-relaxed break-words">
                   {msg.message === "like" ? (
                     <AiFillLike className="text-3xl animate-bounce" />
                   ) : msg.message === "love" || msg.message === "<3" ? (
-                    <BsFillBalloonHeartFill className="text-3xl text-red-400 animate-pulse" />
+                    <span className="text-3xl text-red-400 animate-pulse">❤️</span>
                   ) : (
                     msg.message
                   )}
                 </div>
-                
                 {/* Timestamp */}
                 <div className={`text-xs mt-2 ${msg.senderid === data.uid ? "text-white/70" : "text-gray-500"}`}>
                   {moment(msg.time).fromNow()}
                 </div>
               </div>
-              
-              {/* Message Tail */}
-              {/* <div className={`absolute bottom-0 w-4 h-4 ${
-                msg.senderid === data.uid 
-                  ? "right-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-bl-full" 
-                  : "left-0 bg-white/80 rounded-br-full border-r border-b border-gray-200/50"
-              }`}></div> */}
             </div>
 
-            {/* Reply Button (for others' messages) */}
+            {/* Reply Button */}
             {msg.senderid !== data.uid && (
               <button 
                 onClick={() => setReplyMsg(msg.message)} 
@@ -341,12 +328,11 @@ return (
           </div>
         </div>
       ))}
+      <div className="h-4"></div>
     </div>
 
-    {/* Input Section */}
-    <div className="mt-6 relative">
-      
-      {/* Reply Preview */}
+    {/* Input Section - Fixed */}
+    <div className="flex-shrink-0 relative">
       {replyMsg.length !== "" && replyMsg && (
         <div className="absolute -top-16 left-0 right-0 mx-4">
           <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-50 to-purple-50 backdrop-blur-sm border border-blue-200/50 rounded-2xl shadow-lg">
@@ -358,7 +344,7 @@ return (
                 {replyMsg === "like" ? (
                   <AiFillLike className="text-2xl text-blue-500" />
                 ) : replyMsg === "love" || replyMsg === "<3" ? (
-                  <BsFillBalloonHeartFill className="text-2xl text-red-500" />
+                  <span className="text-2xl text-red-500">❤️</span>
                 ) : (
                   `Replying to: ${replyMsg}`
                 )}
@@ -374,17 +360,20 @@ return (
         </div>
       )}
 
-      {/* Input Bar */}
       <div className="flex items-center gap-4 p-2 bg-white/60 backdrop-blur-xl rounded-2xl border border-white/30 shadow-lg">
         <input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter' && message.trim()) {
+              sentMessageHandler();
+            }
+          }}
           placeholder="Type your message..."
           className="flex-1 px-4 py-3 bg-transparent text-gray-800 placeholder-gray-500 text-sm focus:outline-none"
         />
         
-        {/* Send/Like Button */}
         {message.length === 0 ? (
           <button
             onClick={() => sentMessageHandler("like")}
@@ -402,8 +391,26 @@ return (
         )}
       </div>
     </div>
+
+    {/* Custom Scrollbar */}
+    <style jsx>{`
+      .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .scrollbar-thin::-webkit-scrollbar-thumb {
+        background-color: rgba(156, 163, 175, 0.5);
+        border-radius: 3px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(156, 163, 175, 0.7);
+      }
+    `}</style>
   </div>
 );
+
 };
 
 export default Conversation;
