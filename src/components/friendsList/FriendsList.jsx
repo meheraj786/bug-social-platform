@@ -2,8 +2,8 @@ import { get, getDatabase, onValue, push, ref, remove, set } from 'firebase/data
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
-import time from '../../layouts/time';
 import { TiUserDelete } from 'react-icons/ti';
+import moment from 'moment/moment';
 
 const FriendsList = () => {
   const [friendList, setFriendList] = useState([]);
@@ -26,7 +26,7 @@ const FriendsList = () => {
         set(push(ref(db, "notification/")), {
           notifyReciver: friend.senderid === currentUser.uid ? friend.reciverid : friend.senderid,
           type: "negative",
-          time: time(),
+          time: moment().format(),
           content: `${currentUser.displayName} unfriended you`,
         });
       }

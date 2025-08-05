@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import Button from "../../layouts/Button";
 import time from "../../layouts/time";
 import { Link } from "react-router";
+import moment from "moment";
 
 const BlogPostForm = () => {
   
@@ -65,7 +66,7 @@ const BlogPostForm = () => {
       const blogData = {
         name: user.displayName,
         description: info.description,
-        time: time(),
+        time: moment().format(),
         bloggerId: user.uid,
         imageUrl: user.photoURL,
         postImage: info.imageUrl || "", 

@@ -15,6 +15,8 @@ import { useNavigate } from "react-router";
 import time from "../../layouts/time";
 import { FaComment, FaHeart, FaRegComments } from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
+import moment from "moment";
+import FullScreenOverlay from "../../layouts/FullscreenOverlay";
 
 const CommentForm = ({ post, commentLength }) => {
   const navigate = useNavigate();
@@ -22,9 +24,11 @@ const CommentForm = ({ post, commentLength }) => {
   const [reactorId, setReactorId] = useState([]);
   const [react, setReact] = useState([]);
   const [comment, setComment] = useState("");
+  const [reactors, setReactors]= useState([])
   const [error, setError] = useState("");
   const [reactLength, setReactLength] = useState([]);
   const db = getDatabase();
+  const [reactionPop, setReactionPop]= useState(false)
 
   useEffect(() => {
     const reactRef = ref(db, "react/");
@@ -41,6 +45,21 @@ const CommentForm = ({ post, commentLength }) => {
       setReactorId(arr);
     });
   }, [db, user, post]);
+  useEffect(() => {
+    const reactRef = ref(db, "react/");
+    onValue(reactRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((react) => {
+        if (
+          react.val().blogId == post.id
+        ) {
+          arr.push({...react.val(), id:react.key});
+        }
+      });
+      setReactors(arr);
+    });
+  }, [db, user, post]);
+console.log("react",reactors);
 
   useEffect(() => {
     const reactRef = ref(db, "react/");
@@ -108,7 +127,7 @@ const CommentForm = ({ post, commentLength }) => {
     const commentData = {
       name: user?.displayName,
       comment: comment,
-      date: time(),
+      date: moment().format(),
       commenterId: user?.uid,
       blogId: post.id,
       imageUrl: user?.photoURL,
@@ -128,6 +147,12 @@ const CommentForm = ({ post, commentLength }) => {
 return (
   <div className="bg-gradient-to-r font-secondary from-gray-50/80 to-white/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-200/50">
     <Toaster position="top-right" reverseOrder={false} />
+    {
+      reactionPop && (
+<FullScreenOverlay reactors={reactors} setReactionPop={setReactionPop} />
+
+      )
+    }
 
     {/* Like and Comment Stats */}
     <div className="flex items-center justify-between mb-5">
@@ -160,18 +185,11 @@ return (
       </div>
 
       {/* Additional Actions */}
-      <div className="flex items-center gap-2">
-        <button className="p-2 rounded-full text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all duration-200">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-          </svg>
-        </button>
-        <button className="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all duration-200">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-          </svg>
-        </button>
-      </div>
+                <button  onClick={()=>setReactionPop(true)}
+            className="flex items-center gap-2 text-xs cursor-pointer text-purple-600 hover:text-purple-700 font-semibold mt-3 p-2 rounded-xl hover:bg-purple-50 transition-all duration-200"
+          >
+            {reactLength.length} People likes this post...
+          </button>
     </div>
 
     {/* Comment Input Section */}

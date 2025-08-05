@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import { TbUserCancel } from "react-icons/tb";
 import { IoPersonAddSharp } from "react-icons/io5";
 import { Link } from "react-router";
+import moment from "moment";
 
 const followers = [
   {
@@ -66,7 +67,7 @@ export default function UserList() {
           set(push(ref(db, "notification/")), {
             notifyReciver: friend.senderid,
             type: "negative",
-            time: time(),
+            time: moment().format(),
             content: `${friend.recivername} canceled your friend request`,
           });
         }
@@ -92,7 +93,7 @@ export default function UserList() {
     set(push(ref(db, "notification/")), {
       notifyReciver: user.senderid,
       type: "positive",
-      time: time(),
+      time: moment().format(),
       content: `${user.recivername} Accept your friend request`,
     });
   };

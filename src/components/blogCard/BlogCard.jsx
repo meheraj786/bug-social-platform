@@ -10,6 +10,7 @@ import CommentList from "../commentList/CommentList";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import Flex from "../../layouts/Flex";
+import moment from "moment";
 
 const BlogCard = ({ blog }) => {
   const user = useSelector((state) => state.user.user);
@@ -72,7 +73,7 @@ return (
               </p>
               <Flex className="gap-2 items-center text-xs text-gray-500 mt-0.5">
                 <MdOutlineDateRange size={14} className="text-gray-400" />
-                <span className="font-medium">{blog.time}</span>
+                <span className="font-medium">{moment(blog.time).fromNow()}</span>
                 <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
                 <span className="text-gray-400">Public</span>
               </Flex>

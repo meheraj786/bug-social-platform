@@ -8,6 +8,7 @@ import { getDatabase, ref, remove } from "firebase/database";
 import toast, { Toaster } from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
+import moment from "moment";
 
 const CommentList = ({ comment }) => {
   const user = useSelector((state) => state.user.user);
@@ -52,7 +53,8 @@ return (
             </p>
             <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
               <MdOutlineDateRange size={12} className="text-gray-400" />
-              <span className="font-medium">{comment.date}</span>
+              <span className="font-medium">{moment(comment.date).fromNow()}
+</span>
               <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
               <span className="text-gray-400">Reply</span>
             </div>

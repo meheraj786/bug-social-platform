@@ -16,13 +16,14 @@ import Notification from "./pages/Notification.jsx";
 import Messages from "./pages/Messages.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
+import Conversation from "./components/conversation/Conversation.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
     children: [
-      { index: true, Component: App },
+      { index: true, element: <App/> },
       { path: "/blogs", element: <AuthProtect><Blogs/></AuthProtect>  },
       { path: "/profile/:id", element: <AuthProtect><Profile/></AuthProtect>  },
       { path: "/auth", Component: AuthPage },
@@ -30,7 +31,9 @@ const router = createBrowserRouter([
       { path: "/signup", Component: Signup },
       { path: "/forgotpassword", Component: ForgotPassPage },
       { path: "/notification", Component: Notification },
-      { path: "/messages", Component: Messages },
+      { path: "/messages", Component: Messages, children:[{
+        path: '/messages/chat/:id', Component: Conversation,
+      }] },
     ],
   },
 ]);
