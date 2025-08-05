@@ -147,7 +147,7 @@ const Signup = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br font-secondary from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <Toaster position="top-right"/>
       <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
         {/* Header */}

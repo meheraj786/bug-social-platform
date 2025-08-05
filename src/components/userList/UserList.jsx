@@ -183,7 +183,7 @@ export default function UserList() {
   }
 
 return (
-  <div className="w-full lg:w-[400px] h-1/2 fixed mt-[80px] top-0 right-0 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl border border-gray-200/50 p-6 space-y-5 overflow-y-auto">
+  <div className="w-full font-secondary lg:w-[400px] h-1/2 fixed mt-[80px] top-0 right-0 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl border border-gray-200/50 p-6 space-y-5 overflow-y-auto">
     {/* Header */}
     <div className="flex items-center justify-between">
       <h2 className="text-transparent bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text font-bold text-xl">
@@ -221,7 +221,7 @@ return (
               </div>
               
               <Link to={`/profile/${user.id}`} className="flex-1 min-w-0">
-                <p className="text-gray-900 font-semibold text-sm hover:text-purple-600 transition-colors duration-200 truncate">
+                <p className="text-gray-900 font-primary font-semibold text-sm hover:text-purple-600 transition-colors duration-200 truncate">
                   {user.sendername}
                 </p>
                 <p className="text-gray-500 text-xs font-medium truncate">{user.senderemail}</p>
@@ -282,7 +282,7 @@ return (
               </div>
               
               <Link to={`/profile/${user.id}`} className="flex-1 min-w-0">
-                <p className="text-gray-900 font-semibold text-sm hover:text-blue-600 transition-colors duration-200 truncate">
+                <p className="text-gray-900 font-primary font-semibold text-sm hover:text-blue-600 transition-colors duration-200 truncate">
                   {user.username}
                 </p>
                 <p className="text-gray-500 text-xs font-medium truncate">{user.email}</p>

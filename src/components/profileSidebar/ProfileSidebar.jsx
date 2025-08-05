@@ -45,7 +45,7 @@ const ProfileSidebar = () => {
   
 return (
   <>
-    <aside className="w-full lg:w-[400px] bg-white/80 backdrop-blur-xl mb-10 border border-gray-200/50 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 font-sans fixed mt-[80px] top-0 h-[55%] overflow-y-auto">
+    <aside className="w-full lg:w-[400px] font-secondary bg-white/80 backdrop-blur-xl mb-10 border border-gray-200/50 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300  fixed mt-[80px] top-0 h-[55%] overflow-y-auto">
       {/* Profile Section */}
       <div className="flex flex-col items-center text-center">
         <div className="relative group">
@@ -61,7 +61,7 @@ return (
           </div>
         </div>
         
-        <h2 className="mt-4 text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+        <h2 className="mt-4 font-primary text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
           {userProfile?.username}
         </h2>
         <p className="text-sm text-gray-500 font-medium">{userProfile?.email}</p>

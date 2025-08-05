@@ -70,10 +70,10 @@ const Notification = () => {
   }
 
   return (
-    <div className="p-4 bg-white rounded-md shadow-md mx-auto mt-8">
+    <div className="p-4 font-secondary bg-white rounded-md shadow-md mx-auto mt-8">
       <Container>
       <div className="flex justify-between items-center mb-4 border-b pb-2">
-        <h2 className="text-xl font-semibold text-black">Notifications</h2>
+        <h2 className="text-xl font-semibold font-primary text-black">Notifications</h2>
         {notifications.length > 0 && (
           <button
             onClick={clearAllNotifications}

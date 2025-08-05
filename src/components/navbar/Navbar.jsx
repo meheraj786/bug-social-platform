@@ -55,7 +55,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className="bg-gradient-to-r from-purple-700 via-blue-600 to-blue-800 fixed w-full z-[999] font-primary text-white py-4 shadow-md">
+    <div className="bg-gradient-to-r from-purple-700 via-blue-600 to-blue-800 fixed w-full z-[999] font-secondary text-white py-4 shadow-md">
       <Toaster position="top-right" reverseOrder={false} duration={2000} />
       <Container>
         <Flex className="justify-center lg:justify-between gap-y-5 lg:gap-y-0">

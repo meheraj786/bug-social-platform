@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Outfit:wght@100..900&display=swap');
 @import "tailwindcss";
 
 @theme{
-  --font-primary: "Merriweather", serif;
-  --font-secondary: "Open Sans", sans-serif;
+  --font-primary: "Outfit", sans-serif;
+  --font-secondary: "Manrope", sans-serif;
 }
 
 .floating {
