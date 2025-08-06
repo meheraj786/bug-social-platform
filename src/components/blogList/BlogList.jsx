@@ -26,21 +26,24 @@ const BlogList = () => {
     });
   }, [db]);
 
-  return (
-    <div className="py-5  font-secondary">
-      <Container>
-        {isLoading ? (
-          <>
-            <BlogCardSkeleton />
-          </>
-        ) : blogList.length == 0 ? (
-          <NoBlog />
-        ) : (
-          blogList.map((blog) => <BlogCard blog={blog} key={blogList.id} />)
-        )}
-      </Container>
-    </div>
-  );
+
+
+
+return (
+  <div className="py-5 font-secondary">
+    <Container>
+      {isLoading ? (
+        <BlogCardSkeleton />
+      ) : blogList.length === 0 ? (
+        <NoBlog />
+      ) : (blogList.map((blog) => (
+              <BlogCard blog={blog} />
+          ))
+      )}
+    </Container>
+  </div>
+);
+
 };
 
 export default BlogList;

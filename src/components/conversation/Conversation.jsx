@@ -18,6 +18,8 @@ import { RxCross2 } from "react-icons/rx";
 import { MdOutlineReply } from "react-icons/md";
 import { useParams } from "react-router";
 import moment from "moment";
+import { AnimatePresence } from "motion/react"
+import { motion } from "motion/react"
 
 const Conversation = ({ msgNotification, isFriend }) => {
   const db = getDatabase();
@@ -237,7 +239,7 @@ return (
   <div className="h-full flex flex-col bg-gradient-to-br from-white to-gray-50/50 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/20 max-w-3xl mx-auto relative overflow-hidden">
 
     {/* User Info - Fixed Height */}
-    <div className="flex-shrink-0 mb-4">
+    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex-shrink-0 mb-4">
       <div
         key={roomuser.senderid==data.uid ? roomuser.reciverid : roomuser.senderid}
         className="flex items-center gap-4 p-3 bg-white/80 rounded-xl border border-white/60 shadow hover:shadow-lg cursor-pointer transition-all hover:scale-[1.02]"
@@ -254,15 +256,24 @@ return (
           {roomuser.senderid==data.uid ? roomuser.recivername : roomuser.sendername}
         </span>
       </div>
-    </div>
+    </motion.div>
 
     {/* Decorative Background */}
     <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl pointer-events-none"></div>
     <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-pink-200/20 to-yellow-200/20 rounded-full blur-2xl pointer-events-none"></div>
 
     {/* Messages Container - Flexible and Scrollable */}
-    <div className="flex-1 overflow-y-auto border border-red-500 mb-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent flex flex-col justify-end space-y-6 pr-2">
+    <div className="flex-1 overflow-y-auto border border-yellow-500 mb-6 space-y-6 pr-2">
+      <AnimatePresence initial={false}>
       {messageList?.map((msg) => (
+         <motion.div
+  key={msg.id}
+  className="relative group"
+  initial={{ opacity: 0, y: 20 }}
+  whileInView={{ opacity: 1, y: 0 }} 
+  viewport={{ once: true, amount: 0.2 }} 
+  transition={{ duration: 0.3 }}
+>
         <div key={msg.id} className="relative group">
           {/* Reply Indicator */}
           {msg.replyMsg && (
@@ -327,7 +338,11 @@ return (
             )}
           </div>
         </div>
+
+      </motion.div>
       ))}
+
+      </AnimatePresence>
       <div className="h-4"></div>
     </div>
 
@@ -350,22 +365,24 @@ return (
                 )}
               </div>
             </div>
-            <button 
+           <motion.button whileHover={{ scale: 1.1 }}
+  whileTap={{ scale: 0.95 }}
               onClick={() => setReplyMsg("")}
               className="p-2 hover:bg-red-100 rounded-full text-red-500 hover:text-red-600 transition-all duration-200"
             >
               <RxCross2 className="text-lg" />
-            </button>
+            </motion.button>
           </div>
         </div>
       )}
 
       <div className="flex items-center gap-4 p-2 bg-white/60 backdrop-blur-xl rounded-2xl border border-white/30 shadow-lg">
-        <input
+        <motion.input
+        initial={{ scale: 0 }} animate={{ scale: 1 }}
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          onKeyPress={(e) => {
+          onKeyDown={(e) => {
             if (e.key === 'Enter' && message.trim()) {
               sentMessageHandler();
             }
@@ -375,39 +392,24 @@ return (
         />
         
         {message.length === 0 ? (
-          <button
+          <motion.button whileHover={{ scale: 1.1 }}
+  whileTap={{ scale: 0.95 }}
             onClick={() => sentMessageHandler("like")}
             className="group p-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             <AiFillLike className="text-xl group-hover:animate-bounce" />
-          </button>
+          </motion.button>
         ) : (
-          <button
+          <motion.button whileHover={{ scale: 1.1 }}
+  whileTap={{ scale: 0.95 }}
             onClick={() => sentMessageHandler()}
             className="group p-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             <FaRegPaperPlane className="text-xl group-hover:translate-x-1 transition-transform duration-200" />
-          </button>
+          </motion.button>
         )}
       </div>
     </div>
-
-    {/* Custom Scrollbar */}
-    <style jsx>{`
-      .scrollbar-thin::-webkit-scrollbar {
-        width: 6px;
-      }
-      .scrollbar-thin::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      .scrollbar-thin::-webkit-scrollbar-thumb {
-        background-color: rgba(156, 163, 175, 0.5);
-        border-radius: 3px;
-      }
-      .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-        background-color: rgba(156, 163, 175, 0.7);
-      }
-    `}</style>
   </div>
 );
 

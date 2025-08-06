@@ -41,7 +41,6 @@ const BlogCard = ({ blog }) => {
 
 return (
   <div className="w-full max-w-4xl font-secondary mx-auto mb-8 bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-white/20 overflow-hidden group">
-    <Toaster position="top-right" reverseOrder={false} duration={2000} />
 
     {/* Header Section */}
     <div className="p-6 font-primary pb-4">
@@ -135,9 +134,7 @@ return (
       {expandComments ? (
         <div className="mt-4 space-y-4">
           {commentList.map((comment) => (
-            <div key={comment.id} className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-100/50 hover:shadow-md transition-shadow duration-300">
               <CommentList comment={comment} />
-            </div>
           ))}
           <button 
             onClick={() => setExpandComments(false)} 
@@ -152,17 +149,13 @@ return (
       ) : commentList.length <= 1 ? (
         <div className="mt-4 space-y-4">
           {commentList.map((comment) => (
-            <div key={comment.id} className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-100/50 hover:shadow-md transition-shadow duration-300">
               <CommentList comment={comment} />
-            </div>
           ))}
         </div>
       ) : (
         <div className="mt-4 space-y-4">
           {commentList.slice(0, 1).map((comment) => (
-            <div key={comment.id} className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-100/50 hover:shadow-md transition-shadow duration-300">
               <CommentList comment={comment} />
-            </div>
           ))}
           <button 
             onClick={() => setExpandComments(true)} 

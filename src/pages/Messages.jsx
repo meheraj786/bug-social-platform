@@ -59,7 +59,7 @@ console.log("friendList", friendList);
   }, []);
 
 return (
-  <div className="min-h-screen pt-[50px] bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-6">
+  <div className="h-screen pt-[50px] bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-6">
     <Container>
       {/* Flex Container */}
       <div className="flex gap-6">
@@ -101,7 +101,7 @@ return (
         </div>
 
         {/* Conversation Section */}
-        <div className="w-[70%] bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 overflow-hidden flex flex-col">
+        <div className="w-[70%] h-[85vh] bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 overflow-hidden flex flex-col">
           <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
