@@ -9,6 +9,7 @@ import {
 } from 'react-icons/ai';
 import Container from '../layouts/Container';
 import moment from 'moment';
+import { motion } from 'motion/react';
 
 const Notification = () => {
   const [notifications, setNotifications] = useState([]);
@@ -130,7 +131,10 @@ return (
           ) : (
             // Notifications
             notifications.map((notif, index) => (
-              <div
+              <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+  animate={{ opacity: 1, scale: 1 }}   
+  transition={{ duration: 0.4, ease: "easeOut" }}
                 key={notif.id}
                 className={`group relative bg-white/70 backdrop-blur-xl rounded-2xl border shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden
                   ${notif.type === 'positive' 
@@ -210,7 +214,7 @@ return (
 
                 {/* Hover overlay */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
+              </motion.div>
             ))
           )}
         </div>

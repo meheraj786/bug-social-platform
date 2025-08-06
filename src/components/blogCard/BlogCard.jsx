@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import Flex from "../../layouts/Flex";
 import moment from "moment";
+import {motion} from 'motion/react'
 
 const BlogCard = ({ blog }) => {
   const user = useSelector((state) => state.user.user);
@@ -40,7 +41,10 @@ const BlogCard = ({ blog }) => {
   }, [blog.id, db]);
 
 return (
-  <div className="w-full max-w-4xl font-secondary mx-auto mb-8 bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-white/20 overflow-hidden group">
+  <motion.div initial={{ opacity: 0, scale: 0.9 }}
+  whileInView={{ opacity: 1, scale: 1 }}
+  viewport={{ once: true, amount: 0.2 }} 
+  transition={{ duration: 0.4, ease: "easeOut" }} className="w-full max-w-4xl font-secondary mx-auto mb-8 bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-white/20 overflow-hidden group">
 
     {/* Header Section */}
     <div className="p-6 font-primary pb-4">
@@ -169,7 +173,7 @@ return (
         </div>
       )}
     </div>
-  </div>
+  </motion.div>
 );
 };
 

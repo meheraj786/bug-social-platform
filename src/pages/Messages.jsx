@@ -5,21 +5,9 @@ import Container from '../layouts/Container';
 import { roomUser } from '../features/chatRoom/chatRoom';
 import Conversation from '../components/conversation/Conversation';
 import { Link } from 'react-router';
+import { motion } from 'motion/react';
 
-const mockMessages = [
-  {
-    id: 1,
-    sender: 'friend',
-    text: 'Hey! What’s up?',
-    time: '2:30 PM',
-  },
-  {
-    id: 2,
-    sender: 'me',
-    text: 'All good! You?',
-    time: '2:32 PM',
-  },
-];
+
 
 const Messages = () => {
   const [friendList, setFriendList] = useState([]);
@@ -28,7 +16,6 @@ const Messages = () => {
   const db = getDatabase();
   const dispatch= useDispatch()
   const currentUser = useSelector((state) => state.user.user);
-console.log("friendList", friendList);
 
 
   useEffect(() => {
@@ -117,9 +104,11 @@ return (
           </div>
 
           {/* Conversation Messages */}
-          <div className="flex-1 p-6 overflow-y-auto">
+          <motion.div initial={{ opacity: 0, scale: 0.9 }}
+  animate={{ opacity: 1, scale: 1 }}   
+  transition={{ duration: 0.4, ease: "easeOut" }} className="flex-1 p-6 overflow-y-auto">
             <Conversation />
-          </div>
+          </motion.div>
         </div>
       </div>
     </Container>

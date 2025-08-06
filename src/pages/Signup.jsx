@@ -23,6 +23,8 @@ import {
 import { getDatabase, ref, set } from "firebase/database";
 import { useNavigate } from "react-router";
 
+  import { motion } from "motion/react";
+
 const Signup = () => {
   const [signupInfo, setSignupInfo] = useState({
     name: "",
@@ -126,6 +128,7 @@ const Signup = () => {
         });
         setTimeout(() => {
           setIsLoading(false);
+          navigate("/login")
           toast.success("Signup Successful!");
         }, 3000);
         setSignupInfo({
@@ -147,7 +150,9 @@ const Signup = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br font-secondary from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <motion.div initial={{ opacity: 0, scale: 0.9 }}
+  animate={{ opacity: 1, scale: 1 }}   
+  transition={{ duration: 0.4, ease: "easeOut" }} className="min-h-screen bg-gradient-to-br font-secondary from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <Toaster position="top-right"/>
       <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
         {/* Header */}
@@ -465,7 +470,7 @@ const Signup = () => {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

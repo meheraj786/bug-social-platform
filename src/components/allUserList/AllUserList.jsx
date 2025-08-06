@@ -6,6 +6,7 @@ import time from "../../layouts/time";
 import { IoPersonAddSharp } from "react-icons/io5";
 import { TbUserCancel } from "react-icons/tb";
 import { FaUserFriends } from "react-icons/fa";
+import { motion } from "motion/react";
 
 const AllUserList = () => {
   const [userList, setUserList] = useState([]);
@@ -96,7 +97,9 @@ const AllUserList = () => {
   }
 
   return (
-    <div className="p-4 absolute top-5 left-5 h-full overflow-y-auto bg-white rounded-md shadow-md w-[380px] mx-auto mt-8">
+    <motion.div initial={{ opacity: 0, scale: 0.9 }}
+  animate={{ opacity: 1, scale: 1 }}   
+  transition={{ duration: 0.4, ease: "easeOut" }} className="p-4 absolute top-5 left-5 h-full overflow-y-auto bg-white rounded-md shadow-md w-[380px] mx-auto mt-8">
       <h2 className="text-xl font-semibold text-black mb-4 border-b pb-2">All Users</h2>
       <ul className="space-y-4">
         {userList.map((user) => (
@@ -133,7 +136,7 @@ const AllUserList = () => {
           </li>
         ))}
       </ul>
-    </div>
+    </motion.div>
   );
 };
 

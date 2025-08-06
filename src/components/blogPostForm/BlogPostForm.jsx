@@ -7,6 +7,7 @@ import Button from "../../layouts/Button";
 import time from "../../layouts/time";
 import { Link } from "react-router";
 import moment from "moment";
+import { motion } from "motion/react";
 
 const BlogPostForm = () => {
   
@@ -94,7 +95,9 @@ const BlogPostForm = () => {
   };
 
 return (
-  <div className="bg-white/90 font-secondary backdrop-blur-xl p-6 mt-10 rounded-3xl shadow-xl hover:shadow-2xl border border-white/20 hover:border-purple-300 transition-all duration-500 w-full max-w-3xl mx-auto group">
+  <motion.div initial={{ opacity: 0, scale: 0.9 }}
+  animate={{ opacity: 1, scale: 1 }}   
+  transition={{ duration: 0.4, ease: "easeOut" }} className="bg-white/90 font-secondary backdrop-blur-xl p-6 mt-10 rounded-3xl shadow-xl hover:shadow-2xl border border-white/20 hover:border-purple-300 transition-all duration-500 w-full max-w-3xl mx-auto group">
     {/* Header Section */}
     <div className="flex items-center gap-4 mb-5">
       {user && (
@@ -236,7 +239,7 @@ return (
         </Link>
       )}
     </div>
-  </div>
+  </motion.div>
 );
 };
 

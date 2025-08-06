@@ -6,23 +6,8 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import moment from "moment";
 
-const followers = [
-  {
-    name: "Product Hunt",
-    username: "@ProductHunt",
-    avatar: "https://i.pravatar.cc/150?img=12",
-  },
-  {
-    name: "Mark Zuckerberg",
-    username: "@MZuckerberg_",
-    avatar: "https://i.pravatar.cc/150?img=5",
-  },
-  {
-    name: "Ryan Hoover",
-    username: "@rrhoover",
-    avatar: "https://i.pravatar.cc/150?img=32",
-  },
-];
+
+  import { motion } from "motion/react";
 
 export default function Friends() {
 
@@ -84,7 +69,9 @@ export default function Friends() {
     return <div className="w-full lg:w-[400px] h-[35%] mt-10 bg-gray-100 fixed bottom-0 left-0 shadow-md rounded-xl p-4 space-y-4">Loading friends...</div>;
   }
 return (
-  <div className="w-full lg:w-[400px] font-secondary h-[35%] mt-10 bg-white/90 backdrop-blur-xl fixed bottom-0 left-0 shadow-2xl rounded-t-3xl border-t border-gray-200/50 p-6 space-y-5 overflow-y-auto">
+  <motion.div initial={{ opacity: 0, scale: 0.9 }}
+  animate={{ opacity: 1, scale: 1 }}   
+  transition={{ duration: 0.4, ease: "easeOut" }} className="w-full lg:w-[400px] font-secondary h-[35%] mt-10 bg-white/90 backdrop-blur-xl fixed bottom-0 left-0 shadow-2xl rounded-t-3xl border-t border-gray-200/50 p-6 space-y-5 overflow-y-auto">
     {/* Header */}
     <div className="flex items-center justify-between">
       <h2 className="text-transparent bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text font-bold text-xl">
@@ -159,6 +146,6 @@ return (
         <p className="text-gray-400 text-sm">Start connecting with people!</p>
       </div>
     )}
-  </div>
+  </motion.div>
 );
 }

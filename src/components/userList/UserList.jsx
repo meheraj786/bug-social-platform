@@ -16,23 +16,8 @@ import { IoPersonAddSharp } from "react-icons/io5";
 import { Link } from "react-router";
 import moment from "moment";
 
-const followers = [
-  {
-    name: "Product Hunt",
-    username: "@ProductHunt",
-    avatar: "https://i.pravatar.cc/150?img=12",
-  },
-  {
-    name: "Mark Zuckerberg",
-    username: "@MZuckerberg_",
-    avatar: "https://i.pravatar.cc/150?img=5",
-  },
-  {
-    name: "Ryan Hoover",
-    username: "@rrhoover",
-    avatar: "https://i.pravatar.cc/150?img=32",
-  },
-];
+
+  import { motion } from "motion/react";
 
 export default function UserList() {
   const [userList, setUserList] = useState([]);
@@ -184,7 +169,9 @@ export default function UserList() {
   }
 
 return (
-  <div className="w-full font-secondary lg:w-[400px] h-1/2 fixed mt-[80px] top-0 right-0 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl border border-gray-200/50 p-6 space-y-5 overflow-y-auto">
+  <motion.div initial={{ opacity: 0, scale: 0.9 }}
+  animate={{ opacity: 1, scale: 1 }}   
+  transition={{ duration: 0.4, ease: "easeOut" }} className="w-full font-secondary lg:w-[400px] h-1/2 fixed mt-[80px] top-0 right-0 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl border border-gray-200/50 p-6 space-y-5 overflow-y-auto">
     {/* Header */}
     <div className="flex items-center justify-between">
       <h2 className="text-transparent bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text font-bold text-xl">
@@ -324,15 +311,6 @@ return (
         ))}
     </div>
 
-    {/* Show More Button */}
-    <div className="flex justify-center pt-4">
-      <button className="text-sm text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text hover:from-blue-700 hover:to-purple-700 font-semibold transition-all duration-200 flex items-center gap-2 group">
-        <span>Show more suggestions</span>
-        <svg className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-    </div>
 
     {/* Empty State */}
     {userList.filter(
@@ -350,6 +328,6 @@ return (
         <p className="text-gray-400 text-sm">Check back later for new friends!</p>
       </div>
     )}
-  </div>
+  </motion.div>
 );
 }

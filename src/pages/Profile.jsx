@@ -16,6 +16,9 @@ import toast from "react-hot-toast";
 import time from "../layouts/time";
 import moment from "moment";
 
+  import { motion } from "motion/react";
+import { FaImage } from "react-icons/fa6";
+
 export default function Profile() {
   const db = getDatabase();
   const { id } = useParams();
@@ -33,6 +36,86 @@ export default function Profile() {
   const [friendRequestList, setFriendRequestList] = useState([]);
   const [requestListLoading, setRequestListLoading] = useState(true);
   const [currentUserInfo, setCurrentUserInfo]= useState([])
+    const coudinaryApi = import.meta.env.VITE_CLOUDINARY_API;
+    const [info, setInfo] = useState({
+      description: "",
+      descriptionErr: "",
+      loading: false,
+      imageUrl:""
+    });
+    const [image, setImage] = useState(null);
+    const [preview, setPreview] = useState(null);
+    const [imgLoading, setImgLoading]= useState(false)
+  
+    const handleChangeImage = async (e) => {
+      setImgLoading(true);
+      const file = e.target.files[0];
+      const data = new FormData();
+      data.append("file", file);
+      data.append("upload_preset", "e-com app with firebase");
+      data.append("cloud_name", "dlrycnxnh");
+  
+      const res = await fetch(coudinaryApi, {
+        method: "POST",
+        body: data,
+      });
+      const result = await res.json();
+      setInfo({
+        ...setInfo,
+        imageUrl: result.secure_url,
+      });
+      setPreview(result.secure_url)
+      setImgLoading(false);
+    };
+  
+    const handleSubmit = () => {
+      if (!user) {
+        toast.error("Please wait while we load your profile.");
+        return;
+      }
+  
+      if (info.description.trim() === "") {
+        setInfo((prev) => ({
+          ...prev,
+          descriptionErr: "Enter your Description",
+        }));
+      } else {
+        setInfo((prev) => ({
+          ...prev,
+          loading: true,
+          descriptionErr: "",
+        }));
+  
+  
+        const blogData = {
+          name: user.displayName,
+          description: info.description,
+          time: moment().format(),
+          bloggerId: user.uid,
+          imageUrl: user.photoURL,
+          postImage: info.imageUrl || "", 
+        };
+  
+        set(push(ref(db, "blogs/")), blogData)
+          .then(() => {
+            toast.success("Blog Published Successfully!");
+            setInfo({
+              description: "",
+              descriptionErr: "",
+              loading: false,
+            });
+            setImage(null);
+            setPreview(null);
+          })
+          .catch(() => {
+            toast.error("Something went wrong!");
+            setInfo((prev) => ({
+              ...prev,
+              loading: false,
+            }));
+          });
+      }
+    };
 
   useEffect(() => {
     const userRef = ref(db, "users/");
@@ -121,7 +204,6 @@ export default function Profile() {
     });
     toast.success("Friend Request Sent");
   };
-console.log(requestList);
 
   const cancelRequest = () => {
     const requestRef = ref(db, "friendRequest/");
@@ -160,15 +242,13 @@ return (
         <div className="absolute bottom-20 right-20 w-24 h-24 bg-white rounded-full blur-lg animate-bounce"></div>
         <div className="absolute top-1/2 left-1/2 w-16 h-16 bg-white rounded-full blur-md animate-ping"></div>
       </div>
-      
-      <Container>
-
-      </Container>
     </div>
 
     <Container>
       {/* Profile Info Card */}
-      <div className="relative -mt-8 mb-8">
+      <motion.div initial={{ opacity: 0, scale: 0.9 }}
+  animate={{ opacity: 1, scale: 1 }}   
+  transition={{ duration: 0.4, ease: "easeOut" }} className="relative -mt-8 mb-8">
               <div className="w-40 absolute -top-20 left-5 z-50 h-40 rounded-3xl border-6 border-white shadow-2xl group-hover:scale-105 transition-transform duration-300">
                 <img
                   src={userProfile?.imageUrl}
@@ -257,12 +337,14 @@ return (
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row gap-8 pb-8">
         {/* Sidebar */}
-        <div className="w-full lg:w-1/3 space-y-6">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }}
+  animate={{ opacity: 1, scale: 1 }}   
+  transition={{ duration: 0.4, ease: "easeOut" }} className="w-full lg:w-1/3 space-y-6">
           {/* About Card */}
           <div className="bg-white/80  backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
             <h3 className="text-xl font-primary font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -319,13 +401,15 @@ return (
               See all friends
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Posts Section */}
         <div className="w-full lg:w-2/3 space-y-6">
           {/* Create Post Card - Only for own profile */}
           {currentUser.uid === id && (
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }}
+  animate={{ opacity: 1, scale: 1 }}   
+  transition={{ duration: 0.4, ease: "easeOut" }} className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
               <div className="flex items-start gap-4">
                 <img
                   src={currentUser.photoURL}
@@ -335,39 +419,64 @@ return (
                 <div className="flex-1">
                   <textarea
                     rows={3}
+                    value={info.description}
+          onChange={(e) =>
+            setInfo((prev) => ({ ...prev, description: e.target.value }))
+          }
                     placeholder="What's on your mind?"
                     className="w-full p-4 rounded-2xl border-2 border-gray-200 focus:border-blue-400 focus:outline-none resize-none font-medium placeholder-gray-500 bg-gray-50/50"
                   />
                   <div className="mt-4 flex justify-between items-center">
                     <div className="flex gap-6">
-                      <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        Photo
-                      </button>
-                      <button className="flex items-center gap-2 text-green-600 hover:text-green-700 font-medium transition-colors duration-200">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h4a1 1 0 110 2h-1v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6H3a1 1 0 110-2h4zM9 6v10a1 1 0 102 0V6a1 1 0 10-2 0zm4 0v10a1 1 0 102 0V6a1 1 0 10-2 0z" />
-                        </svg>
-                        Video
-                      </button>
+                          {/* Media Section */}
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-4">
+                              <label className="flex items-center gap-2 cursor-pointer text-blue-600 hover:text-purple-600 transition-colors duration-200 px-4 py-2 rounded-full hover:bg-blue-50 group/media">
+                                <FaImage className="text-lg group-hover/media:scale-110 transition-transform duration-200" />
+                                <span className="text-sm font-semibold">Add Photo</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={handleChangeImage}
+                                  disabled={!user}
+                                />
+                              </label>
+                            </div>
+                          </div>
+                      
+                          {/* Image Preview */}
+                          {preview && (
+                            <div className="mb-4 relative group/preview">
+                              <img
+                                src={preview}
+                                alt="Preview"
+                                className="rounded-2xl w-full max-h-64 object-cover shadow-lg"
+                              />
+                              <button className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg opacity-0 group-hover/preview:opacity-100 transition-opacity duration-200">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                              <div className="absolute bottom-3 left-3 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium">
+                                Click to remove
+                              </div>
+                            </div>
+                          )}
                     </div>
-                    <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+                    <button onClick={handleSubmit} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
                       Post
                     </button>
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Posts */}
           <div className="space-y-6">
             {blogList.map((blog) => (
-              <div key={blog.id} className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 overflow-hidden hover:shadow-2xl transition-shadow duration-300">
                 <BlogCard blog={blog} />
-              </div>
             ))}
           </div>
 

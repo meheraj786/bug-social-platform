@@ -17,6 +17,8 @@ import { useDispatch } from "react-redux";
 import { setUser } from "../features/user/userSlice";
 import { useNavigate } from "react-router";
 
+  import { motion } from "motion/react";
+
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -105,7 +107,9 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen font-secondary bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <motion.div initial={{ opacity: 0, scale: 0.9 }}
+  animate={{ opacity: 1, scale: 1 }}   
+  transition={{ duration: 0.4, ease: "easeOut" }} className="min-h-screen font-secondary bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <Toaster position="top-right" />
       <div className="max-w-md w-full">
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
@@ -282,7 +286,7 @@ const Login = () => {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
