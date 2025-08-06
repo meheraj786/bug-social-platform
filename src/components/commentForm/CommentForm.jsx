@@ -93,7 +93,14 @@ console.log("react",reactors);
   const cancelReactHandler = () => {
     react.forEach((rec) => {
       if (rec.reactorId == user?.uid && rec.blogId == post.id) {
-        remove(ref(db, "react/" + rec.id));
+        remove(ref(db, "react/" + rec.id)).then(()=>{
+                set(push(ref(db, "notification/")), {
+                notifyReciver: post.bloggerId,
+                type: "react",
+                time: moment().format(),
+                content: `${user?.displayName} remove react from your post "${post.description.slice(0,30)}..."`,
+              });
+        })
       }
     });
     toast.success("cancel React");
@@ -110,6 +117,12 @@ console.log("react",reactors);
       imageUrl: user?.photoURL,
     };
     set(push(ref(db, "react/")), reactData).then(() => {
+      set(push(ref(db, "notification/")), {
+                notifyReciver: post.bloggerId,
+                type: "react",
+                time: moment().format(),
+                content: `${user?.displayName} react on your post "${post.description.slice(0,30)}..."`,
+              });
       toast.success("React");
     });
   };
@@ -146,7 +159,6 @@ console.log("react",reactors);
 
 return (
   <div className="bg-gradient-to-r font-secondary from-gray-50/80 to-white/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-200/50">
-    <Toaster position="top-right" reverseOrder={false} />
     {
       reactionPop && (
 <FullScreenOverlay reactors={reactors} setReactionPop={setReactionPop} />

@@ -10,6 +10,7 @@ import {
 import Container from '../layouts/Container';
 import moment from 'moment';
 import { motion } from 'motion/react';
+import NotificationSkeleton from '../components/notificationSkeleton/NotificationSkeleton';
 
 const Notification = () => {
   const [notifications, setNotifications] = useState([]);
@@ -68,7 +69,7 @@ const Notification = () => {
   };
 
   if (loading) {
-    return <div className="text-center text-gray-500 mt-5">Loading notifications...</div>;
+    return <NotificationSkeleton/>;
   }
 
 return (
