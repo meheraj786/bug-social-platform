@@ -21,7 +21,7 @@ import moment from "moment";
 import { AnimatePresence } from "motion/react";
 import { motion } from "motion/react";
 
-const Conversation = ({ msgNotification, isFriend }) => {
+const Conversation = ({ msgNotif }) => {
   const db = getDatabase();
   const dispatch = useDispatch();
   const data = useSelector((state) => state.user.user);
@@ -66,27 +66,16 @@ const Conversation = ({ msgNotification, isFriend }) => {
     }
   };
 
-  // const unFriendHandler = () => {
-  //   remove(ref(db, "friendlist/" + roomuser.id));
-  //   toast.success("Unfriended successfully");
-  //   set(push(ref(db, "notification/")), {
-  //     notifyReciver:
-  //       roomuser.senderid == data.uid ? roomuser.reciverid : roomuser.senderid,
-  //     type: "negative",
-  //     time: time(),
-  //     content: `${data.displayName} unfriend you`,
-  //   });
-  // };
-
-
   useEffect(() => {
     scrollToBottom();
   }, [messageList]);
 
-  const handleMsgNotificationDelete = () => {
-    if (!roomuser || !msgNotification?.length) return;
+  
 
-    msgNotification.forEach((item) => {
+  const handleMsgNotificationDelete = () => {
+    if (!roomuser || !msgNotif?.length) return;
+
+    msgNotif.forEach((item) => {
       if (
         (item.senderid === roomuser.senderid &&
           item.reciverid === roomuser.reciverid) ||
@@ -150,6 +139,10 @@ const Conversation = ({ msgNotification, isFriend }) => {
         .then(() => {
           setMessage("");
           setReplyMsg("");
+          set(push(ref(db, "messagenotification/")), {
+      senderid: data?.uid,
+      reciverid: reciverid,
+    });
         })
         .catch((err) => {
           console.error(err);
@@ -168,6 +161,10 @@ const Conversation = ({ msgNotification, isFriend }) => {
         .then(() => {
           setMessage("");
           setReplyMsg("");
+          set(push(ref(db, "messagenotification/")), {
+      senderid: data?.uid,
+      reciverid: reciverid,
+    });
         })
         .catch((err) => {
           console.error(err);
@@ -205,7 +202,7 @@ const Conversation = ({ msgNotification, isFriend }) => {
     );
   }
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-white to-gray-50/50 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/20 max-w-3xl mx-auto relative overflow-hidden">
+    <div onClick={handleMsgNotificationDelete} className="h-full flex flex-col bg-gradient-to-br from-white to-gray-50/50 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/20 max-w-3xl mx-auto relative overflow-hidden">
       {/* User Info - Fixed Height */}
       <motion.div
         initial={{ scale: 0 }}

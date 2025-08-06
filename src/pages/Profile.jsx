@@ -22,20 +22,15 @@ import { FaImage } from "react-icons/fa6";
 export default function Profile() {
   const db = getDatabase();
   const { id } = useParams();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
   const currentUser = useSelector((state) => state.user.user);
   const [userProfile, setUserProfile] = useState(null);
   const [blogList, setBlogList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [userList, setUserList] = useState([]);
   const [requestList, setRequestList] = useState([]);
-  const [userLoading, setUserLoading] = useState(true);
-  const [friendList, setFriendList] = useState([]);
-  const [friendRequestList, setFriendRequestList] = useState([]);
-  const [requestListLoading, setRequestListLoading] = useState(true);
   const [currentUserInfo, setCurrentUserInfo]= useState([])
+  const [friendList, setFriendList] = useState([]);
+  const [friends, setFriends] = useState([]);
     const coudinaryApi = import.meta.env.VITE_CLOUDINARY_API;
     const [info, setInfo] = useState({
       description: "",
@@ -46,6 +41,31 @@ export default function Profile() {
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState(null);
     const [imgLoading, setImgLoading]= useState(false)
+      useEffect(() => {
+    const requestRef = ref(db, "friendlist/");
+    onValue(requestRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        const request = item.val();
+        if (request.senderid === currentUser.uid || request.reciverid === currentUser.uid) {
+          const isSender = request.senderid === currentUser.uid;
+          const friendId = isSender ? request.reciverid : request.senderid;
+          const friendName = isSender ? request.recivername : request.sendername;
+          const friendEmail = isSender ? request.reciveremail : request.senderemail;
+          const friendImage = isSender ? request.reciverimg : request.senderimg;
+
+          arr.push({
+            id: friendId,
+            name: friendName,
+            email: friendEmail,
+            image: friendImage,
+            listId: item.key,
+          });
+        }
+      });
+      setFriends(arr);
+    });
+  }, []);
   
     const handleChangeImage = async (e) => {
       setImgLoading(true);
@@ -230,6 +250,7 @@ export default function Profile() {
       });
   };
 
+  console.log(friendList, "friendList");
   
 
 return (
@@ -271,11 +292,11 @@ return (
               {/* Stats */}
               <div className="flex gap-8 mb-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-800">247</div>
+                  <div className="text-2xl font-bold text-gray-800">{blogList.length}</div>
                   <div className="text-sm text-gray-500 font-medium">Posts</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-800">1.2K</div>
+                  <div className="text-2xl font-bold text-gray-800">{friendList.length}</div>
                   <div className="text-sm text-gray-500 font-medium">Friends</div>
                 </div>
                 <div className="text-center">
@@ -384,22 +405,24 @@ return (
                 </svg>
                 Friends
               </h3>
-              <span className="text-sm text-gray-500 font-medium">1.2K friends</span>
+              <span className="text-sm text-gray-500 font-medium">{friendList.length} friends</span>
             </div>
             <div className="grid grid-cols-3 gap-3">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
+              {friends.map((i) => (
+                <Link to={`/profile/${i.id}`}>
                 <div key={i} className="group cursor-pointer">
                   <img
-                    src={`https://i.pravatar.cc/100?img=${i}`}
+                    src={i.image}
                     alt="friend"
                     className="w-full aspect-square rounded-2xl object-cover group-hover:scale-105 transition-transform duration-300 shadow-md"
                   />
                 </div>
+                </Link>
               ))}
             </div>
-            <button className="w-full mt-4 text-blue-600 hover:text-blue-700 font-semibold text-sm py-2 hover:bg-blue-50 rounded-xl transition-colors duration-200">
+            {/* <button className="w-full mt-4 text-blue-600 hover:text-blue-700 font-semibold text-sm py-2 hover:bg-blue-50 rounded-xl transition-colors duration-200">
               See all friends
-            </button>
+            </button> */}
           </div>
         </motion.div>
 

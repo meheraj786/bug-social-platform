@@ -5,9 +5,7 @@ import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import moment from "moment";
-
-
-  import { motion } from "motion/react";
+import { motion } from "motion/react";
 
 export default function Friends() {
 
@@ -77,10 +75,10 @@ return (
       <h2 className="text-transparent bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text font-bold text-xl">
         Your Friends
       </h2>
-      <div className="flex items-center gap-2 text-sm text-gray-500">
-        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-        <span className="font-medium">{friendList.length} online</span>
-      </div>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              {friendList.length==0 ? "No Friends": friendList.length==1 ? `${friendList.length} Friend`: `${friendList.length} Friends`} 
+            </div>
     </div>
 
     {/* Friends List */}

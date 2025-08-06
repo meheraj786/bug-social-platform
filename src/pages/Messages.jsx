@@ -1,4 +1,4 @@
-import { getDatabase, onValue, ref } from 'firebase/database';
+import { getDatabase, onValue, ref, remove } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Container from '../layouts/Container';
@@ -16,6 +16,50 @@ const Messages = () => {
   const db = getDatabase();
   const dispatch= useDispatch()
   const currentUser = useSelector((state) => state.user.user);
+  const [msgNotification, setMsgNotification]= useState([])
+  const [msgNotif, setMsgNotif]= useState([])
+    useEffect(() => {
+    const notificationRef = ref(db, "messagenotification/");
+    onValue(notificationRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        const notification = item.val();
+
+        if (notification.reciverid == currentUser?.uid) {
+          arr.push(notification.senderid);
+        }
+      });
+      setMsgNotification(arr);
+    });
+  }, [currentUser?.uid, db]);
+    useEffect(() => {
+    const notificationRef = ref(db, "messagenotification/");
+    onValue(notificationRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        const notification = item.val();
+
+        if (notification.reciverid == currentUser?.uid) {
+          arr.push({...notification, id:item.key});
+        }
+      });
+      setMsgNotif(arr);
+    });
+  }, [currentUser?.uid, db]);
+    
+  const handleMsgNotificationDelete = (friend) => {
+    msgNotif.forEach((item) => {
+      if (
+        (item.senderid === friend.id &&
+          item.reciverid === currentUser.uid) ||
+        (item.senderid === currentUser.uid &&
+          item.reciverid === friend.id)
+      ) {
+        const notificationRef = ref(db, "messagenotification/" + item.id);
+        remove(notificationRef);
+      }
+    });
+  };
 
 
   useEffect(() => {
@@ -58,8 +102,8 @@ return (
               Active Friends
             </h2>
             <div className="flex items-center gap-2 text-sm text-gray-500">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              {friendList.length} online
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              {friendList.length==0 ? "No Friends": friendList.length==1 ? `${friendList.length} Friend`: `${friendList.length} Friends`} 
             </div>
           </div>
 
@@ -68,8 +112,14 @@ return (
               <Link to={`/messages/chat/${friend.id}`}>
               <div
                 key={friend.id}
-                className="flex items-center gap-4 p-3 bg-white/80 rounded-xl border border-white/60 shadow hover:shadow-lg cursor-pointer transition-all hover:scale-[1.02]"
-              >
+                onClick={()=>handleMsgNotificationDelete(friend)}
+                className="flex relative items-center gap-4 p-3 bg-white/80 rounded-xl border border-white/60 shadow hover:shadow-lg cursor-pointer transition-all hover:scale-[1.02]"
+                >
+                {
+                  msgNotification.includes(friend.id) && (
+                    <span className='w-3 h-3 absolute top-2 right-2 rounded-full  bg-red-500 animate-pulse'></span>
+                  )
+                }
                 <div className="relative">
                   <img
                     src={friend.image}
@@ -107,7 +157,7 @@ return (
           <motion.div initial={{ opacity: 0, scale: 0.9 }}
   animate={{ opacity: 1, scale: 1 }}   
   transition={{ duration: 0.4, ease: "easeOut" }} className="flex-1 p-6 overflow-y-auto">
-            <Conversation />
+            <Conversation  msgNotif={msgNotif} />
           </motion.div>
         </div>
       </div>

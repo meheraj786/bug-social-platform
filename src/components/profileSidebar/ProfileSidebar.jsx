@@ -16,6 +16,33 @@ const ProfileSidebar = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
   const [userProfile, setUserProfile] = useState(null);
+  
+    const [friendList, setFriendList] = useState([]);
+    useEffect(() => {
+      const requestRef = ref(db, "friendlist/");
+      onValue(requestRef, (snapshot) => {
+        let arr = [];
+        snapshot.forEach((item) => {
+          const request = item.val();
+          if (request.senderid === user.uid || request.reciverid === user.uid) {
+            const isSender = request.senderid === user.uid;
+            const friendId = isSender ? request.reciverid : request.senderid;
+            const friendName = isSender ? request.recivername : request.sendername;
+            const friendEmail = isSender ? request.reciveremail : request.senderemail;
+            const friendImage = isSender ? request.reciverimg : request.senderimg;
+  
+            arr.push({
+              id: friendId,
+              name: friendName,
+              email: friendEmail,
+              image: friendImage,
+              listId: item.key,
+            });
+          }
+        });
+        setFriendList(arr);
+      });
+    }, []);
 
   useEffect(() => {
     const userRef = ref(db, "users/");
@@ -73,11 +100,11 @@ return (
       {/* Stats Section */}
       <div className="flex gap-3 mt-6">
         <div className="flex-1 text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 rounded-2xl border border-purple-200/50 transition-all duration-300 hover:scale-105 cursor-pointer">
-          <div className="text-2xl font-bold text-purple-700">10</div>
+          <div className="text-2xl font-bold text-purple-700">{friendList.length}</div>
           <div className="text-sm font-medium text-purple-600 capitalize">Friends</div>
         </div>
         <div className="flex-1 text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-2xl border border-blue-200/50 transition-all duration-300 hover:scale-105 cursor-pointer">
-          <div className="text-2xl font-bold text-blue-700">20</div>
+          <div className="text-2xl font-bold text-blue-700">0</div>
           <div className="text-sm font-medium text-blue-600 capitalize">Followers</div>
         </div>
       </div>
