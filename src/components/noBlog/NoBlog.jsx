@@ -8,9 +8,6 @@ const NoBlog = () => {
       <h2 className="font-primary text-[32px] text-black mt-4 mb-2">
         No blogs yet
       </h2>
-      <p className="font-secondary text-gray-400">
-        Be the first to share your thoughts!
-      </p>
     </div>
   );
 };

@@ -18,7 +18,7 @@ import moment from "moment";
 
 import { motion } from "motion/react";
 import { FaImage } from "react-icons/fa6";
-import { Plus, UserRoundPlus } from "lucide-react";
+import { Plus, UserRoundPlus, UserRoundX } from "lucide-react";
 
 export default function Profile() {
   const db = getDatabase();
@@ -496,7 +496,7 @@ export default function Profile() {
                   onClick={() => unFollowHandler(userProfile)}
                   className="bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-blue-300 px-6 py-3 rounded-2xl text-gray-700 hover:text-blue-600 font-semibold shadow-lg transition-all duration-300 flex items-center gap-2"
                 >
-                  <UserRoundPlus />
+                  <UserRoundX />
                   Unfollow
                 </button>
               )}
