@@ -22,23 +22,20 @@ import moment from "moment";
 import { AnimatePresence } from "motion/react";
 import { motion } from "motion/react";
 import EmojiPicker from "emoji-picker-react";
-
+import ImageUploadPop from "../../layouts/ImageUploadPop";
 
 const Conversation = ({ msgNotif }) => {
   const db = getDatabase();
-  const dispatch = useDispatch();
   const data = useSelector((state) => state.user.user);
   const [message, setMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
-  const [emojiActive, setEmojiActive] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState(false);
-  const [unfriendConfirm, setUnfriendConfirm] = useState(false);
-  const [blockPopup, setBlockPopup] = useState(false);
   const [replyMsg, setReplyMsg] = useState("");
   const [msgLoading, setMsgLoading] = useState(true);
   const [roomuser, setRoomuser] = useState(null);
   const { id } = useParams();
-  const [showEmoji, setShowEmoji]= useState(true)
+  const [msgImg, setMsgImg] = useState("");
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [imgUploadPop, setImgUploadPop] = useState(false);
 
   const messagesEndRef = useRef(null);
   const scrollContainerRef = useRef(null);
@@ -72,8 +69,6 @@ const Conversation = ({ msgNotif }) => {
   useEffect(() => {
     scrollToBottom();
   }, [messageList]);
-
-  
 
   const handleMsgNotificationDelete = () => {
     if (!roomuser || !msgNotif?.length) return;
@@ -143,9 +138,9 @@ const Conversation = ({ msgNotif }) => {
           setMessage("");
           setReplyMsg("");
           set(push(ref(db, "messagenotification/")), {
-      senderid: data?.uid,
-      reciverid: reciverid,
-    });
+            senderid: data?.uid,
+            reciverid: reciverid,
+          });
         })
         .catch((err) => {
           console.error(err);
@@ -158,6 +153,7 @@ const Conversation = ({ msgNotif }) => {
         reciverid: reciverid,
         recivername: recivername,
         message: message,
+        msgImg: msgImg,
         replyMsg: replyMsg,
         time: moment().format(),
       })
@@ -165,16 +161,17 @@ const Conversation = ({ msgNotif }) => {
           setMessage("");
           setReplyMsg("");
           set(push(ref(db, "messagenotification/")), {
-      senderid: data?.uid,
-      reciverid: reciverid,
-    });
+            senderid: data?.uid,
+            reciverid: reciverid,
+          });
         })
         .catch((err) => {
           console.error(err);
           toast.error("Failed to send message.");
         });
     }
-    setShowEmoji(false)
+    setShowEmoji(false);
+    setImgUploadPop(false)
   };
 
   const messageDeleteHandler = (msg) => {
@@ -206,7 +203,19 @@ const Conversation = ({ msgNotif }) => {
     );
   }
   return (
-    <div onClick={handleMsgNotificationDelete} className="h-full flex flex-col bg-gradient-to-br from-white to-gray-50/50 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/20 max-w-3xl mx-auto relative overflow-hidden">
+    <div
+      onClick={handleMsgNotificationDelete}
+      className="h-full flex flex-col bg-gradient-to-br from-white to-gray-50/50 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/20 max-w-3xl mx-auto relative overflow-hidden"
+    >
+      {imgUploadPop && (
+        <ImageUploadPop
+          setImgUploadPop={setImgUploadPop}
+          message={message}
+          setMessage={setMessage}
+          sentMessageHandler={sentMessageHandler}
+          setMsgImg={setMsgImg}
+        />
+      )}
       {/* User Info - Fixed Height */}
       <motion.div
         initial={{ scale: 0 }}
@@ -283,7 +292,21 @@ const Conversation = ({ msgNotif }) => {
                     )}
                   </div>
                 )}
-
+                {msg.msgImg && (
+                  <div
+                    className=
+                    {`flex items-end gap-3 ${
+                      msg.senderid === data.uid
+                        ? "justify-end"
+                        : "justify-start"
+                    }`}>
+                    <img
+                      src={msg.msgImg}
+                      className="w-[220px] h-[180px] rounded-lg object-cover"
+                      alt=""
+                    />
+                  </div>
+                )}
                 <div
                   className={`flex items-end gap-3 ${
                     msg.senderid === data.uid ? "justify-end" : "justify-start"
@@ -300,7 +323,9 @@ const Conversation = ({ msgNotif }) => {
                   )}
 
                   {/* Message Bubble */}
-                  <div
+                  {
+                    msg.message && (
+<div
                     className={`relative max-w-[70%] ${
                       msg.senderid === data.uid ? "order-1" : "order-2"
                     }`}
@@ -336,9 +361,12 @@ const Conversation = ({ msgNotif }) => {
                       </div>
                     </div>
                   </div>
+                    )
+                  }
+                  
 
                   {/* Reply Button */}
-                  {msg.senderid !== data.uid && (
+                  {msg.message && msg.senderid !== data.uid && (
                     <button
                       onClick={() => setReplyMsg(msg.message)}
                       className="opacity-0 group-hover:opacity-100 transition-all duration-300 p-2 hover:bg-blue-100 rounded-full text-blue-500 hover:text-blue-600 transform hover:scale-110"
@@ -387,41 +415,41 @@ const Conversation = ({ msgNotif }) => {
         )}
 
         <div className="flex relative items-center gap-4 p-2 bg-white/60 backdrop-blur-xl rounded-2xl border border-white/30 shadow-lg">
-        {
-          showEmoji && (
+          {showEmoji && (
             <div className="absolute bottom-20 left-0">
-              <EmojiPicker onEmojiClick={(emoji) =>
-  setMessage((prev) => prev + emoji.emoji)
-} height={350} />
-
+              <EmojiPicker
+                onEmojiClick={(emoji) =>
+                  setMessage((prev) => prev + emoji.emoji)
+                }
+                height={350}
+              />
             </div>
-          )
-        }
-        <div className="w-full relative">
-          <motion.input
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && message.trim()) {
-                sentMessageHandler();
-              }
-            }}
-            placeholder="Type your message..."
-            className="flex-1 px-4 w-full py-3 pr-15 bg-transparent text-gray-800 placeholder-gray-500 text-sm focus:outline-none"
-          />
-          <span onClick={()=>setShowEmoji(!showEmoji)} className="absolute top-1/2 rounded-full hover:bg-gray-100 p-1 text-gray-400 -translate-y-1/2 right-8" >
-          <GrEmoji size={20} />
-          </span>
-          <span className="absolute top-1/2 rounded-full hover:bg-gray-100 p-1 text-gray-400 -translate-y-1/2 right-0" >
-          <PiImageDuotone
- size={20} />
-          </span>
-
-
-        </div>
+          )}
+          <div className="w-full relative">
+            <motion.input
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && message.trim()) {
+                  sentMessageHandler();
+                }
+              }}
+              placeholder="Type your message..."
+              className="flex-1 px-4 w-full py-3 pr-15 bg-transparent text-gray-800 placeholder-gray-500 text-sm focus:outline-none"
+            />
+            <span
+              onClick={() => setShowEmoji(!showEmoji)}
+              className="absolute top-1/2 rounded-full hover:bg-gray-100 p-1 text-gray-400 -translate-y-1/2 right-8"
+            >
+              <GrEmoji size={20} />
+            </span>
+            <span onClick={()=>setImgUploadPop(true)} className="absolute top-1/2 rounded-full hover:bg-gray-100 p-1 text-gray-400 -translate-y-1/2 right-0">
+              <PiImageDuotone size={20} />
+            </span>
+          </div>
 
           {message.length === 0 ? (
             <motion.button
