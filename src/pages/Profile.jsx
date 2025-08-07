@@ -19,6 +19,10 @@ import moment from "moment";
 import { motion } from "motion/react";
 import { FaImage } from "react-icons/fa6";
 import { Plus, UserRoundPlus, UserRoundX } from "lucide-react";
+import CustomToast from "../layouts/CustomToast";
+import FriendsModal from "../layouts/FriendsModal";
+import FollowersModal from "../layouts/FollowersModal";
+import FollowingModal from "../layouts/FollowingModal";
 
 export default function Profile() {
   const db = getDatabase();
@@ -34,6 +38,8 @@ export default function Profile() {
   const [friends, setFriends] = useState([]);
   const [followingId, setFollowingId] = useState([]);
   const [followers, setFollowers] = useState([]);
+  const [ownFollwers, setOwnFollowers] = useState([]);
+  const [ownFollowing, setOwnFollowing] = useState([]);
   const coudinaryApi = import.meta.env.VITE_CLOUDINARY_API;
   const [info, setInfo] = useState({
     description: "",
@@ -44,6 +50,9 @@ export default function Profile() {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [imgLoading, setImgLoading] = useState(false);
+  const [friendsPop, setFriendsPop]= useState(false)
+  const [followersPop, setFollowersPop]= useState(false)
+  const [followingPop, setFollowingPop]= useState(false)
   useEffect(() => {
     const requestRef = ref(db, "friendlist/");
     onValue(requestRef, (snapshot) => {
@@ -127,7 +136,9 @@ export default function Profile() {
 
       set(push(ref(db, "blogs/")), blogData)
         .then(() => {
-          toast.success("Blog Published Successfully!");
+              toast.custom((t)=>(
+      <CustomToast t={t} img={info.imageUrl || ""} name={info.description.slice(0,10)} content={`You Successfully Posted`}/>
+    ))
           setInfo({
             description: "",
             descriptionErr: "",
@@ -227,9 +238,12 @@ export default function Profile() {
       reciverid: currentUserInfo.id,
       senderimg: currentUser.photoURL,
       recivername: currentUserInfo.username,
+      reciverimg: currentUserInfo.imageUrl,
       time: moment().format(),
     });
-    toast.success("Friend Request Sent");
+        toast.custom((t)=>(
+      <CustomToast t={t} img={currentUserInfo.imageUrl} name={currentUserInfo.username} content={`You sent a Friend Request to ${currentUserInfo.username}`}/>
+    ))
   };
 
   const cancelRequest = () => {
@@ -247,6 +261,7 @@ export default function Profile() {
               request.senderid === currentUserInfo.id)
           ) {
             toast.success("Friend request canceled");
+            
             return remove(ref(db, "friendRequest/" + key));
           }
         });
@@ -264,7 +279,7 @@ export default function Profile() {
         const follow = data.val();
         if (
           follow.followerid == user?.uid &&
-          follow.followingid == userProfile.id
+          follow.followingid == userProfile?.id
         ) {
           arr.push({ ...follow, id: data.key });
         }
@@ -290,7 +305,21 @@ export default function Profile() {
   }, [db, user, userProfile]);
   console.log(followers, "followers");
   console.log(followingId, "folloid");
-
+  useEffect(() => {
+    const followRef = ref(db, "follow/");
+    onValue(followRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((data) => {
+        const follow = data.val();
+          arr.push({...follow, id:data.key});
+      });
+      setOwnFollowers(arr.filter((follower)=>follower.followingid==userProfile?.id));
+      setOwnFollowing(arr.filter((follower)=>follower.followerid==userProfile?.id));
+    });
+  }, [db, user, userProfile, id]);
+  console.log(ownFollwers, "ownFollwers");
+  console.log(ownFollowing, "ownFollowing");
+  
   const followHandler = (following) => {
     console.log(following);
     set(push(ref(db, "follow/")), {
@@ -302,20 +331,25 @@ export default function Profile() {
       followingimg: following.imageUrl,
       time: moment().format(),
     });
-    toast.success(`Your'e Following ${following.username}`);
+    toast.custom((t)=>(
+      <CustomToast t={t} img={following.imageUrl} name={following.username} content={`You're Following ${following.username}`}/>
+    ))
     set(push(ref(db, "notification/")), {
       notifyReciver: following.id,
       type: "positive",
       time: moment().format(),
       content: `${user?.displayName} starts following you!`,
     });
+    console.log("Image URL:", following.imageUrl);
   };
-
   const unFollowHandler = (followId) => {
     followers.forEach((follow) => {
       if (follow.followerid == user?.uid && follow.followingid == followId.id) {
         remove(ref(db, "follow/" + follow.id));
         toast.success(`Your'e Unfollowing ${follow.followingname}`);
+            toast.custom((t)=>(
+      <CustomToast t={t} img={followId.imageUrl} name={followId.username} content={`You're Following ${followId.username}`}/>
+    ))
       }
       set(push(ref(db, "notification/")), {
         notifyReciver: followId.id,
@@ -328,6 +362,17 @@ export default function Profile() {
 
   return (
     <div className="bg-gradient-to-br font-secondary from-gray-50 via-blue-50/30 to-purple-50/30 min-h-screen ">
+      {
+        friendsPop && (
+          <FriendsModal friends={friends} setFriendsPop={setFriendsPop}/>
+        )
+      }
+      {followersPop &&
+        <FollowersModal followingId={followingId} followers={ownFollwers} setFollowersPop={setFollowersPop}/> 
+      }
+      {followingPop &&
+        <FollowingModal following={ownFollowing} setFollowingPop={setFollowingPop}/> 
+      }
       {/* Cover Section with Glass Effect */}
       <div className="relative w-full h-80 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden">
         {/* Animated Background Elements */}
@@ -377,18 +422,24 @@ export default function Profile() {
                       Posts
                     </div>
                   </div>
-                  <div className="text-center">
+                  <div onClick={()=>setFriendsPop(true)}  className="text-center !hover:text-blue-400 cursor-pointer">
                     <div className="text-2xl font-bold text-gray-800">
                       {friends.length}
                     </div>
-                    <div className="text-sm text-gray-500 font-medium">
+                    <div className="text-sm  text-gray-500 font-medium">
                       Friends
                     </div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-800">0</div>
-                    <div className="text-sm text-gray-500 font-medium">
+                  <div onClick={()=>setFollowersPop(true)} className="text-center   !hover:text-blue-400 cursor-pointer">
+                    <div className="text-2xl font-bold text-gray-800">{ownFollwers.length}</div>
+                    <div className="text-sm  text-gray-500 font-medium">
                       Followers
+                    </div>
+                  </div>
+                  <div onClick={()=>setFollowingPop(true)} className="text-center  !hover:text-blue-400 cursor-pointer">
+                    <div className="text-2xl font-bold text-gray-800">{ownFollowing.length}</div>
+                    <div className="text-sm text-gray-500 font-medium">
+                      Following
                     </div>
                   </div>
                 </div>
@@ -483,7 +534,7 @@ export default function Profile() {
                   </button>
                 )}
               </div>
-              {id !== user.uid && !followingId.includes(userProfile?.id) ? (
+              {id !== user?.uid && !followingId.includes(userProfile?.id) ? (
                 <button
                   onClick={() => followHandler(userProfile)}
                   className="bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-blue-300 px-6 py-3 rounded-2xl text-gray-700 hover:text-blue-600 font-semibold shadow-lg transition-all duration-300 flex items-center gap-2"
@@ -491,7 +542,7 @@ export default function Profile() {
                   <UserRoundPlus />
                   Follow
                 </button>
-              ) : (
+              ) : id !== user?.uid && followingId.includes(userProfile?.id) ? (
                 <button
                   onClick={() => unFollowHandler(userProfile)}
                   className="bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-blue-300 px-6 py-3 rounded-2xl text-gray-700 hover:text-blue-600 font-semibold shadow-lg transition-all duration-300 flex items-center gap-2"
@@ -499,7 +550,7 @@ export default function Profile() {
                   <UserRoundX />
                   Unfollow
                 </button>
-              )}
+              ): null}
             </div>
           </div>
         </motion.div>

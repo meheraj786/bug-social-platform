@@ -103,7 +103,6 @@ console.log("react",reactors);
         })
       }
     });
-    toast.success("cancel React");
   };
 
   const reactHandler = () => {
@@ -123,7 +122,6 @@ console.log("react",reactors);
                 time: moment().format(),
                 content: `${user?.displayName} react on your post "${post.description.slice(0,30)}..."`,
               });
-      toast.success("React");
     });
   };
   const handleSubmit = () => {
@@ -148,7 +146,6 @@ console.log("react",reactors);
 
     set(push(ref(db, "comments/")), commentData)
       .then(() => {
-        toast.success("Comment Published Successfully!");
         setComment("");
         setError("");
       })

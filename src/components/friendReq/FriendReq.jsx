@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { getDatabase, onValue, push, ref, remove, set } from 'firebase/database';
 import { useSelector } from 'react-redux';
 import FriendsList from '../friendsList/FriendsList';
+import CustomToast from '../../layouts/CustomToast';
 
 const FriendReq = () => {
   const [requestList, setRequestList] = useState([]);
@@ -54,7 +55,9 @@ const FriendReq = () => {
       reciverimg: currentUser.photoURL,
       recivername: currentUser.displayName,
     });
-    toast.success("Friend Request Accepted");
+            toast.custom((t)=>(
+      <CustomToast t={t} img={user.senderimg} name={user.sendername} content={`You accept Friend Request from ${user.sendername}`}/>
+    ))
     const dontShow = true;
     cancelRequest(user, dontShow);
     set(push(ref(db, "notification/")), {

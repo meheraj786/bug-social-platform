@@ -7,6 +7,7 @@ import { IoPersonAddSharp } from "react-icons/io5";
 import { TbUserCancel } from "react-icons/tb";
 import { FaUserFriends } from "react-icons/fa";
 import { motion } from "motion/react";
+import CustomToast from "../../layouts/CustomToast";
 
 const AllUserList = () => {
   const [userList, setUserList] = useState([]);
@@ -65,7 +66,14 @@ const AllUserList = () => {
       recivername: item.username,
       time: time(),
     });
-    toast.success("Friend Request Sent");
+        toast.custom((t) => (
+      <CustomToast
+        t={t}
+        img={item.imageUrl}
+        name={item.username}
+        content={`You sent Friend Request to ${item.username}`}
+      />
+    ));
   };
 
     const cancelRequest = (friend) => {

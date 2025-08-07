@@ -5,7 +5,6 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlineDateRange } from "react-icons/md";
 import Flex from "../../layouts/Flex";
 import { getDatabase, ref, remove } from "firebase/database";
-import toast, { Toaster } from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import moment from "moment";
@@ -15,14 +14,11 @@ const CommentList = ({ comment }) => {
 
   const deleteHandler = (id) => {
     const db = getDatabase();
-    remove(ref(db, "comments/" + id)).then(() => {
-      toast.success("Comment Successfully Deleted");
-    });
+    remove(ref(db, "comments/" + id))
   };
 
 return (
   <div className="bg-white/90 font-secondary backdrop-blur-sm rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 mb-4 p-5 border border-gray-100/50 group">
-    <Toaster position="top-right" reverseOrder={false} duration={2000} />
     
     {/* Header Section */}
     <div className="flex justify-between items-start mb-4">
