@@ -13,19 +13,21 @@ import time from "../../layouts/time";
 import { roomUser } from "../../features/chatRoom/chatRoom";
 import { AiFillLike, AiTwotoneDelete } from "react-icons/ai";
 import { FaRegPaperPlane, FaReplyAll } from "react-icons/fa";
-import Flex from "../../layouts/Flex";
+import { GrEmoji } from "react-icons/gr";
 import { RxCross2 } from "react-icons/rx";
+import { PiImageDuotone } from "react-icons/pi";
 import { MdOutlineReply } from "react-icons/md";
 import { useParams } from "react-router";
 import moment from "moment";
 import { AnimatePresence } from "motion/react";
 import { motion } from "motion/react";
+import EmojiPicker from "emoji-picker-react";
+
 
 const Conversation = ({ msgNotif }) => {
   const db = getDatabase();
   const dispatch = useDispatch();
   const data = useSelector((state) => state.user.user);
-  // const roomuser = useSelector((state) => state.roomUser.value);
   const [message, setMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
   const [emojiActive, setEmojiActive] = useState(false);
@@ -36,6 +38,7 @@ const Conversation = ({ msgNotif }) => {
   const [msgLoading, setMsgLoading] = useState(true);
   const [roomuser, setRoomuser] = useState(null);
   const { id } = useParams();
+  const [showEmoji, setShowEmoji]= useState(true)
 
   const messagesEndRef = useRef(null);
   const scrollContainerRef = useRef(null);
@@ -171,6 +174,7 @@ const Conversation = ({ msgNotif }) => {
           toast.error("Failed to send message.");
         });
     }
+    setShowEmoji(false)
   };
 
   const messageDeleteHandler = (msg) => {
@@ -382,7 +386,18 @@ const Conversation = ({ msgNotif }) => {
           </div>
         )}
 
-        <div className="flex items-center gap-4 p-2 bg-white/60 backdrop-blur-xl rounded-2xl border border-white/30 shadow-lg">
+        <div className="flex relative items-center gap-4 p-2 bg-white/60 backdrop-blur-xl rounded-2xl border border-white/30 shadow-lg">
+        {
+          showEmoji && (
+            <div className="absolute bottom-20 left-0">
+              <EmojiPicker onEmojiClick={(emoji) =>
+  setMessage((prev) => prev + emoji.emoji)
+} height={350} />
+
+            </div>
+          )
+        }
+        <div className="w-full relative">
           <motion.input
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -395,8 +410,18 @@ const Conversation = ({ msgNotif }) => {
               }
             }}
             placeholder="Type your message..."
-            className="flex-1 px-4 py-3 bg-transparent text-gray-800 placeholder-gray-500 text-sm focus:outline-none"
+            className="flex-1 px-4 w-full py-3 pr-15 bg-transparent text-gray-800 placeholder-gray-500 text-sm focus:outline-none"
           />
+          <span onClick={()=>setShowEmoji(!showEmoji)} className="absolute top-1/2 rounded-full hover:bg-gray-100 p-1 text-gray-400 -translate-y-1/2 right-8" >
+          <GrEmoji size={20} />
+          </span>
+          <span className="absolute top-1/2 rounded-full hover:bg-gray-100 p-1 text-gray-400 -translate-y-1/2 right-0" >
+          <PiImageDuotone
+ size={20} />
+          </span>
+
+
+        </div>
 
           {message.length === 0 ? (
             <motion.button

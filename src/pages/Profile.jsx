@@ -47,8 +47,8 @@ export default function Profile() {
       let arr = [];
       snapshot.forEach((item) => {
         const request = item.val();
-        if (request.senderid === currentUser.uid || request.reciverid === currentUser.uid) {
-          const isSender = request.senderid === currentUser.uid;
+        if (request.senderid === userProfile.id ||  request.reciverid === userProfile.id) {
+          const isSender = request.senderid === userProfile.id;
           const friendId = isSender ? request.reciverid : request.senderid;
           const friendName = isSender ? request.recivername : request.sendername;
           const friendEmail = isSender ? request.reciveremail : request.senderemail;
@@ -65,7 +65,9 @@ export default function Profile() {
       });
       setFriends(arr);
     });
-  }, []);
+  }, [userProfile, db, id, user]);
+
+  
   
     const handleChangeImage = async (e) => {
       setImgLoading(true);
@@ -211,7 +213,7 @@ export default function Profile() {
       });
       setFriendList(arr);
     });
-  }, []);
+  }, [db]);
 
   const handleRequest = () => {
     set(push(ref(db, "friendRequest/")), {
@@ -250,7 +252,6 @@ export default function Profile() {
       });
   };
 
-  console.log(friendList, "friendList");
   
 
 return (
@@ -296,11 +297,11 @@ return (
                   <div className="text-sm text-gray-500 font-medium">Posts</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-800">{friendList.length}</div>
+                  <div className="text-2xl font-bold text-gray-800">{friends.length}</div>
                   <div className="text-sm text-gray-500 font-medium">Friends</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-800">5.8K</div>
+                  <div className="text-2xl font-bold text-gray-800">0</div>
                   <div className="text-sm text-gray-500 font-medium">Followers</div>
                 </div>
               </div>
@@ -405,7 +406,7 @@ return (
                 </svg>
                 Friends
               </h3>
-              <span className="text-sm text-gray-500 font-medium">{friendList.length} friends</span>
+              <span className="text-sm text-gray-500 font-medium">{friends.length} friends</span>
             </div>
             <div className="grid grid-cols-3 gap-3">
               {friends.map((i) => (
