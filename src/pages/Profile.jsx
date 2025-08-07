@@ -50,9 +50,9 @@ export default function Profile() {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [imgLoading, setImgLoading] = useState(false);
-  const [friendsPop, setFriendsPop]= useState(false)
-  const [followersPop, setFollowersPop]= useState(false)
-  const [followingPop, setFollowingPop]= useState(false)
+  const [friendsPop, setFriendsPop] = useState(false);
+  const [followersPop, setFollowersPop] = useState(false);
+  const [followingPop, setFollowingPop] = useState(false);
   useEffect(() => {
     const requestRef = ref(db, "friendlist/");
     onValue(requestRef, (snapshot) => {
@@ -136,9 +136,14 @@ export default function Profile() {
 
       set(push(ref(db, "blogs/")), blogData)
         .then(() => {
-              toast.custom((t)=>(
-      <CustomToast t={t} img={info.imageUrl || ""} name={info.description.slice(0,10)} content={`You Successfully Posted`}/>
-    ))
+          toast.custom((t) => (
+            <CustomToast
+              t={t}
+              img={info.imageUrl || ""}
+              name={info.description.slice(0, 10)}
+              content={`You Successfully Posted`}
+            />
+          ));
           setInfo({
             description: "",
             descriptionErr: "",
@@ -241,9 +246,14 @@ export default function Profile() {
       reciverimg: currentUserInfo.imageUrl,
       time: moment().format(),
     });
-        toast.custom((t)=>(
-      <CustomToast t={t} img={currentUserInfo.imageUrl} name={currentUserInfo.username} content={`You sent a Friend Request to ${currentUserInfo.username}`}/>
-    ))
+    toast.custom((t) => (
+      <CustomToast
+        t={t}
+        img={currentUserInfo.imageUrl}
+        name={currentUserInfo.username}
+        content={`You sent a Friend Request to ${currentUserInfo.username}`}
+      />
+    ));
   };
 
   const cancelRequest = () => {
@@ -261,7 +271,7 @@ export default function Profile() {
               request.senderid === currentUserInfo.id)
           ) {
             toast.success("Friend request canceled");
-            
+
             return remove(ref(db, "friendRequest/" + key));
           }
         });
@@ -303,23 +313,23 @@ export default function Profile() {
       setFollowingId(arr);
     });
   }, [db, user, userProfile]);
-  console.log(followers, "followers");
-  console.log(followingId, "folloid");
   useEffect(() => {
     const followRef = ref(db, "follow/");
     onValue(followRef, (snapshot) => {
       let arr = [];
       snapshot.forEach((data) => {
         const follow = data.val();
-          arr.push({...follow, id:data.key});
+        arr.push({ ...follow, id: data.key });
       });
-      setOwnFollowers(arr.filter((follower)=>follower.followingid==userProfile?.id));
-      setOwnFollowing(arr.filter((follower)=>follower.followerid==userProfile?.id));
+      setOwnFollowers(
+        arr.filter((follower) => follower.followingid == userProfile?.id)
+      );
+      setOwnFollowing(
+        arr.filter((follower) => follower.followerid == userProfile?.id)
+      );
     });
   }, [db, user, userProfile, id]);
-  console.log(ownFollwers, "ownFollwers");
-  console.log(ownFollowing, "ownFollowing");
-  
+
   const followHandler = (following) => {
     console.log(following);
     set(push(ref(db, "follow/")), {
@@ -331,9 +341,14 @@ export default function Profile() {
       followingimg: following.imageUrl,
       time: moment().format(),
     });
-    toast.custom((t)=>(
-      <CustomToast t={t} img={following.imageUrl} name={following.username} content={`You're Following ${following.username}`}/>
-    ))
+    toast.custom((t) => (
+      <CustomToast
+        t={t}
+        img={following.imageUrl}
+        name={following.username}
+        content={`You're Following ${following.username}`}
+      />
+    ));
     set(push(ref(db, "notification/")), {
       notifyReciver: following.id,
       type: "positive",
@@ -347,9 +362,14 @@ export default function Profile() {
       if (follow.followerid == user?.uid && follow.followingid == followId.id) {
         remove(ref(db, "follow/" + follow.id));
         toast.success(`Your'e Unfollowing ${follow.followingname}`);
-            toast.custom((t)=>(
-      <CustomToast t={t} img={followId.imageUrl} name={followId.username} content={`You're Following ${followId.username}`}/>
-    ))
+        toast.custom((t) => (
+          <CustomToast
+            t={t}
+            img={followId.imageUrl}
+            name={followId.username}
+            content={`You're Following ${followId.username}`}
+          />
+        ));
       }
       set(push(ref(db, "notification/")), {
         notifyReciver: followId.id,
@@ -362,17 +382,22 @@ export default function Profile() {
 
   return (
     <div className="bg-gradient-to-br font-secondary from-gray-50 via-blue-50/30 to-purple-50/30 min-h-screen ">
-      {
-        friendsPop && (
-          <FriendsModal friends={friends} setFriendsPop={setFriendsPop}/>
-        )
-      }
-      {followersPop &&
-        <FollowersModal followingId={followingId} followers={ownFollwers} setFollowersPop={setFollowersPop}/> 
-      }
-      {followingPop &&
-        <FollowingModal following={ownFollowing} setFollowingPop={setFollowingPop}/> 
-      }
+      {friendsPop && (
+        <FriendsModal friends={friends} setFriendsPop={setFriendsPop} />
+      )}
+      {followersPop && (
+        <FollowersModal
+          followingId={followingId}
+          followers={ownFollwers}
+          setFollowersPop={setFollowersPop}
+        />
+      )}
+      {followingPop && (
+        <FollowingModal
+          following={ownFollowing}
+          setFollowingPop={setFollowingPop}
+        />
+      )}
       {/* Cover Section with Glass Effect */}
       <div className="relative w-full h-80 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden">
         {/* Animated Background Elements */}
@@ -414,6 +439,7 @@ export default function Profile() {
 
                 {/* Stats */}
                 <div className="flex gap-8 mb-4">
+                  {/* Posts */}
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-800">
                       {blogList.length}
@@ -422,23 +448,66 @@ export default function Profile() {
                       Posts
                     </div>
                   </div>
-                  <div onClick={()=>setFriendsPop(true)}  className="text-center !hover:text-blue-400 cursor-pointer">
-                    <div className="text-2xl font-bold text-gray-800">
+
+                  {/* Friends */}
+                  <div
+                    onClick={() => setFriendsPop(true)}
+                    className="text-center group cursor-pointer transition-colors duration-300"
+                  >
+                    <div
+                      className="text-2xl font-bold text-gray-800 transition-all duration-300 
+        group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-blue-500 
+        group-hover:bg-clip-text group-hover:text-transparent"
+                    >
                       {friends.length}
                     </div>
-                    <div className="text-sm  text-gray-500 font-medium">
+                    <div
+                      className="text-sm font-medium text-gray-500 transition-all duration-300 
+        group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-blue-500 
+        group-hover:bg-clip-text group-hover:text-transparent"
+                    >
                       Friends
                     </div>
                   </div>
-                  <div onClick={()=>setFollowersPop(true)} className="text-center   !hover:text-blue-400 cursor-pointer">
-                    <div className="text-2xl font-bold text-gray-800">{ownFollwers.length}</div>
-                    <div className="text-sm  text-gray-500 font-medium">
+
+                  {/* Followers */}
+                  <div
+                    onClick={() => setFollowersPop(true)}
+                    className="text-center group cursor-pointer transition-colors duration-300"
+                  >
+                    <div
+                      className="text-2xl font-bold text-gray-800 transition-all duration-300 
+        group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-blue-500 
+        group-hover:bg-clip-text group-hover:text-transparent"
+                    >
+                      {ownFollwers.length}
+                    </div>
+                    <div
+                      className="text-sm font-medium text-gray-500 transition-all duration-300 
+        group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-blue-500 
+        group-hover:bg-clip-text group-hover:text-transparent"
+                    >
                       Followers
                     </div>
                   </div>
-                  <div onClick={()=>setFollowingPop(true)} className="text-center  !hover:text-blue-400 cursor-pointer">
-                    <div className="text-2xl font-bold text-gray-800">{ownFollowing.length}</div>
-                    <div className="text-sm text-gray-500 font-medium">
+
+                  {/* Following */}
+                  <div
+                    onClick={() => setFollowingPop(true)}
+                    className="text-center group cursor-pointer transition-colors duration-300"
+                  >
+                    <div
+                      className="text-2xl font-bold text-gray-800 transition-all duration-300 
+        group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-blue-500 
+        group-hover:bg-clip-text group-hover:text-transparent"
+                    >
+                      {ownFollowing.length}
+                    </div>
+                    <div
+                      className="text-sm font-medium text-gray-500 transition-all duration-300 
+        group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-blue-500 
+        group-hover:bg-clip-text group-hover:text-transparent"
+                    >
                       Following
                     </div>
                   </div>
@@ -550,7 +619,7 @@ export default function Profile() {
                   <UserRoundX />
                   Unfollow
                 </button>
-              ): null}
+              ) : null}
             </div>
           </div>
         </motion.div>

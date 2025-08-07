@@ -1,9 +1,26 @@
 import { createPortal } from 'react-dom';
 import React from 'react';
 import { Link } from 'react-router';
+import { getDatabase, push, ref, remove, set } from 'firebase/database';
+import moment from 'moment';
+import { useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 
 // Friends Modal Component
 const FriendsModal = ({ friends, setFriendsPop}) => {
+
+  const currentUser = useSelector((state) => state.user.user);
+  const db=getDatabase()
+  const unFriendHandler=(friend)=>{
+remove(ref(db, "friendlist/" + friend.listId));
+toast.success(`You Unfriend ${friend.name}`)
+    set(push(ref(db, "notification/")), {
+      notifyReciver: friend.id,
+      type: "negative",
+      time: moment().format(),
+      content: `${currentUser?.displayName} unfriend you!`,
+    });
+  }
 
   return createPortal(
     <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex justify-center items-center z-[9999] p-4">
@@ -89,12 +106,16 @@ const FriendsModal = ({ friends, setFriendsPop}) => {
                         </p>
                       </div>
 
-                      {/* Arrow Icon */}
-                      <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1">
-                        <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
+                      <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            unFriendHandler(friend);
+                          }}
+                          className="px-3 py-1 text-xs bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors"
+                        >
+                          Unfriend
+                        </button>
                     </div>
                   </Link>
                 </li>
