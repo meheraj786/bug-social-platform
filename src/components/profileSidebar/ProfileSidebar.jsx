@@ -16,6 +16,7 @@ const ProfileSidebar = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
   const [userProfile, setUserProfile] = useState(null);
+  const [followers, setFollowers]= useState([])
   
     const [friendList, setFriendList] = useState([]);
     useEffect(() => {
@@ -49,11 +50,22 @@ const ProfileSidebar = () => {
     onValue(userRef, (snapshot) => {
       snapshot.forEach((data) => {
         const userdb = data.val();
-        console.log("dbdata", data.val());
-        console.log("key", data.key);
         if (user?.uid === data.key) {
           setUserProfile(userdb);
         }
+      });
+    });
+  }, [db, user]);
+  useEffect(() => {
+    const followRef = ref(db, "follow/");
+    onValue(followRef, (snapshot) => {
+      let arr=[]
+      snapshot.forEach((data) => {
+        const follow = data.val();
+        if (follow.followingid==user?.uid) {
+          arr.push({...follow, id:data.key})
+        }
+        setFollowers(arr)
       });
     });
   }, [db, user]);
@@ -104,7 +116,7 @@ return (
           <div className="text-sm font-medium text-purple-600 capitalize">Friends</div>
         </div>
         <div className="flex-1 text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-2xl border border-blue-200/50 transition-all duration-300 hover:scale-105 cursor-pointer">
-          <div className="text-2xl font-bold text-blue-700">0</div>
+          <div className="text-2xl font-bold text-blue-700">{followers.length}</div>
           <div className="text-sm font-medium text-blue-600 capitalize">Followers</div>
         </div>
       </div>
