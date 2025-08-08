@@ -719,7 +719,7 @@ export default function Profile() {
                   </svg>
                   Friends
                 </h3>
-                <span className="text-sm text-gray-500 font-medium">
+                <span onClick={() => setFriendsPop(true)} className="text-sm text-gray-500 hover:text-blue-500 cursor-pointer font-medium">
                   {friends.length} friends
                 </span>
               </div>

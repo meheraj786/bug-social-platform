@@ -4,17 +4,27 @@ import { GoDotFill } from "react-icons/go";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlineDateRange } from "react-icons/md";
 import Flex from "../../layouts/Flex";
-import { getDatabase, ref, remove } from "firebase/database";
+import { getDatabase, push, ref, remove, set } from "firebase/database";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import moment from "moment";
 
-const CommentList = ({ comment }) => {
+const CommentList = ({ post,comment }) => {
   const user = useSelector((state) => state.user.user);
 
   const deleteHandler = (id) => {
     const db = getDatabase();
-    remove(ref(db, "comments/" + id))
+    remove(ref(db, "comments/" + id)).then(()=>{
+              set(push(ref(db, "notification/")), {
+              notifyReciver: post.bloggerId,
+              type: "comment",
+              reactorId: user?.uid,
+              time: moment().format(),
+              content: `${
+                user?.displayName
+              } remove comment on your post "${post.description.slice(0, 30)}..."`,
+            });
+    })
   };
 
 return (

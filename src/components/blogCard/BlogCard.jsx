@@ -153,13 +153,13 @@ return (
       ) : commentList.length <= 1 ? (
         <div className="mt-4 space-y-4">
           {commentList.map((comment) => (
-              <CommentList comment={comment} />
+              <CommentList comment={comment} post={blog} />
           ))}
         </div>
       ) : (
         <div className="mt-4 space-y-4">
           {commentList.slice(0, 1).map((comment) => (
-              <CommentList comment={comment} />
+              <CommentList comment={comment} post={blog} />
           ))}
           <button 
             onClick={() => setExpandComments(true)} 

@@ -24,7 +24,7 @@ const Notification = () => {
       let arr = [];
       snapshot.forEach((item) => {
         const notification = item.val();
-        if (notification.notifyReciver === currentUser.uid) {
+        if (notification.notifyReciver === currentUser.uid && notification.reactorId!==currentUser?.uid) {
           arr.unshift({
             id: item.key,
             ...notification,
@@ -34,7 +34,7 @@ const Notification = () => {
       setNotifications(arr);
       setLoading(false);
     });
-  }, [currentUser]);
+  }, [currentUser, db]);
 
   const deleteNotification = (notificationId) => {
     remove(ref(db, 'notification/' + notificationId));

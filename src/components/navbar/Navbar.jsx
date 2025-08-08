@@ -62,7 +62,7 @@ const Navbar = () => {
       let arr = [];
       snapshot.forEach((item) => {
         const notification = item.val();
-        if (notification.notifyReciver == user?.uid) {
+        if (notification.notifyReciver == user?.uid && notification.reactorId!==user?.uid) {
           arr.push({
             id: item.key,
             ...notification,
