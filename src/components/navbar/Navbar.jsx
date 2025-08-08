@@ -22,25 +22,25 @@ const Navbar = () => {
   const [notification, setNotification] = useState([]);
   const user = useSelector((state) => state.user.user);
   const db = getDatabase();
-  const [msgNotification, setMsgNotification]= useState([])
+  const [msgNotification, setMsgNotification] = useState([]);
 
-      useEffect(() => {
-      const notificationRef = ref(db, "messagenotification/");
-      onValue(notificationRef, (snapshot) => {
-        let arr = [];
-        snapshot.forEach((item) => {
-          const notification = item.val();
-  
-          if (notification.reciverid == user.uid) {
-            arr.push({
-              id: item.key,
-              ...notification,
-            });
-          }
-        });
-        setMsgNotification(arr);
+  useEffect(() => {
+    const notificationRef = ref(db, "messagenotification/");
+    onValue(notificationRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        const notification = item.val();
+
+        if (notification.reciverid == user.uid) {
+          arr.push({
+            id: item.key,
+            ...notification,
+          });
+        }
       });
-    }, [user?.uid, db]);
+      setMsgNotification(arr);
+    });
+  }, [user?.uid, db]);
 
   const signOutHandler = () => {
     const auth = getAuth();
@@ -62,7 +62,10 @@ const Navbar = () => {
       let arr = [];
       snapshot.forEach((item) => {
         const notification = item.val();
-        if (notification.notifyReciver == user?.uid && notification.reactorId!==user?.uid) {
+        if (
+          notification.notifyReciver == user?.uid &&
+          notification.reactorId !== user?.uid
+        ) {
           arr.push({
             id: item.key,
             ...notification,
@@ -111,7 +114,7 @@ const Navbar = () => {
                 <NavLink
                   to="/messages"
                   className="flex relative items-center gap-x-2 px-4 py-2 rounded-full text-sm font-medium text-white hover:bg-white/10 transition-all duration-200 hover:scale-105"
-                  >
+                >
                   {msgNotification.length > 0 && (
                     <span className="w-4 h-4 flex justify-center items-center bg-red-600 text-white rounded-full absolute top-0 right-0 text-[11px] z-10">
                       {msgNotification.length}
@@ -130,7 +133,11 @@ const Navbar = () => {
                     }`
                   }
                 >
-                  <img className="w-8 h-8 rounded-full border" src={user?.photoURL} alt="" />
+                  <img
+                    className="w-8 h-8 rounded-full border"
+                    src={user?.photoURL}
+                    alt=""
+                  />
                 </NavLink>
 
                 <div

@@ -53,38 +53,43 @@ export default function Profile() {
   const [friendsPop, setFriendsPop] = useState(false);
   const [followersPop, setFollowersPop] = useState(false);
   const [followingPop, setFollowingPop] = useState(false);
-  useEffect(() => {
-    const requestRef = ref(db, "friendlist/");
-    onValue(requestRef, (snapshot) => {
-      let arr = [];
-      snapshot.forEach((item) => {
-        const request = item.val();
-        if (
-          request.senderid === userProfile.id ||
-          request.reciverid === userProfile.id
-        ) {
-          const isSender = request.senderid === userProfile.id;
-          const friendId = isSender ? request.reciverid : request.senderid;
-          const friendName = isSender
-            ? request.recivername
-            : request.sendername;
-          const friendEmail = isSender
-            ? request.reciveremail
-            : request.senderemail;
-          const friendImage = isSender ? request.reciverimg : request.senderimg;
+useEffect(() => {
+  const requestRef = ref(db, "friendlist/");
+  onValue(requestRef, (snapshot) => {
+    let arr = [];
+    snapshot.forEach((item) => {
+      const request = item.val();
+      if (
+        request.senderid === userProfile.id ||
+        request.reciverid === userProfile.id
+      ) {
+        const isSender = request.senderid === userProfile.id;
+        const friendId = isSender ? request.reciverid : request.senderid;
+        const friendName = isSender
+          ? request.recivername
+          : request.sendername;
+        const friendEmail = isSender
+          ? request.reciveremail
+          : request.senderemail;
+        const friendImage = isSender
+          ? request.reciverimg
+          : request.senderimg;
 
-          arr.push({
-            id: friendId,
-            name: friendName,
-            email: friendEmail,
-            image: friendImage,
-            listId: item.key,
-          });
-        }
-      });
-      setFriends(arr);
+        arr.push({
+          id: friendId,
+          name: friendName,
+          email: friendEmail,
+          image: friendImage,
+          listId: item.key,
+          relationOwner: userProfile.id, 
+          relationWith: friendId,    
+        });
+      }
     });
-  }, [userProfile, db, id, user]);
+    setFriends(arr);
+  });
+}, [userProfile, db, id, user]);
+
 
   const handleChangeImage = async (e) => {
     setImgLoading(true);
@@ -800,21 +805,11 @@ export default function Profile() {
                               alt="Preview"
                               className="rounded-2xl w-full max-h-64 object-cover shadow-lg"
                             />
-                            <button className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg opacity-0 group-hover/preview:opacity-100 transition-opacity duration-200">
-                              <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M6 18L18 6M6 6l12 12"
-                                />
-                              </svg>
-                            </button>
+                                        <button onClick={()=>{setPreview("")
+                                        setImage("")
+            }} className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg opacity-0 group-hover/preview:opacity-100 transition-opacity duration-200">
+              <X/>
+            </button>
                             <div className="absolute bottom-3 left-3 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium">
                               Click to remove
                             </div>

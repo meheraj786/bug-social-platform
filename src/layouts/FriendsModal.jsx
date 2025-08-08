@@ -5,6 +5,7 @@ import { getDatabase, push, ref, remove, set } from 'firebase/database';
 import moment from 'moment';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
+import { current } from '@reduxjs/toolkit';
 
 // Friends Modal Component
 const FriendsModal = ({ friends, setFriendsPop}) => {
@@ -21,6 +22,7 @@ toast.success(`You Unfriend ${friend.name}`)
       content: `${currentUser?.displayName} unfriend you!`,
     });
   }
+console.log(friends, "friends");
 
   return createPortal(
     <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex justify-center items-center z-[9999] p-4">
@@ -105,8 +107,8 @@ toast.success(`You Unfriend ${friend.name}`)
                           {friend.name}
                         </p>
                       </div>
-
-                      <button
+{
+  friend.relationOwner==currentUser.uid && (<button
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -115,7 +117,9 @@ toast.success(`You Unfriend ${friend.name}`)
                           className="px-3 py-1 text-xs bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors"
                         >
                           Unfriend
-                        </button>
+                        </button>)
+}
+                      
                     </div>
                   </Link>
                 </li>

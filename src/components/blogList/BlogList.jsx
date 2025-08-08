@@ -16,7 +16,7 @@ const BlogList = () => {
   const [blogList, setBlogList] = useState([]);
   const [followBlogList, setFollowBlogList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("global");
+  const [activeTab, setActiveTab] = useState(localStorage.getItem("activeTab") || "global");
 
   useEffect(() => {
     const followRef = ref(db, "follow/");
@@ -76,7 +76,9 @@ const BlogList = () => {
 
             {/* Global Button */}
             <button
-              onClick={() => setActiveTab("global")}
+              onClick={() => {setActiveTab("global")
+                localStorage.setItem("activeTab", "global")
+              }}
               className={`relative z-10 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-300 ease-out ${
                 activeTab === "global"
                   ? "text-blue-600 "
@@ -88,7 +90,9 @@ const BlogList = () => {
 
             {/* Following Button */}
             <button
-              onClick={() => setActiveTab("following")}
+              onClick={() => {setActiveTab("following")
+                localStorage.setItem("activeTab", "following")
+              }}
               className={`relative z-10 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-300 ease-out ${
                 activeTab === "following"
                   ? "text-blue-600 "
