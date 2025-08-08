@@ -163,7 +163,7 @@ const BlogCard = ({ blog }) => {
                   </div>
                 )}
               </div>
-            ) : (
+            ) : blog.bloggerId==user?.uid && editMode ? (
               <button
                 onClick={() => {
                   setEditMode(false);
@@ -174,7 +174,7 @@ const BlogCard = ({ blog }) => {
                 <Edit size={16} />
                 <span>Save</span>
               </button>
-            )}
+            ): null}
           </div>
         </Flex>
       </div>

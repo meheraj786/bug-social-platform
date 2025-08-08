@@ -1,16 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaUser } from "react-icons/fa6";
 import { GoDotFill } from "react-icons/go";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlineDateRange } from "react-icons/md";
 import Flex from "../../layouts/Flex";
-import { getDatabase, push, ref, remove, set } from "firebase/database";
+import { getDatabase, push, ref, remove, set, update } from "firebase/database";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import moment from "moment";
+import toast from "react-hot-toast";
+import { Edit, Ellipsis, Trash2 } from "lucide-react";
 
 const CommentList = ({ post,comment }) => {
   const user = useSelector((state) => state.user.user);
+  const db= getDatabase()
+  const [editComment, setEditComment]= useState(comment.comment)
+  const [editMode, setEditMode]= useState(false)
+  const [showMenu, setShowMenu]= useState(false)
 
   const deleteHandler = (id) => {
     const db = getDatabase();
@@ -26,6 +32,12 @@ const CommentList = ({ post,comment }) => {
             });
     })
   };
+    const editCommentHandler = () => {
+      update(ref(db, "/comments/" + comment.id), {
+        comment: editComment,
+      });
+      toast.success("Blog Successfully Edited");
+    };
 
 return (
   <div className="bg-white/90 font-secondary backdrop-blur-sm rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 mb-4 p-5 border border-gray-100/50 group">
@@ -67,38 +79,76 @@ return (
           </div>
         </Link>
       </div>
+        {/* {user?.uid === comment.commenterId && ( */}
 
-      {/* Action Buttons */}
-      <div className="flex items-center gap-2">
-        {user?.uid === comment.commenterId && (
-          <>
-            <button className="p-2 rounded-full text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 opacity-0 group-hover:opacity-100">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
-            </button>
-            <button
-              className="p-2 rounded-full text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 opacity-0 group-hover:opacity-100"
-              onClick={() => deleteHandler(comment.id)}
-            >
-              <RiDeleteBin6Line size={16} />
-            </button>
-          </>
-        )}
-        
-        <button className="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all duration-200 opacity-0 group-hover:opacity-100">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
-          </svg>
-        </button>
-      </div>
+          <div className="flex items-center gap-2">
+            {user?.uid === comment.commenterId && !editMode ? (
+              <div className="relative">
+                {/* Three Dot Button */}
+                <button
+                  onClick={() => setShowMenu(!showMenu)}
+                  className="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all duration-200"
+                >
+                  <Ellipsis size={16} />
+                </button>
+
+                {/* Dropdown Menu */}
+                {showMenu && (
+                  <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50 animate-fadeInUp">
+                    {/* Edit Option */}
+                    <button
+                      onClick={() => {
+                        setEditMode(true);
+                        setShowMenu(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                    >
+                      <Edit size={16} />
+                      <span>Edit</span>
+                    </button>
+
+                    {/* Divider */}
+                    <div className="h-px bg-gray-100 my-1"></div>
+
+                    {/* Delete Option */}
+                    <button
+                      onClick={() => {
+                        deleteHandler(comment.id);
+                        setShowMenu(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                    >
+                      <Trash2 size={16} />
+                      <span>Delete</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : comment.commenterId==user?.uid && editMode ? (
+              <button
+                onClick={() => {
+                  setEditMode(false);
+                  editCommentHandler();
+                }}
+                className="w-full flex rounded-lg items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-green-600 transition-colors duration-200"
+              >
+                <Edit size={16} />
+                <span>Save</span>
+              </button>
+            ): null}
+          </div>
     </div>
 
     {/* Comment Content */}
     <div className="ml-13 mb-4">
-      <p className="text-gray-800 text-sm leading-relaxed font-medium whitespace-pre-wrap">
+      {
+        editMode ? <textarea value={editComment} onChange={(e)=>setEditComment(e.target.value)} className="text-gray-800  w-full text-sm leading-relaxed font-medium whitespace-pre-wrap outline-none border border-gray-300 hover:border-purple-500 rounded-lg">
+        {comment.comment}</textarea>
+      : <p className="text-gray-800 text-sm leading-relaxed font-medium whitespace-pre-wrap">
         {comment.comment}
       </p>
+      }
+      
     </div>
 
     {/* Comment Actions */}
