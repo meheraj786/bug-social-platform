@@ -1,31 +1,24 @@
 import { createPortal } from 'react-dom';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router';
 import { getDatabase, push, ref, remove, set } from 'firebase/database';
 import moment from 'moment';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { current } from '@reduxjs/toolkit';
+import UnfriendPopup from './UnfriendPopup';
 
 // Friends Modal Component
-const FriendsModal = ({ friends, setFriendsPop}) => {
-
+const FriendsModal = ({ friends, setFriendsPop, setUnfriendPop, setSelectFriend}) => {
+  
   const currentUser = useSelector((state) => state.user.user);
   const db=getDatabase()
-  const unFriendHandler=(friend)=>{
-remove(ref(db, "friendlist/" + friend.listId));
-toast.success(`You Unfriend ${friend.name}`)
-    set(push(ref(db, "notification/")), {
-      notifyReciver: friend.id,
-      type: "negative",
-      time: moment().format(),
-      content: `${currentUser?.displayName} unfriend you!`,
-    });
-  }
-console.log(friends, "friends");
+
 
   return createPortal(
+    
     <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex justify-center items-center z-[9999] p-4">
+
       {/* Modal Container */}
       <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 w-full max-w-md max-h-[80vh] overflow-hidden animate-modalSlideIn">
         
@@ -112,7 +105,9 @@ console.log(friends, "friends");
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            unFriendHandler(friend);
+                            setUnfriendPop(true)
+                            setSelectFriend(friend)
+                            setFriendsPop(false)
                           }}
                           className="px-3 py-1 text-xs bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors"
                         >

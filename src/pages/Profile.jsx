@@ -23,6 +23,7 @@ import CustomToast from "../layouts/CustomToast";
 import FriendsModal from "../layouts/FriendsModal";
 import FollowersModal from "../layouts/FollowersModal";
 import FollowingModal from "../layouts/FollowingModal";
+import UnfriendPopup from "../layouts/UnfriendPopup";
 
 export default function Profile() {
   const db = getDatabase();
@@ -53,6 +54,9 @@ export default function Profile() {
   const [friendsPop, setFriendsPop] = useState(false);
   const [followersPop, setFollowersPop] = useState(false);
   const [followingPop, setFollowingPop] = useState(false);
+  
+    const [unFriendPop, setUnfriendPop]= useState(false)
+    const [selectFriend, setSelectFriend]= useState(null)
 useEffect(() => {
   const requestRef = ref(db, "friendlist/");
   onValue(requestRef, (snapshot) => {
@@ -384,11 +388,24 @@ useEffect(() => {
       });
     });
   };
+    const unFriendHandler=()=>{
+  remove(ref(db, "friendlist/" + selectFriend.listId));
+  toast.success(`You Unfriend ${selectFriend.name}`)
+      set(push(ref(db, "notification/")), {
+        notifyReciver: selectFriend.id,
+        type: "negative",
+        time: moment().format(),
+        content: `${currentUser?.displayName} unfriend you!`,
+      });
+    }
 
   return (
     <div className="bg-gradient-to-br font-secondary from-gray-50 via-blue-50/30 to-purple-50/30 min-h-screen ">
+                  {
+                unFriendPop && <UnfriendPopup name={selectFriend.name} image={selectFriend.image} unfriendPopup={setUnfriendPop} unfriendHandler={unFriendHandler}/>
+              }
       {friendsPop && (
-        <FriendsModal friends={friends} setFriendsPop={setFriendsPop} />
+        <FriendsModal setSelectFriend={setSelectFriend} setUnfriendPop={setUnfriendPop} friends={friends} setFriendsPop={setFriendsPop} />
       )}
       {followersPop && (
         <FollowersModal

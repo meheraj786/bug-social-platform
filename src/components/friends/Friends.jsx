@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import moment from "moment";
 import { motion } from "motion/react";
+import UnfriendPopup from "../../layouts/UnfriendPopup";
 
 export default function Friends() {
 
@@ -13,16 +14,19 @@ export default function Friends() {
   const [friendListLoading, setFriendListLoading] = useState(true);
   const db = getDatabase();
   const currentUser = useSelector((state) => state.user.user);
+  const [selectFriend, setSelectedFriend]= useState(null)
+  
+    const [unFriendPop, setUnfriendPop]= useState(false)
 
-  const unFriendHandler = async (selectedFriend) => {
+  const unFriendHandler = async () => {
     const friendListRef = ref(db, "friendlist/");
     const snapshot = await get(friendListRef);
 
     snapshot.forEach((item) => {
       const friend = item.val();
       if (
-        (friend.senderid === currentUser.uid && friend.reciverid === selectedFriend.id) ||
-        (friend.senderid === selectedFriend.id && friend.reciverid === currentUser.uid)
+        (friend.senderid === currentUser.uid && friend.reciverid === selectFriend.id) ||
+        (friend.senderid === selectFriend.id && friend.reciverid === currentUser.uid)
       ) {
         remove(ref(db, "friendlist/" + item.key));
         toast.success("Unfriended successfully");
@@ -70,6 +74,10 @@ return (
   <motion.div initial={{ opacity: 0, scale: 0.9 }}
   animate={{ opacity: 1, scale: 1 }}   
   transition={{ duration: 0.4, ease: "easeOut" }} className="w-full lg:w-[400px] font-secondary h-[35%] mt-10 bg-white/90 backdrop-blur-xl fixed bottom-0 left-0 shadow-2xl rounded-t-3xl border-t border-gray-200/50 p-6 space-y-5 overflow-y-auto">
+    
+      {
+        unFriendPop && <UnfriendPopup name={selectFriend.name} image={selectFriend.image} unfriendPopup={setUnfriendPop} unfriendHandler={unFriendHandler}/>
+      }
     {/* Header */}
     <div className="flex items-center justify-between">
       <h2 className="text-transparent bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text font-bold text-xl">
@@ -119,7 +127,9 @@ return (
             </Link>
             
             <button 
-              onClick={() => unFriendHandler(friend)} 
+              onClick={() => {setSelectedFriend(friend)
+                setUnfriendPop(true)
+              }} 
               className="text-xs bg-white hover:bg-red-50 border border-gray-300 hover:border-red-300 text-gray-600 hover:text-red-600 px-4 py-2 rounded-full shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 font-medium flex items-center gap-1.5"
             >
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
