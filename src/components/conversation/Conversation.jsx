@@ -41,6 +41,7 @@ const Conversation = ({ msgNotif }) => {
   const [showEmoji, setShowEmoji] = useState(false);
   const [imgUploadPop, setImgUploadPop] = useState(false);
   const [msgDeletePop, setMsgDeletePop]=useState(false)
+  const [selectedMsg, setSelectedMsg]= useState(null)
 
   const messagesEndRef = useRef(null);
   const scrollContainerRef = useRef(null);
@@ -181,13 +182,7 @@ const Conversation = ({ msgNotif }) => {
     setMsgImg("")
   };
 
-  const messageDeleteHandler = (msg) => {
-    const msgRef = ref(db, "message/" + msg.id);
-    update(msgRef,{
-      status:"deleted"
-    });
-    toast.success("Message Deleted");
-  };
+
 
   if (!roomuser) {
     return (
@@ -324,7 +319,9 @@ const Conversation = ({ msgNotif }) => {
                   {/* Delete Button */}
                   {msg.senderid === data.uid && msg.status!="deleted" && (
                     <button
-                      onClick={() => setMsgDeletePop(true)}
+                      onClick={() => {setMsgDeletePop(true)
+                        setSelectedMsg(msg)
+                      }}
                       className="opacity-0 group-hover:opacity-100 transition-all duration-300 p-2 hover:bg-red-100 rounded-full text-red-500 hover:text-red-600 transform hover:scale-110"
                     >
                       <AiTwotoneDelete className="text-lg" />
@@ -332,7 +329,7 @@ const Conversation = ({ msgNotif }) => {
                   )}
                   {
                     msgDeletePop && (
-                      <DeleteMessagePopup id={msg} msgDeleteHandler={messageDeleteHandler} setMsgDeletePop={setMsgDeletePop} />
+                      <DeleteMessagePopup  selectedMsg={selectedMsg} setMsgDeletePop={setMsgDeletePop} />
                     )
                   }
                                     {/* Reply Button */}

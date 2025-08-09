@@ -1,8 +1,18 @@
+import { getDatabase, ref, update } from "firebase/database";
 import { Trash2 } from "lucide-react";
 import React from "react";
 import { createPortal } from "react-dom";
+import toast from "react-hot-toast";
 
-export default function DeleteMessagePopup({msgDeleteHandler, id, setMsgDeletePop}) {
+export default function DeleteMessagePopup({selectedMsg, setMsgDeletePop}) {
+  const db=getDatabase()
+    const messageDeleteHandler = () => {
+      const msgRef = ref(db, "message/" + selectedMsg.id);
+      update(msgRef,{
+        status:"deleted"
+      });
+      toast.success("Message Deleted");
+    };
   return  createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Blurred Background Overlay */}
@@ -39,7 +49,7 @@ export default function DeleteMessagePopup({msgDeleteHandler, id, setMsgDeletePo
           </button>
           
           {/* Delete Button */}
-          <button onClick={()=>{msgDeleteHandler(id)
+          <button onClick={()=>{messageDeleteHandler()
             setMsgDeletePop(false)
           }} className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl">
             Delete
