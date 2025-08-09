@@ -5,6 +5,7 @@ import {
   ref,
   remove,
   set,
+  update,
 } from "firebase/database";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -23,6 +24,8 @@ import { AnimatePresence } from "motion/react";
 import { motion } from "motion/react";
 import EmojiPicker from "emoji-picker-react";
 import ImageUploadPop from "../../layouts/ImageUploadPop";
+import { Ban } from "lucide-react";
+import DeleteMessagePopup from "../../layouts/DeleteMessagePopup";
 
 const Conversation = ({ msgNotif }) => {
   const db = getDatabase();
@@ -36,6 +39,7 @@ const Conversation = ({ msgNotif }) => {
   const [msgImg, setMsgImg] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [imgUploadPop, setImgUploadPop] = useState(false);
+  const [msgDeletePop, setMsgDeletePop]=useState(false)
 
   const messagesEndRef = useRef(null);
   const scrollContainerRef = useRef(null);
@@ -155,6 +159,7 @@ const Conversation = ({ msgNotif }) => {
         message: message,
         msgImg: msgImg,
         replyMsg: replyMsg,
+        status:"",
         time: moment().format(),
       })
         .then(() => {
@@ -176,7 +181,9 @@ const Conversation = ({ msgNotif }) => {
 
   const messageDeleteHandler = (msg) => {
     const msgRef = ref(db, "message/" + msg.id);
-    remove(msgRef);
+    update(msgRef,{
+      status:"deleted"
+    });
     toast.success("Message Deleted");
   };
 
@@ -271,7 +278,7 @@ const Conversation = ({ msgNotif }) => {
             >
               <div key={msg.id} className="relative group">
                 {/* Reply Indicator */}
-                {msg.replyMsg && (
+                {msg.replyMsg && msg.status!="deleted" && (
                   <div
                     className={`absolute z-10 ${
                       msg.senderid === data.uid
@@ -313,12 +320,26 @@ const Conversation = ({ msgNotif }) => {
                   }`}
                 >
                   {/* Delete Button */}
-                  {msg.senderid === data.uid && (
+                  {msg.senderid === data.uid && msg.status!="deleted" && (
                     <button
-                      onClick={() => messageDeleteHandler(msg)}
+                      onClick={() => setMsgDeletePop(true)}
                       className="opacity-0 group-hover:opacity-100 transition-all duration-300 p-2 hover:bg-red-100 rounded-full text-red-500 hover:text-red-600 transform hover:scale-110"
                     >
                       <AiTwotoneDelete className="text-lg" />
+                    </button>
+                  )}
+                  {
+                    msgDeletePop && (
+                      <DeleteMessagePopup id={msg} msgDeleteHandler={messageDeleteHandler} setMsgDeletePop={setMsgDeletePop} />
+                    )
+                  }
+                                    {/* Reply Button */}
+                  {msg.message && msg.senderid !== data.uid && msg.status!="deleted" && (
+                    <button
+                      onClick={() => setReplyMsg(msg.message)}
+                      className="opacity-0 group-hover:opacity-100 transition-all duration-300 p-2 hover:bg-blue-100 rounded-full text-blue-500 hover:text-blue-600 transform hover:scale-110"
+                    >
+                      <MdOutlineReply className="text-lg" />
                     </button>
                   )}
 
@@ -338,7 +359,11 @@ const Conversation = ({ msgNotif }) => {
                       }`}
                     >
                       {/* Message Content */}
-                      <div className="text-sm leading-relaxed break-words">
+                      {
+                        msg.status==="deleted" ? <div className="text-sm  flex justify-center items-center gap-x-2 leading-relaxed italic break-words">
+                        <Ban color="red" /> This Message is Deleted
+                      </div>
+                        : <div className="text-sm leading-relaxed break-words">
                         {msg.message === "like" ? (
                           <AiFillLike className="text-3xl animate-bounce" />
                         ) : msg.message === "love" || msg.message === "<3" ? (
@@ -349,6 +374,18 @@ const Conversation = ({ msgNotif }) => {
                           msg.message
                         )}
                       </div>
+                      }
+                      {/* <div className="text-sm leading-relaxed break-words">
+                        {msg.message === "like" ? (
+                          <AiFillLike className="text-3xl animate-bounce" />
+                        ) : msg.message === "love" || msg.message === "<3" ? (
+                          <span className="text-3xl text-red-400 animate-pulse">
+                            ❤️
+                          </span>
+                        ) : (
+                          msg.message
+                        )}
+                      </div> */}
                       {/* Timestamp */}
                       <div
                         className={`text-xs mt-2 ${
@@ -365,15 +402,7 @@ const Conversation = ({ msgNotif }) => {
                   }
                   
 
-                  {/* Reply Button */}
-                  {msg.message && msg.senderid !== data.uid && (
-                    <button
-                      onClick={() => setReplyMsg(msg.message)}
-                      className="opacity-0 group-hover:opacity-100 transition-all duration-300 p-2 hover:bg-blue-100 rounded-full text-blue-500 hover:text-blue-600 transform hover:scale-110"
-                    >
-                      <MdOutlineReply className="text-lg" />
-                    </button>
-                  )}
+
                 </div>
               </div>
             </motion.div>

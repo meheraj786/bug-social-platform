@@ -119,7 +119,7 @@ return (
     <div className="relative mb-4">
       {user ? (
         <textarea
-          className="w-full resize-none border-2 border-gray-200 focus:border-purple-400 rounded-2xl outline-none text-gray-800 placeholder-gray-500 p-4 text-base focus:ring-4 focus:ring-purple-100 transition-all duration-300 font-medium bg-gray-50/50 focus:bg-white"
+          className="w-full relative resize-none border-2 border-gray-200 focus:border-purple-400 rounded-2xl outline-none text-gray-800 placeholder-gray-500 p-4 text-base focus:ring-4 focus:ring-purple-100 transition-all duration-300 font-medium bg-gray-50/50 focus:bg-white"
           placeholder="Share your thoughts, experiences, or ask a question..."
           maxLength={500}
           rows={4}
