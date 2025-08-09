@@ -110,8 +110,8 @@ const StoryViewer = ({ story, onClose }) => {
         ) : (
           // Text Only Story
           <div className="max-w-md w-full">
-            <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-8 text-center shadow-2xl">
-              <p className="text-black text-3xl font-bold leading-relaxed drop-shadow-lg">
+            <div className="  rounded-2xl p-8 text-center shadow-2xl">
+              <p className="text-white text-3xl font-bold leading-relaxed drop-shadow-lg">
                 {story?.storyText}
               </p>
             </div>
@@ -122,8 +122,8 @@ const StoryViewer = ({ story, onClose }) => {
       {/* Story Text Overlay (for image stories) */}
       {story?.storyImage && story?.storyText && (
         <div className="absolute bottom-24 left-4 right-4 z-20">
-          <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-xl px-6 py-4 shadow-lg">
-            <p className="text-black text-lg font-semibold text-center drop-shadow-lg">
+          <div className="rounded-xl px-6 py-4 shadow-lg">
+            <p className="text-white text-lg font-semibold text-center drop-shadow-lg">
               {story?.storyText}
             </p>
           </div>
