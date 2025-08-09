@@ -8,11 +8,13 @@ import BlogPostForm from "./components/blogPostForm/BlogPostForm";
 import BlogList from "./components/blogList/BlogList";
 import ProfileSidebar from "./components/profileSidebar/ProfileSidebar";
 import FriendList from "./components/userList/UserList";
+import FeatureImage from "./components/featureImage/FeatureImage";
 
 function App() {
   return (
     <>
       {/* <Banner /> */}
+      <FeatureImage/>
       <ProfileSidebar/>
       <FriendList/>
       <BlogPostForm />

@@ -28,6 +28,7 @@ import { Ban } from "lucide-react";
 import DeleteMessagePopup from "../../layouts/DeleteMessagePopup";
 
 const Conversation = ({ msgNotif }) => {
+  
   const db = getDatabase();
   const data = useSelector((state) => state.user.user);
   const [message, setMessage] = useState("");

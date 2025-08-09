@@ -54,46 +54,43 @@ export default function Profile() {
   const [friendsPop, setFriendsPop] = useState(false);
   const [followersPop, setFollowersPop] = useState(false);
   const [followingPop, setFollowingPop] = useState(false);
-  
-    const [unFriendPop, setUnfriendPop]= useState(false)
-    const [selectFriend, setSelectFriend]= useState(null)
-useEffect(() => {
-  const requestRef = ref(db, "friendlist/");
-  onValue(requestRef, (snapshot) => {
-    let arr = [];
-    snapshot.forEach((item) => {
-      const request = item.val();
-      if (
-        request.senderid === userProfile.id ||
-        request.reciverid === userProfile.id
-      ) {
-        const isSender = request.senderid === userProfile.id;
-        const friendId = isSender ? request.reciverid : request.senderid;
-        const friendName = isSender
-          ? request.recivername
-          : request.sendername;
-        const friendEmail = isSender
-          ? request.reciveremail
-          : request.senderemail;
-        const friendImage = isSender
-          ? request.reciverimg
-          : request.senderimg;
 
-        arr.push({
-          id: friendId,
-          name: friendName,
-          email: friendEmail,
-          image: friendImage,
-          listId: item.key,
-          relationOwner: userProfile.id, 
-          relationWith: friendId,    
-        });
-      }
+  const [unFriendPop, setUnfriendPop] = useState(false);
+  const [selectFriend, setSelectFriend] = useState(null);
+  useEffect(() => {
+    const requestRef = ref(db, "friendlist/");
+    onValue(requestRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        const request = item.val();
+        if (
+          request.senderid === userProfile.id ||
+          request.reciverid === userProfile.id
+        ) {
+          const isSender = request.senderid === userProfile.id;
+          const friendId = isSender ? request.reciverid : request.senderid;
+          const friendName = isSender
+            ? request.recivername
+            : request.sendername;
+          const friendEmail = isSender
+            ? request.reciveremail
+            : request.senderemail;
+          const friendImage = isSender ? request.reciverimg : request.senderimg;
+
+          arr.push({
+            id: friendId,
+            name: friendName,
+            email: friendEmail,
+            image: friendImage,
+            listId: item.key,
+            relationOwner: userProfile.id,
+            relationWith: friendId,
+          });
+        }
+      });
+      setFriends(arr);
     });
-    setFriends(arr);
-  });
-}, [userProfile, db, id, user]);
-
+  }, [userProfile, db, id, user]);
 
   const handleChangeImage = async (e) => {
     setImgLoading(true);
@@ -388,24 +385,34 @@ useEffect(() => {
       });
     });
   };
-    const unFriendHandler=()=>{
-  remove(ref(db, "friendlist/" + selectFriend.listId));
-  toast.success(`You Unfriend ${selectFriend.name}`)
-      set(push(ref(db, "notification/")), {
-        notifyReciver: selectFriend.id,
-        type: "negative",
-        time: moment().format(),
-        content: `${currentUser?.displayName} unfriend you!`,
-      });
-    }
+  const unFriendHandler = () => {
+    remove(ref(db, "friendlist/" + selectFriend.listId));
+    toast.success(`You Unfriend ${selectFriend.name}`);
+    set(push(ref(db, "notification/")), {
+      notifyReciver: selectFriend.id,
+      type: "negative",
+      time: moment().format(),
+      content: `${currentUser?.displayName} unfriend you!`,
+    });
+  };
 
   return (
     <div className="bg-gradient-to-br font-secondary from-gray-50 via-blue-50/30 to-purple-50/30 min-h-screen ">
-                  {
-                unFriendPop && <UnfriendPopup name={selectFriend.name} image={selectFriend.image} unfriendPopup={setUnfriendPop} unfriendHandler={unFriendHandler}/>
-              }
+      {unFriendPop && (
+        <UnfriendPopup
+          name={selectFriend.name}
+          image={selectFriend.image}
+          unfriendPopup={setUnfriendPop}
+          unfriendHandler={unFriendHandler}
+        />
+      )}
       {friendsPop && (
-        <FriendsModal setSelectFriend={setSelectFriend} setUnfriendPop={setUnfriendPop} friends={friends} setFriendsPop={setFriendsPop} />
+        <FriendsModal
+          setSelectFriend={setSelectFriend}
+          setUnfriendPop={setUnfriendPop}
+          friends={friends}
+          setFriendsPop={setFriendsPop}
+        />
       )}
       {followersPop && (
         <FollowersModal
@@ -741,7 +748,10 @@ useEffect(() => {
                   </svg>
                   Friends
                 </h3>
-                <span onClick={() => setFriendsPop(true)} className="text-sm text-gray-500 hover:text-blue-500 cursor-pointer font-medium">
+                <span
+                  onClick={() => setFriendsPop(true)}
+                  className="text-sm text-gray-500 hover:text-blue-500 cursor-pointer font-medium"
+                >
                   {friends.length} friends
                 </span>
               </div>
@@ -822,11 +832,15 @@ useEffect(() => {
                               alt="Preview"
                               className="rounded-2xl w-full max-h-64 object-cover shadow-lg"
                             />
-                                        <button onClick={()=>{setPreview("")
-                                        setImage("")
-            }} className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg opacity-0 group-hover/preview:opacity-100 transition-opacity duration-200">
-              <X/>
-            </button>
+                            <button
+                              onClick={() => {
+                                setPreview("");
+                                setImage("");
+                              }}
+                              className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg opacity-0 group-hover/preview:opacity-100 transition-opacity duration-200"
+                            >
+                              <X />
+                            </button>
                             <div className="absolute bottom-3 left-3 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium">
                               Click to remove
                             </div>
