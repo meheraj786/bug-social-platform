@@ -90,26 +90,28 @@ const FeatureImage = () => {
     setImgLoading(false);
   };
 
-  const addStoryHandler = () => {
-    const storyData = {
-      storyCreatorId: user?.uid,
-      storyCreatorName: user?.displayName,
-      storyCreatorImage: user?.photoURL,
-      storyText: storyText || "",
-      storyImage: selectedImage || "",
-      time: moment().format(),
-    };
-    if (storyText.length !== "" || selectedImage?.length !== "") {
-      set(push(ref(db, "story/")), storyData).then(() => {
-        toast.success("Story Added Successfully!");
-        setSelectedImage(null);
-        setStoryText("");
-        setShowAddStoryModal(false);
-      });
-    } else {
-      toast.error("Please fill the story details!");
-    }
+const addStoryHandler = () => {
+  const storyData = {
+    storyCreatorId: user?.uid,
+    storyCreatorName: user?.displayName,
+    storyCreatorImage: user?.photoURL,
+    storyText: storyText || "",
+    storyImage: selectedImage || "",
+    time: moment().format(),
   };
+
+  if (storyText && selectedImage) {
+    set(push(ref(db, "story/")), storyData).then(() => {
+      toast.success("Story Added Successfully!");
+      setSelectedImage(null);
+      setStoryText("");
+      setShowAddStoryModal(false);
+    });
+  } else {
+    toast.error("Please fill the story details!");
+  }
+};
+
 
   const AddStoryCard = () => (
     <div className="flex-shrink-0">
@@ -214,7 +216,7 @@ const FeatureImage = () => {
             </div>
           </div>
 
-          <div className="flex space-x-4 overflow-x-auto scrollbar-hide pb-2">
+          <div className="flex space-x-4 overflow-x-auto pb-2">
             <AddStoryCard />
             {story.map((s) => (
               <StoryCard key={s.id} s={s} />
@@ -222,17 +224,6 @@ const FeatureImage = () => {
           </div>
         </div>
       </Container>
-
-      {/* Custom scrollbar styles */}
-      <style jsx>{`
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </div>
   );
 };

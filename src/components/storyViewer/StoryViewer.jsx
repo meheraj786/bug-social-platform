@@ -4,6 +4,7 @@ import moment from "moment";
 import { getDatabase, ref, remove } from "firebase/database";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { Link } from "react-router";
 
 const StoryViewer = ({ story, onClose }) => {
   const [pause, setPause] = useState(false);
@@ -32,9 +33,10 @@ const StoryViewer = ({ story, onClose }) => {
   console.log(story, "selcstory");
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-purple-500 to-blue-500 z-50 flex items-center justify-center">
+    <div onClick={()=>setPause(!pause)} className="fixed inset-0 bg-gradient-to-br from-purple-500 to-blue-500 z-50 flex items-center justify-center">
       {/* Header */}
       <div className="absolute pt-20  top-8 left-4 right-4 z-20 flex items-center justify-between">
+        <Link to={`/profile/${story.storyCreatorId}`}>
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-full bg-white p-0.5">
             <div className="w-full h-full rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
@@ -60,7 +62,7 @@ const StoryViewer = ({ story, onClose }) => {
             </p>
           </div>
         </div>
-
+</Link>
         <div className="flex items-center space-x-2">
           {/* Pause/Play Button */}
           <button
