@@ -177,7 +177,8 @@ const Conversation = ({ msgNotif }) => {
         });
     }
     setShowEmoji(false);
-    setImgUploadPop(false)
+    setImgUploadPop(false);
+    setMsgImg("")
   };
 
   const messageDeleteHandler = (msg) => {
@@ -300,7 +301,7 @@ const Conversation = ({ msgNotif }) => {
                     )}
                   </div>
                 )}
-                {msg.msgImg && (
+                {msg.msgImg && msg.status!="deleted" && (
                   <div
                     className=
                     {`flex items-end gap-3 ${

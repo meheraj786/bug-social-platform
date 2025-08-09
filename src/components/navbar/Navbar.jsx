@@ -74,7 +74,7 @@ const Navbar = () => {
       });
       setNotification(arr);
     });
-  }, []);
+  }, [db, user]);
 
   return (
     <div className="bg-gradient-to-r from-purple-700 via-blue-600 to-blue-800 fixed w-full z-[999] font-secondary text-white py-4 shadow-md">

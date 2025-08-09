@@ -24,7 +24,7 @@ const BlogCard = ({ blog }) => {
   const [editDescription, setEditDescription] = useState(blog.description);
   const [preview, setPreview] = useState(blog.postImage || "");
   const [imgLoading, setImgLoading] = useState(false);
-  const [editImg, setEditImg] = useState("");
+  const [editImg, setEditImg] = useState(blog.postImage || "");
   const coudinaryApi = import.meta.env.VITE_CLOUDINARY_API;
   const handleChangeImage = async (e) => {
     setImgLoading(true);
