@@ -197,7 +197,7 @@ if (!user) return null;
       )}
 
       {activeStory && (
-        <StoryViewer story={activeStory} onClose={() => setActiveStory(null)} />
+        <StoryViewer friendList={friendList} story={activeStory} onClose={() => setActiveStory(null)} />
       )}
 
       <Container>

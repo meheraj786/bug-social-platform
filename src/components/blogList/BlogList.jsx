@@ -65,7 +65,8 @@ const BlogList = () => {
   return (
     <div className="py-3 font-secondary">
       <Container>
-        <div className="flex justify-center my-4 w-full">
+        {
+          user && <div className="flex justify-center my-4 w-full">
           <div className="relative bg-gray-100  rounded-full p-1 flex items-center shadow-lg">
             {/* Background slider */}
             <div
@@ -110,6 +111,8 @@ const BlogList = () => {
             </div>
           </div>
         </div>
+        }
+        
 {isLoading ? (
   <BlogCardSkeleton />
 ) : blogList.length === 0 && activeTab === "global" ? (

@@ -14,7 +14,7 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { Link } from "react-router";
 
-const StoryViewer = ({ story, onClose }) => {
+const StoryViewer = ({friendList, story, onClose }) => {
   const [pause, setPause] = useState(false);
   const db = getDatabase();
   const [message, setMessage] = useState("");
@@ -195,7 +195,7 @@ const StoryViewer = ({ story, onClose }) => {
         </div>
       )}
       {/* Bottom Actions */}
-      {story.storyCreatorId !== user?.uid && (
+      {story.storyCreatorId !== user?.uid && (friendList.includes(story.storyCreatorId+user?.uid)|| friendList.includes(user?.uid+story.storyCreatorId)) &&(
         <div className="absolute bottom-4 left-4 right-4 z-20">
           <div className="flex items-center space-x-3">
             <div className="flex-1 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-4 py-3">
