@@ -20,7 +20,7 @@ const FeatureImage = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [story, setStory] = useState([]);
   const [activeStory, setActiveStory] = useState(null);
-
+  
   useEffect(() => {
     const followRef = ref(db, "follow/");
     onValue(followRef, (snapshot) => {
@@ -90,28 +90,27 @@ const FeatureImage = () => {
     setImgLoading(false);
   };
 
-const addStoryHandler = () => {
-  const storyData = {
-    storyCreatorId: user?.uid,
-    storyCreatorName: user?.displayName,
-    storyCreatorImage: user?.photoURL,
-    storyText: storyText || "",
-    storyImage: selectedImage || "",
-    time: moment().format(),
+  const addStoryHandler = () => {
+    const storyData = {
+      storyCreatorId: user?.uid,
+      storyCreatorName: user?.displayName,
+      storyCreatorImage: user?.photoURL,
+      storyText: storyText || "",
+      storyImage: selectedImage || "",
+      time: moment().format(),
+    };
+
+    if (storyText || selectedImage) {
+      set(push(ref(db, "story/")), storyData).then(() => {
+        toast.success("Story Added Successfully!");
+        setSelectedImage(null);
+        setStoryText("");
+        setShowAddStoryModal(false);
+      });
+    } else {
+      toast.error("Please fill the story details!");
+    }
   };
-
-  if (storyText || selectedImage) {
-    set(push(ref(db, "story/")), storyData).then(() => {
-      toast.success("Story Added Successfully!");
-      setSelectedImage(null);
-      setStoryText("");
-      setShowAddStoryModal(false);
-    });
-  } else {
-    toast.error("Please fill the story details!");
-  }
-};
-
 
   const AddStoryCard = () => (
     <div className="flex-shrink-0">
@@ -143,7 +142,7 @@ const addStoryHandler = () => {
       </div>
     </div>
   );
-
+if (!user) return null;
   const StoryCard = ({ s }) => {
     const gradientClass = "from-purple-500 via-purple-600 to-blue-500";
     const hoverGradientClass = "hover:from-purple-600 hover:to-blue-600";
@@ -198,15 +197,12 @@ const addStoryHandler = () => {
       )}
 
       {activeStory && (
-        <StoryViewer
-          story={activeStory}
-          onClose={() => setActiveStory(null)}
-        />
+        <StoryViewer story={activeStory} onClose={() => setActiveStory(null)} />
       )}
 
       <Container>
-        <div className="bg-white mx-40 rounded-2xl shadow-lg border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-6">
+        <div className="bg-white mx-40 rounded-2xl shadow-lg border border-gray-100 px-6 py-2">
+          <div className="flex items-center justify-between mb-2">
             <h2 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               Stories
             </h2>

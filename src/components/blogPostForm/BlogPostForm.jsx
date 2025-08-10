@@ -97,7 +97,7 @@ const BlogPostForm = () => {
 return (
   <motion.div initial={{ opacity: 0, scale: 0.9 }}
   animate={{ opacity: 1, scale: 1 }}   
-  transition={{ duration: 0.4, ease: "easeOut" }} className="bg-white/90 font-secondary backdrop-blur-xl p-6 mt-10 rounded-3xl shadow-xl hover:shadow-2xl border border-white/20 hover:border-purple-300 transition-all duration-500 w-full max-w-3xl mx-auto group">
+  transition={{ duration: 0.4, ease: "easeOut" }} className="bg-white/90 font-secondary backdrop-blur-xl p-6 mt-3 rounded-3xl shadow-xl hover:shadow-2xl border border-white/20 hover:border-purple-300 transition-all duration-500 w-full max-w-3xl mx-auto group">
     {/* Header Section */}
     <div className="flex items-center gap-4 mb-5">
       {user && (
@@ -122,8 +122,8 @@ return (
         <textarea
           className="w-full relative resize-none border-2 border-gray-200 focus:border-purple-400 rounded-2xl outline-none text-gray-800 placeholder-gray-500 p-4 text-base focus:ring-4 focus:ring-purple-100 transition-all duration-300 font-medium bg-gray-50/50 focus:bg-white"
           placeholder="Share your thoughts, experiences, or ask a question..."
-          maxLength={500}
-          rows={4}
+          maxLength={800}
+          rows={3}
           value={info.description}
           onChange={(e) =>
             setInfo((prev) => ({ ...prev, description: e.target.value }))
@@ -141,7 +141,7 @@ return (
       {/* Character count overlay */}
       {user && (
         <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-gray-500 border border-gray-200">
-          {info.description?.length || 0}/500
+          {info.description?.length || 0}/800
         </div>
       )}
     </div>

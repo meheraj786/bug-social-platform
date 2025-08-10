@@ -63,9 +63,9 @@ const BlogList = () => {
   console.log(followBlogList, "followBlog");
 
   return (
-    <div className="py-5 font-secondary">
+    <div className="py-3 font-secondary">
       <Container>
-        <div className="flex justify-center my-8 w-full">
+        <div className="flex justify-center my-4 w-full">
           <div className="relative bg-gray-100  rounded-full p-1 flex items-center shadow-lg">
             {/* Background slider */}
             <div
