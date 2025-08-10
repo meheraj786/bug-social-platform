@@ -13,13 +13,10 @@ import time from "../../layouts/time";
 import { useSelector } from "react-redux";
 import { TbUserCancel } from "react-icons/tb";
 import { IoPersonAddSharp } from "react-icons/io5";
-import { Link } from "react-router";
+import { Link, Navigate } from "react-router";
 import moment from "moment";
-
 import CustomToast from "../../layouts/CustomToast";
-
 import { motion } from "motion/react";
-
 export default function UserList() {
   const [userList, setUserList] = useState([]);
   const [requestList, setRequestList] = useState([]);
@@ -29,6 +26,7 @@ export default function UserList() {
   const currentUser = useSelector((state) => state.user.user);
   const [friendRequestList, setFriendRequestList] = useState([]);
   const [requestListLoading, setRequestListLoading] = useState(true);
+
 
   useEffect(() => {
     const requestRef = ref(db, "friendRequest/");
@@ -140,7 +138,7 @@ export default function UserList() {
       recivername: item.username,
       time: time(),
     });
-            toast.custom((t) => (
+    toast.custom((t) => (
       <CustomToast
         t={t}
         img={item.imageUrl}
@@ -175,6 +173,10 @@ export default function UserList() {
       });
   };
 
+  if (!currentUser) {
+  return <Navigate to="/"/>;
+}
+
   if (userLoading) {
     return (
       <div className="text-center absolute top-5 left-5 text-gray-500 mt-5">
@@ -195,8 +197,7 @@ export default function UserList() {
         <h2 className="text-transparent bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text font-bold text-xl">
           Add Friends
         </h2>
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-        </div>
+        <div className="flex items-center gap-2 text-sm text-gray-500"></div>
       </div>
 
       {/* Friend Requests Section */}
@@ -218,8 +219,8 @@ export default function UserList() {
               <div className="flex items-center gap-4 flex-1">
                 <div className="relative">
                   <img
-                    src={user.senderimg}
-                    alt={user.sendername}
+                    src={user?.senderimg}
+                    alt={user?.sendername}
                     className="w-12 h-12 rounded-full object-cover border-2 border-purple-200 group-hover:border-purple-400 transition-colors duration-300"
                   />
                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
@@ -227,12 +228,12 @@ export default function UserList() {
                   </div>
                 </div>
 
-                <Link to={`/profile/${user.id}`} className="flex-1 min-w-0">
+                <Link to={`/profile/${user?.id==user.senderid ? user.reciverid : user.senderid}`} className="flex-1 min-w-0">
                   <p className="text-gray-900 font-primary font-semibold text-sm hover:text-purple-600 transition-colors duration-200 truncate">
-                    {user.sendername}
+                    {user?.sendername}
                   </p>
                   <p className="text-gray-500 text-xs font-medium truncate">
-                    {user.senderemail}
+                    {user?.senderemail}
                   </p>
                 </Link>
               </div>

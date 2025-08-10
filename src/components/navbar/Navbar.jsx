@@ -57,9 +57,8 @@ useEffect(() => {
     const auth = getAuth();
     signOut(auth)
       .then(() => {
-        dispatch(clearUser());
         navigate("/");
-        toast.success("Logout Success");
+        dispatch(clearUser());
         localStorage.removeItem("user");
       })
       .catch((error) => {

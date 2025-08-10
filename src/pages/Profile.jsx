@@ -18,7 +18,7 @@ import moment from "moment";
 
 import { motion } from "motion/react";
 import { FaImage } from "react-icons/fa6";
-import { Plus, UserRoundPlus, UserRoundX } from "lucide-react";
+import { Plus, UserRoundPlus, UserRoundX, X } from "lucide-react";
 import CustomToast from "../layouts/CustomToast";
 import FriendsModal from "../layouts/FriendsModal";
 import FollowersModal from "../layouts/FollowersModal";
