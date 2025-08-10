@@ -1,4 +1,5 @@
 import {
+  get,
   getDatabase,
   onValue,
   push,
@@ -26,9 +27,9 @@ import EmojiPicker from "emoji-picker-react";
 import ImageUploadPop from "../../layouts/ImageUploadPop";
 import { Ban } from "lucide-react";
 import DeleteMessagePopup from "../../layouts/DeleteMessagePopup";
+import UnfriendPopup from "../../layouts/UnfriendPopup";
 
 const Conversation = ({ msgNotif }) => {
-  
   const db = getDatabase();
   const data = useSelector((state) => state.user.user);
   const [message, setMessage] = useState("");
@@ -40,8 +41,23 @@ const Conversation = ({ msgNotif }) => {
   const [msgImg, setMsgImg] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [imgUploadPop, setImgUploadPop] = useState(false);
-  const [msgDeletePop, setMsgDeletePop]=useState(false)
-  const [selectedMsg, setSelectedMsg]= useState(null)
+  const [msgDeletePop, setMsgDeletePop] = useState(false);
+  const [selectedMsg, setSelectedMsg] = useState(null);
+  const [friendList, setFriendList] = useState([]);
+  const [unFirendModalActive, setUnfriendModalActive] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+    const requestRef = ref(db, "friendlist/");
+    onValue(requestRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        const request = item.val();
+        arr.push(request.reciverid + request.senderid);
+      });
+      setFriendList(arr);
+    });
+  }, [db]);
 
   const messagesEndRef = useRef(null);
   const scrollContainerRef = useRef(null);
@@ -161,7 +177,7 @@ const Conversation = ({ msgNotif }) => {
         message: message,
         msgImg: msgImg,
         replyMsg: replyMsg,
-        status:"",
+        status: "",
         time: moment().format(),
       })
         .then(() => {
@@ -179,12 +195,40 @@ const Conversation = ({ msgNotif }) => {
     }
     setShowEmoji(false);
     setImgUploadPop(false);
-    setMsgImg("")
+    setMsgImg("");
   };
+  const unFriendHandler = async () => {
+    const friendListRef = ref(db, "friendlist/");
+    const snapshot = await get(friendListRef);
 
+    snapshot.forEach((item) => {
+      const friend = item.val();
+      const friendId =
+        roomuser.senderid == data?.uid ? roomuser.reciverid : roomuser.senderid;
+      if (
+        (friend.senderid === data?.uid && friend.reciverid === friendId) ||
+        (friend.senderid === friendId && friend.reciverid === data?.uid)
+      ) {
+        remove(ref(db, "friendlist/" + item.key));
+        toast.success("Unfriended successfully");
+        set(push(ref(db, "notification/")), {
+          notifyReciver:
+            friend.senderid === data?.uid ? friend.reciverid : friend.senderid,
+          type: "negative",
+          time: moment().format(),
+          content: `${data?.displayName} unfriended you`,
+        });
+      }
+    });
+  };
+  const areFriends =
+    roomuser &&
+    (friendList.includes(roomuser.senderid + data?.uid) ||
+      friendList.includes(roomuser.reciverid + data?.uid) ||
+      friendList.includes(data?.uid + roomuser.reciverid) ||
+      friendList.includes(data?.uid + roomuser.senderid));
 
-
-  if (!roomuser) {
+  if (!roomuser || !areFriends) {
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
@@ -206,11 +250,29 @@ const Conversation = ({ msgNotif }) => {
       </motion.div>
     );
   }
+  console.log(roomuser, "roomuser");
+
   return (
     <div
       onClick={handleMsgNotificationDelete}
       className="h-full flex flex-col bg-gradient-to-br from-white to-gray-50/50 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/20 max-w-3xl mx-auto relative overflow-hidden"
     >
+      {unFirendModalActive && (
+        <UnfriendPopup
+          unfriendPopup={setUnfriendModalActive}
+          unfriendHandler={unFriendHandler}
+          name={
+            roomuser.senderid == data?.uid
+              ? roomuser.recivername
+              : roomuser.sendername
+          }
+          image={
+            roomuser.senderid == data.uid
+              ? roomuser.reciverimg
+              : roomuser.senderimg
+          }
+        />
+      )}
       {imgUploadPop && (
         <ImageUploadPop
           setImgUploadPop={setImgUploadPop}
@@ -232,7 +294,7 @@ const Conversation = ({ msgNotif }) => {
               ? roomuser.reciverid
               : roomuser.senderid
           }
-          className="flex items-center gap-4 p-3 bg-white/80 rounded-xl border border-white/60 shadow hover:shadow-lg cursor-pointer transition-all hover:scale-[1.02]"
+          className="flex items-center gap-4 p-3 bg-white/80 rounded-xl border border-white/60 shadow hover:shadow-lg cursor-pointer transition-all "
         >
           <div className="relative">
             <img
@@ -246,11 +308,47 @@ const Conversation = ({ msgNotif }) => {
             />
             <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
           </div>
-          <span className="font-medium text-gray-800 truncate">
+          <span className="font-medium text-gray-800 truncate flex-1">
             {roomuser.senderid == data.uid
               ? roomuser.recivername
               : roomuser.sendername}
           </span>
+
+          {/* Three dot dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+            >
+              <svg
+                className="w-5 h-5 text-gray-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+              </svg>
+            </button>
+
+            {showDropdown && (
+              <>
+                <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                  <button
+                    onClick={() => {
+                      setShowDropdown(false);
+                      setUnfriendModalActive(true);
+                    }}
+                    className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    Unfriend
+                  </button>
+                </div>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowDropdown(false)}
+                ></div>
+              </>
+            )}
+          </div>
         </div>
       </motion.div>
 
@@ -275,7 +373,7 @@ const Conversation = ({ msgNotif }) => {
             >
               <div key={msg.id} className="relative group">
                 {/* Reply Indicator */}
-                {msg.replyMsg && msg.status!="deleted" && (
+                {msg.replyMsg && msg.status != "deleted" && (
                   <div
                     className={`absolute z-10 ${
                       msg.senderid === data.uid
@@ -296,14 +394,14 @@ const Conversation = ({ msgNotif }) => {
                     )}
                   </div>
                 )}
-                {msg.msgImg && msg.status!="deleted" && (
+                {msg.msgImg && msg.status != "deleted" && (
                   <div
-                    className=
-                    {`flex items-end gap-3 ${
+                    className={`flex items-end gap-3 ${
                       msg.senderid === data.uid
                         ? "justify-end"
                         : "justify-start"
-                    }`}>
+                    }`}
+                  >
                     <img
                       src={msg.msgImg}
                       className="w-[220px] h-[180px] rounded-lg object-cover"
@@ -317,65 +415,70 @@ const Conversation = ({ msgNotif }) => {
                   }`}
                 >
                   {/* Delete Button */}
-                  {msg.senderid === data.uid && msg.status!="deleted" && (
+                  {msg.senderid === data.uid && msg.status != "deleted" && (
                     <button
-                      onClick={() => {setMsgDeletePop(true)
-                        setSelectedMsg(msg)
+                      onClick={() => {
+                        setMsgDeletePop(true);
+                        setSelectedMsg(msg);
                       }}
                       className="opacity-0 group-hover:opacity-100 transition-all duration-300 p-2 hover:bg-red-100 rounded-full text-red-500 hover:text-red-600 transform hover:scale-110"
                     >
                       <AiTwotoneDelete className="text-lg" />
                     </button>
                   )}
-                  {
-                    msgDeletePop && (
-                      <DeleteMessagePopup  selectedMsg={selectedMsg} setMsgDeletePop={setMsgDeletePop} />
-                    )
-                  }
-                                    {/* Reply Button */}
-                  {msg.message && msg.senderid !== data.uid && msg.status!="deleted" && (
-                    <button
-                      onClick={() => setReplyMsg(msg.message)}
-                      className="opacity-0 group-hover:opacity-100 transition-all duration-300 p-2 hover:bg-blue-100 rounded-full text-blue-500 hover:text-blue-600 transform hover:scale-110"
-                    >
-                      <MdOutlineReply className="text-lg" />
-                    </button>
+                  {msgDeletePop && (
+                    <DeleteMessagePopup
+                      selectedMsg={selectedMsg}
+                      setMsgDeletePop={setMsgDeletePop}
+                    />
                   )}
+                  {/* Reply Button */}
+                  {msg.message &&
+                    msg.senderid !== data.uid &&
+                    msg.status != "deleted" && (
+                      <button
+                        onClick={() => setReplyMsg(msg.message)}
+                        className="opacity-0 group-hover:opacity-100 transition-all duration-300 p-2 hover:bg-blue-100 rounded-full text-blue-500 hover:text-blue-600 transform hover:scale-110"
+                      >
+                        <MdOutlineReply className="text-lg" />
+                      </button>
+                    )}
 
                   {/* Message Bubble */}
-                  {
-                    msg.message && (
-<div
-                    className={`relative max-w-[70%] ${
-                      msg.senderid === data.uid ? "order-1" : "order-2"
-                    }`}
-                  >
+                  {msg.message && (
                     <div
-                      className={`px-5 py-3 rounded-2xl shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-xl ${
-                        msg.senderid === data.uid
-                          ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-br-md shadow-blue-200/50"
-                          : "bg-white/80 text-gray-800 rounded-bl-md border border-gray-200/50 shadow-gray-200/50"
+                      className={`relative max-w-[70%] ${
+                        msg.senderid === data.uid ? "order-1" : "order-2"
                       }`}
                     >
-                      {/* Message Content */}
-                      {
-                        msg.status==="deleted" ? <div className="text-sm  flex justify-center items-center gap-x-2 leading-relaxed italic break-words">
-                        <Ban color="red" /> This Message is Deleted
-                      </div>
-                        : <div className="text-sm leading-relaxed break-words">
-                        {msg.message === "like" ? (
-                          <AiFillLike className="text-3xl animate-bounce" />
-                        ) : msg.message === "love" || msg.message === "<3" ? (
-                          <span className="text-3xl text-red-400 animate-pulse">
-                            ❤️
-                          </span>
+                      <div
+                        className={`px-5 py-3 rounded-2xl shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-xl ${
+                          msg.senderid === data.uid
+                            ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-br-md shadow-blue-200/50"
+                            : "bg-white/80 text-gray-800 rounded-bl-md border border-gray-200/50 shadow-gray-200/50"
+                        }`}
+                      >
+                        {/* Message Content */}
+                        {msg.status === "deleted" ? (
+                          <div className="text-sm  flex justify-center items-center gap-x-2 leading-relaxed italic break-words">
+                            <Ban color="red" /> This Message is Deleted
+                          </div>
                         ) : (
-                          msg.message
+                          <div className="text-sm leading-relaxed break-words">
+                            {msg.message === "like" ? (
+                              <AiFillLike className="text-3xl animate-bounce" />
+                            ) : msg.message === "love" ||
+                              msg.message === "<3" ? (
+                              <span className="text-3xl text-red-400 animate-pulse">
+                                ❤️
+                              </span>
+                            ) : (
+                              msg.message
+                            )}
+                          </div>
                         )}
-                      </div>
-                      }
 
-                      {/* <div className="text-sm leading-relaxed break-words">
+                        {/* <div className="text-sm leading-relaxed break-words">
                         {msg.message === "like" ? (
                           <AiFillLike className="text-3xl animate-bounce" />
                         ) : msg.message === "love" || msg.message === "<3" ? (
@@ -386,28 +489,24 @@ const Conversation = ({ msgNotif }) => {
                           msg.message
                         )}
                       </div> */}
-                      {/* Timestamp */}
-                      <div
-                        className={`text-xs mt-2 ${
-                          msg.senderid === data.uid
-                            ? "text-white/70"
-                            : "text-gray-500"
-                        }`}
-                      >
-                        {moment(msg.time).fromNow()}
+                        {/* Timestamp */}
+                        <div
+                          className={`text-xs mt-2 ${
+                            msg.senderid === data.uid
+                              ? "text-white/70"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {moment(msg.time).fromNow()}
+                        </div>
+                        {msg.from == "story" && (
+                          <span className="text-[12px] text-gray-400 italic">
+                            Message From Story
+                          </span>
+                        )}
                       </div>
-                      {
-                        msg.from=="story" && (
-                          <span className="text-[12px] text-gray-400 italic">Message From Story</span>
-                        )
-                      }
                     </div>
-                  </div>
-                    )
-                  }
-                  
-
-
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -480,7 +579,10 @@ const Conversation = ({ msgNotif }) => {
             >
               <GrEmoji size={20} />
             </span>
-            <span onClick={()=>setImgUploadPop(true)} className="absolute top-1/2 rounded-full hover:bg-gray-100 p-1 text-gray-400 -translate-y-1/2 right-0">
+            <span
+              onClick={() => setImgUploadPop(true)}
+              className="absolute top-1/2 rounded-full hover:bg-gray-100 p-1 text-gray-400 -translate-y-1/2 right-0"
+            >
               <PiImageDuotone size={20} />
             </span>
           </div>

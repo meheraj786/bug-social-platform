@@ -20,10 +20,21 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [notification, setNotification] = useState([]);
+  const [friendList, setFriendList] = useState([]);
   const user = useSelector((state) => state.user.user);
   const db = getDatabase();
   const [msgNotification, setMsgNotification] = useState([]);
-
+useEffect(() => {
+    const requestRef = ref(db, "friendlist/");
+    onValue(requestRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        const request = item.val();
+        arr.push(request.reciverid + request.senderid);
+      });
+      setFriendList(arr);
+    });
+  }, [db]);
   useEffect(() => {
     const notificationRef = ref(db, "messagenotification/");
     onValue(notificationRef, (snapshot) => {
@@ -31,7 +42,7 @@ const Navbar = () => {
       snapshot.forEach((item) => {
         const notification = item.val();
 
-        if (notification.reciverid == user.uid) {
+        if (notification.reciverid == user?.uid && (friendList.includes(notification.senderid+user?.uid)|| friendList.includes(user?.uid+notification.senderid))) {
           arr.push({
             id: item.key,
             ...notification,
@@ -40,7 +51,7 @@ const Navbar = () => {
       });
       setMsgNotification(arr);
     });
-  }, [user?.uid, db]);
+  }, [user?.uid, db, friendList]);
 
   const signOutHandler = () => {
     const auth = getAuth();

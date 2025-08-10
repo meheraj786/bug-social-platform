@@ -139,7 +139,7 @@ return (
 
         {/* Conversation Section */}
         <div className="w-[70%] h-[85vh] bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 overflow-hidden flex flex-col">
-          <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6">
+          {/* <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,7 +151,7 @@ return (
                 <p className="text-white/80 text-sm">Start chatting with your friends</p>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Conversation Messages */}
           <motion.div initial={{ opacity: 0, scale: 0.9 }}
