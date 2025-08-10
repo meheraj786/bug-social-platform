@@ -13,10 +13,11 @@ import {
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import time from "../../layouts/time";
-import { FaComment, FaHeart, FaRegComments } from "react-icons/fa";
+import { FaComment, FaHeart, FaRegComments, FaRegShareSquare } from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
 import moment from "moment";
 import FullScreenOverlay from "../../layouts/FullscreenOverlay";
+import SharePostModal from "../../layouts/SharePostModal";
 
 const CommentForm = ({ post, commentLength }) => {
   const navigate = useNavigate();
@@ -29,6 +30,9 @@ const CommentForm = ({ post, commentLength }) => {
   const [reactLength, setReactLength] = useState([]);
   const db = getDatabase();
   const [reactionPop, setReactionPop] = useState(false);
+  const [shareCaption, setShareCaption]= useState("I shared this post")
+  const [sharePop, setSharePop]= useState(false)
+  const [selectSharePost, setSelectSharePost]= useState(null)
 
   useEffect(() => {
     const reactRef = ref(db, "react/");
@@ -169,6 +173,39 @@ const CommentForm = ({ post, commentLength }) => {
       })
       .catch(() => toast.error("Failed to publish comment."));
   };
+  const shareHandler=()=>{
+    
+      const blogData = {
+        name: user?.displayName,
+        description:  shareCaption,
+        time: moment().format(),
+        sharedBlogTime: post.time,
+        bloggerId: user?.uid,
+        imageUrl: user?.photoURL,
+        postImage: post.postImage || "", 
+        sharedBloggerId: post.bloggerId,
+        sharedBloggerName: post.name,
+        sharedDescription: post.description,
+        sharedBloggerImg: post.imageUrl,
+        postType: "share"
+      };
+      set(push(ref(db, "blogs/")), blogData)
+              .then(() => {
+                toast.success("Post Shared Successfully!");
+                set(push(ref(db, "notification/")), {
+        notifyReciver: post.bloggerId,
+        type: "react",
+        reactorId: user?.uid,
+        time: moment().format(),
+        content: `${
+          user?.displayName
+        } shared your post "${post.description.slice(0, 30)}..."`,
+      });
+              })
+              .catch(() => {
+                toast.error("Something went wrong!");
+              });
+  }
 
   return (
     <div className="bg-gradient-to-r font-secondary from-gray-50/80 to-white/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-200/50">
@@ -178,7 +215,9 @@ const CommentForm = ({ post, commentLength }) => {
           setReactionPop={setReactionPop}
         />
       )}
-
+  {
+    sharePop && <SharePostModal shareHandler={shareHandler} blog={selectSharePost} setShareCaption={setShareCaption} setSharePop={setSharePop}/>
+  }
       {/* Like and Comment Stats */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-6">
@@ -208,6 +247,7 @@ const CommentForm = ({ post, commentLength }) => {
               </span>
             </button>
           )}
+          
 
           {/* Comment Count */}
           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
@@ -216,7 +256,17 @@ const CommentForm = ({ post, commentLength }) => {
               {commentLength} comments
             </span>
           </div>
+          <div onClick={()=>{
+            setSelectSharePost(post)
+setSharePop(true)
+          }} className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-green-700 border border-green-200">
+            <FaRegShareSquare size={18} />
+            <span className="font-semibold text-sm">
+              Share
+            </span>
+          </div>
         </div>
+        
 
         {/* Additional Actions */}
         <button

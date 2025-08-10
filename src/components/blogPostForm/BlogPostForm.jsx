@@ -113,6 +113,7 @@ return (
         </h3>
         <p className="text-sm text-gray-500">Share your thoughts with the world</p>
       </div>
+      
     </div>
 
     {/* Textarea Section */}
