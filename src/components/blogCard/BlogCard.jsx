@@ -125,6 +125,7 @@ const BlogCard = ({ blog }) => {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
+            <span className="mr-2 text-xs text-gray-400 font-normal">Shared a post from {blog.bloggerId==blog.sharedBloggerId ? " his own" : blog.sharedBloggerName}</span>
             {user?.uid === blog.bloggerId && !editMode ? (
               <div className="relative">
                 {/* Three Dot Button */}
@@ -132,8 +133,7 @@ const BlogCard = ({ blog }) => {
                   onClick={() => setShowMenu(!showMenu)}
                   className="p-2 flex items-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all duration-200"
                 >
-                  <span className="mr-2 text-xs text-gray-400 font-normal">Shared a post from {blog.bloggerId==blog.sharedBloggerId ? " his own" : blog.sharedBloggerName}</span>
-                  <Ellipsis size={16} />
+                  
                 </button>
                 {/* Dropdown Menu */}
                 {showMenu && (

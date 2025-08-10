@@ -256,6 +256,9 @@ const CommentForm = ({ post, commentLength }) => {
               {commentLength} comments
             </span>
           </div>
+          {
+            user && (
+
           <div onClick={()=>{
             setSelectSharePost(post)
 setSharePop(true)
@@ -265,6 +268,8 @@ setSharePop(true)
               Share
             </span>
           </div>
+            )
+          }
         </div>
         
 

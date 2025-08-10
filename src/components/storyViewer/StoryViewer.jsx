@@ -214,13 +214,13 @@ const StoryViewer = ({friendList, story, onClose }) => {
             </div>
             <button
               disabled={!message}
-              onClick={sentMessageHandler}
+              onClick={()=>sentMessageHandler()}
               className="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 rounded-full flex items-center justify-center transition-all"
             >
               <Send className="w-5 h-5 text-black" />
             </button>
             <button
-              onClick={sentMessageHandler}
+              onClick={()=>sentMessageHandler("love")}
               className="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 rounded-full flex items-center justify-center transition-all"
             >
               <Heart className="w-5 h-5 text-black" />
