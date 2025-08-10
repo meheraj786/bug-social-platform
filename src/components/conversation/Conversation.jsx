@@ -374,6 +374,7 @@ const Conversation = ({ msgNotif }) => {
                         )}
                       </div>
                       }
+
                       {/* <div className="text-sm leading-relaxed break-words">
                         {msg.message === "like" ? (
                           <AiFillLike className="text-3xl animate-bounce" />
@@ -395,6 +396,11 @@ const Conversation = ({ msgNotif }) => {
                       >
                         {moment(msg.time).fromNow()}
                       </div>
+                      {
+                        msg.from=="story" && (
+                          <span className="text-[12px] text-gray-400 italic">Message From Story</span>
+                        )
+                      }
                     </div>
                   </div>
                     )

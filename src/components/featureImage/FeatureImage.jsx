@@ -100,7 +100,7 @@ const addStoryHandler = () => {
     time: moment().format(),
   };
 
-  if (storyText && selectedImage) {
+  if (storyText || selectedImage) {
     set(push(ref(db, "story/")), storyData).then(() => {
       toast.success("Story Added Successfully!");
       setSelectedImage(null);

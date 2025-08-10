@@ -1,7 +1,7 @@
 import { MoreHorizontal, X, Heart, Send, Play, Pause, Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import moment from "moment";
-import { getDatabase, ref, remove } from "firebase/database";
+import { getDatabase, push, ref, remove, set } from "firebase/database";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { Link } from "react-router";
@@ -9,7 +9,7 @@ import { Link } from "react-router";
 const StoryViewer = ({ story, onClose }) => {
   const [pause, setPause] = useState(false);
   const db=getDatabase()
-  
+  const [message, setMessage]= useState("")
   const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
@@ -30,7 +30,34 @@ const StoryViewer = ({ story, onClose }) => {
   const formatTime = (time) => {
     return moment(time).fromNow();
   };
-  console.log(story, "selcstory");
+  const sentMessageHandler = () => {
+
+
+        set(push(ref(db, "message")), {
+          senderid: user?.uid,
+          sendername: user?.displayName,
+          reciverid: story.storyCreatorId,
+          recivername: story.storyCreatorName,
+          message: message,
+          msgImg: story.storyImage || "",
+          replyMsg: story.storyText || "",
+          status:"reply",
+          from:"story",
+          time: moment().format(),
+        })
+          .then(() => {
+            set(push(ref(db, "messagenotification/")), {
+              senderid: user?.uid,
+              reciverid: story.storyCreatorId,
+            });
+            toast.success("Message Send")
+          })
+          .catch((err) => {
+            console.error(err);
+            toast.error("Failed to send message.");
+          });
+      setMessage("")
+    };
 
   return (
     <div onClick={()=>setPause(!pause)} className="fixed inset-0 bg-gradient-to-br from-purple-500 to-blue-500 z-50 flex items-center justify-center">
@@ -129,7 +156,30 @@ const StoryViewer = ({ story, onClose }) => {
           </div>
         </div>
       )}
+            {/* Bottom Actions */}
+      <div className="absolute bottom-4 left-4 right-4 z-20">
+        <div className="flex items-center space-x-3">
+          <div className="flex-1 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-4 py-3">
+            <input
+  value={message}
+  onChange={(e) => {
+    setMessage(e.target.value);
+    setPause(true);
+  }} 
+  onFocus={() => setPause(true)}
+  onBlur={() => setPause(false)} 
+  type="text"
+  placeholder="Reply to story..."
+  className="w-full bg-transparent text-black placeholder-black placeholder-opacity-80 text-sm focus:outline-none font-medium"
+/>
+          </div>
+          <button disabled={!message} onClick={sentMessageHandler} className="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 rounded-full flex items-center justify-center transition-all">
+            <Send className="w-5 h-5 text-black" />
+          </button>
+        </div>
+      </div>
     </div>
+    
   );
 };
 
