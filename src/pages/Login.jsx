@@ -132,7 +132,7 @@ const Login = () => {
                   Continue with Google
                 </span>
               </button>
-              <button
+              {/* <button
                 onClick={() => handleSocialLogin("Facebook")}
                 className="w-full bg-blue-600 rounded-xl py-3 px-4 flex items-center justify-center space-x-3 hover:bg-blue-700 transition-colors duration-200"
               >
@@ -140,7 +140,7 @@ const Login = () => {
                 <span className="font-semibold text-white">
                   Continue with Facebook
                 </span>
-              </button>
+              </button> */}
             </div>
 
             <div className="relative mb-8">
@@ -274,7 +274,7 @@ const Login = () => {
         </div>
 
         {/* Security Info */}
-        <div className="mt-6 bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-200">
+        {/* <div className="mt-6 bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-200">
           <div className="flex items-center space-x-3">
             <Shield className="w-6 h-6 text-green-500" />
             <div>
@@ -284,7 +284,7 @@ const Login = () => {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </motion.div>
   );
