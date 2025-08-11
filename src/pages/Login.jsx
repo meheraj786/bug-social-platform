@@ -18,6 +18,7 @@ import { setUser } from "../features/user/userSlice";
 import { useNavigate } from "react-router";
 
   import { motion } from "motion/react";
+import { FaGoogle } from "react-icons/fa6";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -127,7 +128,7 @@ const Login = () => {
                 onClick={() => handleSocialLogin("Google")}
                 className="w-full bg-white border-2 border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center space-x-3 hover:border-gray-300 hover:shadow-md transition-all duration-200"
               >
-                <div className="w-5 h-5 bg-gradient-to-r from-red-500 to-yellow-500 rounded-full"></div>
+  <FaGoogle className="w-6 h-6" />
                 <span className="font-semibold text-gray-700">
                   Continue with Google
                 </span>

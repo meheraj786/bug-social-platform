@@ -14,19 +14,26 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { Link } from "react-router";
 
-const StoryViewer = ({friendList, story, onClose }) => {
+const StoryViewer = ({ friendList, story, onClose }) => {
   const [pause, setPause] = useState(false);
   const db = getDatabase();
   const [message, setMessage] = useState("");
   const user = useSelector((state) => state.user.user);
+  const [progress, setProgress] = useState(0);
+  const duration = 3000;
 
   useEffect(() => {
     if (pause) return;
-
-    const interval = setInterval(() => {
-      onClose();
-    }, 3000);
-
+    const startTime = Date.now();
+    const tick = () => {
+      const elapsed = Date.now() - startTime;
+      const percentage = Math.min((elapsed / duration) * 100, 100);
+      setProgress(percentage);
+      if (percentage >= 100) {
+        onClose();
+      }
+    };
+    const interval = setInterval(tick, 30);
     return () => clearInterval(interval);
   }, [pause, onClose]);
   const storyDeleteHandler = () => {
@@ -97,8 +104,9 @@ const StoryViewer = ({friendList, story, onClose }) => {
       onClick={() => setPause(!pause)}
       className="fixed inset-0 bg-gradient-to-br from-purple-500 to-blue-500 z-50 flex items-center justify-center"
     >
+
       {/* Header */}
-      <div className="absolute pt-20  top-8 left-4 right-4 z-20 flex items-center justify-between">
+      <div className="absolute pt-10  top-8 left-4 right-4 z-20 flex items-center justify-between">
         <Link to={`/profile/${story.storyCreatorId}`}>
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-full bg-white p-0.5">
@@ -126,6 +134,12 @@ const StoryViewer = ({friendList, story, onClose }) => {
             </div>
           </div>
         </Link>
+              <div className="absolute top-9 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-blue-500">
+        <div
+          className="h-full bg-white transition-all duration-100 ease-linear"
+          style={{ width: `${progress}%` }}
+        ></div>
+      </div>
         <div className="flex items-center space-x-2">
           {/* Pause/Play Button */}
           <button
@@ -195,39 +209,41 @@ const StoryViewer = ({friendList, story, onClose }) => {
         </div>
       )}
       {/* Bottom Actions */}
-      {story.storyCreatorId !== user?.uid && (friendList.includes(story.storyCreatorId+user?.uid)|| friendList.includes(user?.uid+story.storyCreatorId)) &&(
-        <div className="absolute bottom-4 left-4 right-4 z-20">
-          <div className="flex items-center space-x-3">
-            <div className="flex-1 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-4 py-3">
-              <input
-                value={message}
-                onChange={(e) => {
-                  setMessage(e.target.value);
-                  setPause(true);
-                }}
-                onFocus={() => setPause(true)}
-                onBlur={() => setPause(false)}
-                type="text"
-                placeholder="Reply to story..."
-                className="w-full bg-transparent text-black placeholder-black placeholder-opacity-80 text-sm focus:outline-none font-medium"
-              />
+      {story.storyCreatorId !== user?.uid &&
+        (friendList.includes(story.storyCreatorId + user?.uid) ||
+          friendList.includes(user?.uid + story.storyCreatorId)) && (
+          <div className="absolute bottom-4 left-4 right-4 z-20">
+            <div className="flex items-center space-x-3">
+              <div className="flex-1 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-4 py-3">
+                <input
+                  value={message}
+                  onChange={(e) => {
+                    setMessage(e.target.value);
+                    setPause(true);
+                  }}
+                  onFocus={() => setPause(true)}
+                  onBlur={() => setPause(false)}
+                  type="text"
+                  placeholder="Reply to story..."
+                  className="w-full bg-transparent text-black placeholder-black placeholder-opacity-80 text-sm focus:outline-none font-medium"
+                />
+              </div>
+              <button
+                disabled={!message}
+                onClick={() => sentMessageHandler()}
+                className="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 rounded-full flex items-center justify-center transition-all"
+              >
+                <Send className="w-5 h-5 text-black" />
+              </button>
+              <button
+                onClick={() => sentMessageHandler("love")}
+                className="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 rounded-full flex items-center justify-center transition-all"
+              >
+                <Heart className="w-5 h-5 text-black" />
+              </button>
             </div>
-            <button
-              disabled={!message}
-              onClick={()=>sentMessageHandler()}
-              className="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 rounded-full flex items-center justify-center transition-all"
-            >
-              <Send className="w-5 h-5 text-black" />
-            </button>
-            <button
-              onClick={()=>sentMessageHandler("love")}
-              className="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 rounded-full flex items-center justify-center transition-all"
-            >
-              <Heart className="w-5 h-5 text-black" />
-            </button>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 };

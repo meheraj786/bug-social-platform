@@ -257,7 +257,7 @@ const CommentForm = ({ post, commentLength }) => {
             </span>
           </div>
           {
-            user && (
+            user && post.postType !== "share" && (
 
           <div onClick={()=>{
             setSelectSharePost(post)

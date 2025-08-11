@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import Button from "../layouts/Button";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import toast, { Toaster } from "react-hot-toast";
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowLeft, ArrowRight, Mail } from "lucide-react";
 
 const ForgotPassPage = () => {
   const [email, setEmail] = useState("");
@@ -103,12 +103,12 @@ const ForgotPassPage = () => {
 
           {/* Back to Login */}
           <div className="mt-8 text-center">
+            <Link to="/login">
             <button className="text-white text-opacity-70 text-sm hover:text-white transition-colors duration-200 inline-flex items-center gap-1 group">
-              <svg className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+              <ArrowLeft/>
               <span>Back to Login</span>
             </button>
+            </Link>
           </div>
         </div>
 
