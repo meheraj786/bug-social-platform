@@ -104,7 +104,7 @@ return (
                 alt={friend.name}
                 className="w-12 h-12 rounded-full object-cover border-2 border-purple-200 group-hover:border-purple-400 transition-colors duration-300"
               />
-              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+              {/* <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div> */}
             </div>
             
             <Link to={`/profile/${friend.id}`} className="flex-1 min-w-0">

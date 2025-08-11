@@ -126,7 +126,7 @@ return (
                     alt={friend.name}
                     className="w-12 h-12 rounded-full object-cover ring-2 ring-white"
                   />
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                  {/* <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div> */}
                 </div>
                 <span className="font-medium text-gray-800 truncate">
                   {friend.name}

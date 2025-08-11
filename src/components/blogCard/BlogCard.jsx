@@ -103,7 +103,7 @@ const BlogCard = ({ blog }) => {
                   </div>
                 )}
                 {/* Online status indicator */}
-                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
+                {/* <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-sm"></div> */}
               </div>
 
               <div className="flex-1">
@@ -218,7 +218,7 @@ const BlogCard = ({ blog }) => {
                   </div>
                 )}
                 {/* Online status indicator */}
-                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
+                {/* <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-sm"></div> */}
               </div>
 
               <div className="flex-1">
@@ -282,7 +282,7 @@ const BlogCard = ({ blog }) => {
                   </div>
                 )}
                 {/* Online status indicator */}
-                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
+                {/* <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-sm"></div> */}
               </div>
 
               <div className="flex-1">

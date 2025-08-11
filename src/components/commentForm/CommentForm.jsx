@@ -316,7 +316,7 @@ setSharePop(true)
                            font-medium resize-none"
                   />
 
-                  {/* Floating Actions */}
+                  {/* Floating Actions
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     <button className="p-1.5 rounded-full text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
                       <svg
@@ -348,7 +348,7 @@ setSharePop(true)
                         />
                       </svg>
                     </button>
-                  </div>
+                  </div> */}
                 </div>
 
                 {error && (
