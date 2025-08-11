@@ -133,7 +133,7 @@ const BlogCard = ({ blog }) => {
                   onClick={() => setShowMenu(!showMenu)}
                   className="p-2 flex items-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all duration-200"
                 >
-                  
+                  <Ellipsis size={16}/>
                 </button>
                 {/* Dropdown Menu */}
                 {showMenu && (
@@ -202,7 +202,7 @@ const BlogCard = ({ blog }) => {
         <Flex className="justify-between items-start">
           <Flex className="gap-4 items-center flex-1">
             <Link
-              to={`profile/${blog.sharedBloggerId}`}
+              to={`/profile/${blog.sharedBloggerId}`}
               className="flex items-center gap-3 text-gray-800 hover:text-purple-600 transition-all duration-300 group/profile"
             >
               <div className="relative">
