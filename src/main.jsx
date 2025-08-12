@@ -17,11 +17,13 @@ import Messages from "./pages/Messages.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import Conversation from "./components/conversation/Conversation.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
+    errorElement: <NotFound/>,
     children: [
       { index: true, element: <App/> },
       { path: "/blogs", element: <AuthProtect><Blogs/></AuthProtect>  },
@@ -34,6 +36,7 @@ const router = createBrowserRouter([
       { path: "/messages", Component: Messages, children:[{
         path: '/messages/chat/:id', Component: Conversation,
       }] },
+      { path: "*", element: <NotFound/> }
     ],
   },
 ]);
