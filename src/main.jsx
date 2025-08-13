@@ -18,6 +18,8 @@ import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import Conversation from "./components/conversation/Conversation.jsx";
 import NotFound from "./pages/NotFound.jsx";
+import CreatePages from "./pages/CreatePages.jsx";
+import PageProfile from "./pages/PageProfile.jsx";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +31,8 @@ const router = createBrowserRouter([
       { path: "/blogs", element: <AuthProtect><Blogs/></AuthProtect>  },
       { path: "/profile/:id", element: <AuthProtect><Profile/></AuthProtect>  },
       { path: "/auth", Component: AuthPage },
+      { path: "/create-pages", Component: CreatePages },
+      { path: "/page-profile/:id", Component: PageProfile },
       { path: "/login", Component: Login },
       { path: "/signup", Component: Signup },
       { path: "/forgotpassword", Component: ForgotPassPage },
