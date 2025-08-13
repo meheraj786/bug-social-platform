@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BiGlobe, BiImage, BiX, BiHeart, BiComment, BiShare, BiStar } from 'react-icons/bi';
 import { useParams } from 'react-router';
-import { getDatabase, onValue, push, ref, set } from 'firebase/database';
-import { Camera, ThumbsUp, UserPlus, MessageCircle, Share2 } from "lucide-react";
+import { getDatabase, onValue, push, ref, remove, set } from 'firebase/database';
+import { Camera, ThumbsUp, UserPlus, MessageCircle, Share2, UserRoundPlus, UserRoundX } from "lucide-react";
 import { FaImage, FaCalendar, FaBriefcase, FaShoppingCart, FaNewspaper } from 'react-icons/fa';
 import { X } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import Container from '../layouts/Container';
 import BlogCard from '../components/blogCard/BlogCard';
+import CustomToast from "../layouts/CustomToast";
 import moment from 'moment';
 import toast from 'react-hot-toast';
 
@@ -26,6 +27,11 @@ const PageProfile = () => {
   const [eventTime, setEventTime] = useState('');
   const [jobSalary, setJobSalary] = useState('');
   const [productPrice, setProductPrice] = useState('');
+  
+  const [followingId, setFollowingId] = useState([]);
+  const [followers, setFollowers] = useState([]);
+  const [ownFollwers, setOwnFollowers] = useState([]);
+  const [ownFollowing, setOwnFollowing] = useState([]);
 
   // Content type options
   const contentTypes = [
@@ -102,6 +108,106 @@ const PageProfile = () => {
         setBlogList(arr);
       });
     }, [db, id]);
+
+
+      useEffect(() => {
+    const followRef = ref(db, "follow/");
+    onValue(followRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((data) => {
+        const follow = data.val();
+        if (
+          follow.followerid == user?.uid &&
+          follow.followingid == pageData?.id
+        ) {
+          arr.push({ ...follow, id: data.key });
+        }
+      });
+      setFollowers(arr);
+    });
+  }, [db, user, pageData]);
+  useEffect(() => {
+    const followRef = ref(db, "follow/");
+    onValue(followRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((data) => {
+        const follow = data.val();
+        if (
+          follow.followerid == user?.uid &&
+          follow.followingid == pageData?.id
+        ) {
+          arr.push(follow.followingid);
+        }
+      });
+      setFollowingId(arr);
+    });
+  }, [db, user, pageData]);
+  useEffect(() => {
+    const followRef = ref(db, "follow/");
+    onValue(followRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((data) => {
+        const follow = data.val();
+        arr.push({ ...follow, id: data.key });
+      });
+      setOwnFollowers(
+        arr.filter((follower) => follower.followingid == pageData?.id)
+      );
+      setOwnFollowing(
+        arr.filter((follower) => follower.followerid == pageData?.id)
+      );
+    });
+  }, [db, user, id, pageData]);
+
+      const followHandler = (following) => {
+        console.log(following);
+        set(push(ref(db, "follow/")), {
+          followerid: user?.uid,
+          followername: user?.displayName,
+          followingid: following.id,
+          followerimg: user?.photoURL,
+          followingname: following.pageName,
+          followingimg: following.image,
+          adminid: following.adminId,
+          time: moment().format(),
+        });
+        toast.custom((t) => (
+          <CustomToast
+            t={t}
+            img={following.image}
+            name={following.pageName}
+            content={`You're Following ${following.pageName}`}
+          />
+        ));
+        set(push(ref(db, "notification/")), {
+          notifyReciver: following.adminId,
+          type: "positive",
+          time: moment().format(),
+          content: `${user?.displayName} starts following your page ${following.pageName}!`,
+        });
+      };
+      const unFollowHandler = (followId) => {
+        followers.forEach((follow) => {
+          if (follow.followerid == user?.uid && follow.followingid == followId.id) {
+            remove(ref(db, "follow/" + follow.id));
+            toast.success(`Your'e Unfollowing ${follow.name}`);
+            toast.custom((t) => (
+              <CustomToast
+                t={t}
+                img={followId.image}
+                name={followId.pageName}
+                content={`You unfollow${followId.pageName}`}
+              />
+            ));
+          }
+          set(push(ref(db, "notification/")), {
+            notifyReciver: followId.adminId,
+            type: "negative",
+            time: moment().format(),
+            content: `${user?.displayName} unfollow you!`,
+          });
+        });
+      };
 
   if (!pageData) {
     return (
@@ -198,7 +304,7 @@ const PageProfile = () => {
           group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-blue-500 
           group-hover:bg-clip-text group-hover:text-transparent"
                       >
-                        {/* {ownFollwers.length} */} 0
+                        {ownFollwers.length} 
                       </div>
                       <div
                         className="text-sm font-medium text-gray-500 transition-all duration-300 
@@ -303,23 +409,23 @@ const PageProfile = () => {
                     null
                   )} */}
                 </div>
-                {/* {id !== user?.uid && !followingId.includes(userProfile?.id) ? (
+                {pageData.adminId !== user?.uid && !followingId.includes(pageData?.id) ? (
                   <button
-                    onClick={() => followHandler(userProfile)}
+                    onClick={() => followHandler(pageData)}
                     className="bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-blue-300 px-6 py-3 rounded-2xl text-gray-700 hover:text-blue-600 font-semibold shadow-lg transition-all duration-300 flex items-center gap-2"
                   >
                     <UserRoundPlus />
                     Follow
                   </button>
-                ) : id !== user?.uid && followingId.includes(userProfile?.id) ? (
+                ) : id !== user?.uid && followingId.includes(pageData?.id) ? (
                   <button
-                    onClick={() => unFollowHandler(userProfile)}
+                    onClick={() => unFollowHandler(pageData)}
                     className="bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-blue-300 px-6 py-3 rounded-2xl text-gray-700 hover:text-blue-600 font-semibold shadow-lg transition-all duration-300 flex items-center gap-2"
                   >
                     <UserRoundX />
                     Unfollow
                   </button>
-                ) : null} */}
+                ) : null}
               </div>
             </div>
           </motion.div>
