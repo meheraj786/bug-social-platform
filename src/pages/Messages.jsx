@@ -52,7 +52,6 @@ const Messages = () => {
       let arr = [];
       snapshot.forEach((item) => {
         const notification = item.val();
-
         if (notification.reciverid == currentUser?.uid) {
           arr.push({...notification, id:item.key});
         }
@@ -73,8 +72,7 @@ const Messages = () => {
       );
     });
   }, [db, pageId]);
-    console.log(ownFollowing, "ownFollow");
-    console.log(pageId, "pageId");
+    console.log(msgNotif, "msgNotif from userMsg");
     
   const handleMsgNotificationDelete = (friend) => {
     msgNotif.forEach((item) => {
@@ -83,6 +81,14 @@ const Messages = () => {
           item.reciverid === currentUser.uid) ||
         (item.senderid === currentUser.uid &&
           item.reciverid === friend.id)
+      ) {
+        const notificationRef = ref(db, "messagenotification/" + item.id);
+        remove(notificationRef);
+      } else if (
+        (item.senderid === friend.followingid &&
+          item.reciverid === currentUser.uid) ||
+        (item.senderid === currentUser.uid &&
+          item.reciverid === friend.followingid)
       ) {
         const notificationRef = ref(db, "messagenotification/" + item.id);
         remove(notificationRef);
@@ -167,14 +173,14 @@ return (
               <Link to={`/messages/chat/${friend.followingid}`}>
               <div
                 key={friend.followingid}
-                // onClick={()=>handleMsgNotificationDelete(friend)}
+                onClick={()=>handleMsgNotificationDelete(friend)}
                 className="flex relative items-center gap-4 p-3 bg-white/80 rounded-xl border border-white/60 shadow hover:shadow-lg cursor-pointer transition-all hover:scale-[1.02]"
                 >
-                {/* {
-                  msgNotification.includes(friend.id) && (
+                {
+                  msgNotification.includes(friend.followingid) && (
                     <span className='w-3 h-3 absolute top-2 right-2 rounded-full  bg-red-500 animate-pulse'></span>
                   )
-                } */}
+                }
                 <div className="relative">
                   <img
                     src={friend.followingimg}

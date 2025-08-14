@@ -77,7 +77,6 @@ const PageConversation = ({ msgNotif, page }) => {
       });
     }, [db, chatId, page]);
 
-  console.log(roomuser, "fromPageConvo");
   
 
   const handleMsgNotificationDelete = () => {
@@ -85,10 +84,10 @@ const PageConversation = ({ msgNotif, page }) => {
 
     msgNotif.forEach((item) => {
       if (
-        (item.senderid === roomuser.senderid &&
-          item.reciverid === roomuser.reciverid) ||
-        (item.senderid === roomuser.reciverid &&
-          item.reciverid === roomuser.senderid)
+        (item.senderid === chatId &&
+          item.reciverid === page) ||
+        (item.senderid === page &&
+          item.reciverid === chatId)
       ) {
         const notificationRef = ref(db, "messagenotification/" + item.id);
         remove(notificationRef);
@@ -141,7 +140,7 @@ const PageConversation = ({ msgNotif, page }) => {
           setMessage("");
           setReplyMsg("");
           set(push(ref(db, "messagenotification/")), {
-            senderid: data?.uid,
+            senderid: senderid,
             reciverid: reciverid,
           });
         })
@@ -165,7 +164,7 @@ const PageConversation = ({ msgNotif, page }) => {
           setMessage("");
           setReplyMsg("");
           set(push(ref(db, "messagenotification/")), {
-            senderid: data?.uid,
+            senderid: senderid,
             reciverid: reciverid,
           });
         })
@@ -178,30 +177,7 @@ const PageConversation = ({ msgNotif, page }) => {
     setImgUploadPop(false);
     setMsgImg("");
   };
-  const unFriendHandler = async () => {
-    const friendListRef = ref(db, "friendlist/");
-    const snapshot = await get(friendListRef);
 
-    snapshot.forEach((item) => {
-      const friend = item.val();
-      const friendId =
-        roomuser.senderid == data?.uid ? roomuser.reciverid : roomuser.senderid;
-      if (
-        (friend.senderid === data?.uid && friend.reciverid === friendId) ||
-        (friend.senderid === friendId && friend.reciverid === data?.uid)
-      ) {
-        remove(ref(db, "friendlist/" + item.key));
-        toast.success("Unfriended successfully");
-        set(push(ref(db, "notification/")), {
-          notifyReciver:
-            friend.senderid === data?.uid ? friend.reciverid : friend.senderid,
-          type: "negative",
-          time: moment().format(),
-          content: `${data?.displayName} unfriended you`,
-        });
-      }
-    });
-  };
 
   if (!roomuser) {
     return (
@@ -232,22 +208,6 @@ const PageConversation = ({ msgNotif, page }) => {
       onClick={handleMsgNotificationDelete}
       className="h-full flex flex-col bg-gradient-to-br from-white to-gray-50/50 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/20 max-w-3xl mx-auto relative overflow-hidden"
     >
-      {unFirendModalActive && (
-        <UnfriendPopup
-          unfriendPopup={setUnfriendModalActive}
-          unfriendHandler={unFriendHandler}
-          name={
-            roomuser.senderid == data?.uid
-              ? roomuser.recivername
-              : roomuser.sendername
-          }
-          image={
-            roomuser.senderid == data.uid
-              ? roomuser.reciverimg
-              : roomuser.senderimg
-          }
-        />
-      )}
       {imgUploadPop && (
         <ImageUploadPop
           setImgUploadPop={setImgUploadPop}

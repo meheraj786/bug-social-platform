@@ -51,21 +51,49 @@ const PageMessage = () => {
   // }, [currentUser?.uid, db]);
 
 
-  //   useEffect(() => {
-  //   const notificationRef = ref(db, "messagenotification/");
-  //   onValue(notificationRef, (snapshot) => {
-  //     let arr = [];
-  //     snapshot.forEach((item) => {
-  //       const notification = item.val();
+    useEffect(() => {
+    const notificationRef = ref(db, "messagenotification/");
+    onValue(notificationRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        const notification = item.val();
 
-  //       if (notification.reciverid == currentUser?.uid) {
-  //         arr.push({...notification, id:item.key});
-  //       }
-  //     });
-  //     setMsgNotif(arr);
-  //   });
-  // }, [currentUser?.uid, db]);
+        if (notification.reciverid == id) {
+          arr.push({...notification, id:item.key});
+        }
+      });
+      setMsgNotif(arr);
+    });
+  }, [id, db]);
 
+  useEffect(() => {
+      const notificationRef = ref(db, "messagenotification/");
+      onValue(notificationRef, (snapshot) => {
+        let arr = [];
+        snapshot.forEach((item) => {
+          const notification = item.val();
+          if (notification.reciverid == id) {
+            arr.push({...notification, id:item.key});
+          }
+        });
+        setMsgNotif(arr);
+      })
+    },[db, id])
+console.log(msgNotif, "msgNotif in page");
+    useEffect(() => {
+    const notificationRef = ref(db, "messagenotification/");
+    onValue(notificationRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        const notification = item.val();
+
+        if (notification.reciverid == id) {
+          arr.push(notification.senderid);
+        }
+      });
+      setMsgNotification(arr);
+    });
+  }, [id, db]);
 
   useEffect(() => {
     const followRef = ref(db, "follow/");
@@ -84,10 +112,10 @@ const PageMessage = () => {
   const handleMsgNotificationDelete = (friend) => {
     msgNotif.forEach((item) => {
       if (
-        (item.senderid === friend.id &&
-          item.reciverid === currentUser.uid) ||
-        (item.senderid === currentUser.uid &&
-          item.reciverid === friend.id)
+        (item.senderid === friend.followerid &&
+          item.reciverid === id) ||
+        (item.senderid === id &&
+          item.reciverid === friend.followerid)
       ) {
         const notificationRef = ref(db, "messagenotification/" + item.id);
         remove(notificationRef);
@@ -96,32 +124,6 @@ const PageMessage = () => {
   };
 
 
-  // useEffect(() => {
-  //   const requestRef = ref(db, 'friendlist/');
-  //   onValue(requestRef, (snapshot) => {
-  //     let arr = [];
-  //     snapshot.forEach((item) => {
-  //       const request = item.val();
-  //       if (request.senderid === currentUser.uid || request.reciverid === currentUser.uid) {
-  //         const isSender = request.senderid === currentUser.uid;
-  //         const friendId = isSender ? request.reciverid : request.senderid;
-  //         const friendName = isSender ? request.recivername : request.sendername;
-  //         const friendEmail = isSender ? request.reciveremail : request.senderemail;
-  //         const friendImage = isSender ? request.reciverimg : request.senderimg;
-
-  //         arr.push({
-  //           id: friendId,
-  //           name: friendName,
-  //           email: friendEmail,
-  //           image: friendImage,
-  //           listId: item.key,
-  //         });
-  //       }
-  //     });
-  //     setFriendList(arr);
-  //     setFriendListLoading(false);
-  //   });
-  // }, []);
 
 return (
   <div className="h-screen pt-[50px] bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-6">
@@ -146,14 +148,14 @@ return (
               <Link to={`/pagemessages/${friend.followingid}/chat/${friend.followerid}`}>
               <div
                 key={friend.followersid}
-                // onClick={()=>handleMsgNotificationDelete(friend)}
+                onClick={()=>handleMsgNotificationDelete(friend)}
                 className="flex relative items-center gap-4 p-3 bg-white/80 rounded-xl border border-white/60 shadow hover:shadow-lg cursor-pointer transition-all hover:scale-[1.02]"
                 >
-                {/* {
-                  msgNotification.includes(friend.id) && (
+                {
+                  msgNotification.includes(friend.followerid) && (
                     <span className='w-3 h-3 absolute top-2 right-2 rounded-full  bg-red-500 animate-pulse'></span>
                   )
-                } */}
+                }
                 <div className="relative">
                   <img
                     src={friend.followerimg}
