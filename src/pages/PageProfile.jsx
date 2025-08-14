@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BiGlobe, BiImage, BiX, BiHeart, BiComment, BiShare, BiStar } from 'react-icons/bi';
-import { useNavigate, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import { getDatabase, onValue, push, ref, remove, set } from 'firebase/database';
 import { Camera, ThumbsUp, UserPlus, MessageCircle, Share2, UserRoundPlus, UserRoundX, MessageCircleCode } from "lucide-react";
 import { FaImage, FaCalendar, FaBriefcase, FaShoppingCart, FaNewspaper } from 'react-icons/fa';
@@ -12,6 +12,7 @@ import BlogCard from '../components/blogCard/BlogCard';
 import CustomToast from "../layouts/CustomToast";
 import moment from 'moment';
 import toast from 'react-hot-toast';
+import FollowersModal from '../layouts/FollowersModal.jsx'
 
 const PageProfile = () => {
   const [pageData, setPageData] = useState(null);
@@ -29,9 +30,10 @@ const PageProfile = () => {
   const [productPrice, setProductPrice] = useState('');
   const [followingId, setFollowingId] = useState([]);
   const [followers, setFollowers] = useState([]);
-  const [ownFollwers, setOwnFollowers] = useState([]);
+  const [ownFollowers, setOwnFollowers] = useState([]);
   const navigate=useNavigate()
   const [ownFollowing, setOwnFollowing] = useState([]);
+  const [followersPop, setFollowersPop]= useState(false)
 
   // Content type options
   const contentTypes = [
@@ -222,35 +224,13 @@ const PageProfile = () => {
   }
   return (
       <div className="bg-gradient-to-br font-secondary from-gray-50 via-blue-50/30 to-purple-50/30 min-h-screen ">
-        {/* {unFriendPop && (
-          <UnfriendPopup
-            name={selectFriend.name}
-            image={selectFriend.image}
-            unfriendPopup={setUnfriendPop}
-            unfriendHandler={unFriendHandler}
-          />
-        )}
-        {friendsPop && (
-          <FriendsModal
-            setSelectFriend={setSelectFriend}
-            setUnfriendPop={setUnfriendPop}
-            friends={friends}
-            setFriendsPop={setFriendsPop}
-          />
-        )}
         {followersPop && (
           <FollowersModal
             followingId={followingId}
-            followers={ownFollwers}
+            followers={ownFollowers}
             setFollowersPop={setFollowersPop}
           />
         )}
-        {followingPop && (
-          <FollowingModal
-            following={ownFollowing}
-            setFollowingPop={setFollowingPop}
-          />
-        )} */}
         {/* Cover Section with Glass Effect */}
         <div className="relative w-full h-80 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden">
           {/* Animated Background Elements */}
@@ -300,7 +280,7 @@ const PageProfile = () => {
   
                     {/* Followers */}
                     <div
-                      // onClick={() => setFollowersPop(true)} 0
+                      onClick={() => setFollowersPop(true)} 
                       className="text-center group cursor-pointer transition-colors duration-300"
                     >
                       <div
@@ -308,7 +288,7 @@ const PageProfile = () => {
           group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-blue-500 
           group-hover:bg-clip-text group-hover:text-transparent"
                       >
-                        {ownFollwers.length} 
+                        {ownFollowers.length} 
                       </div>
                       <div
                         className="text-sm font-medium text-gray-500 transition-all duration-300 
@@ -530,7 +510,7 @@ const PageProfile = () => {
                 </div>
               </div>
   
-              {/* Friends Preview Card */}
+              {/* Followers Preview Card */}
               <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-xl font-primary font-bold text-gray-800 flex items-center gap-2">
@@ -550,24 +530,24 @@ const PageProfile = () => {
                     Friends
                   </h3>
                   <span
-                    // onClick={() => setFriendsPop(true)}
+                    onClick={() => setFollowersPop(true)}
                     className="text-sm text-gray-500 hover:text-blue-500 cursor-pointer font-medium"
                   >
-                    {/* {friends.length} friends */} 0
+                    {ownFollowers.length} Followers 
                   </span>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
-                  {/* {friends.map((i) => (
-                    <Link to={`/profile/${i.id}`}>
+                  {ownFollowers.map((i) => (
+                    <Link to={`/profile/${i.followerid}`}>
                       <div key={i} className="group cursor-pointer">
                         <img
-                          src={i.image}
+                          src={i.followerimg}
                           alt="friend"
                           className="w-full aspect-square rounded-2xl object-cover group-hover:scale-105 transition-transform duration-300 shadow-md"
                         />
                       </div>
                     </Link>
-                  ))} */}
+                  ))}
                 </div>
                 {/* <button className="w-full mt-4 text-blue-600 hover:text-blue-700 font-semibold text-sm py-2 hover:bg-blue-50 rounded-xl transition-colors duration-200">
                 See all friends
