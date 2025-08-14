@@ -23,33 +23,23 @@ const PageMessage = () => {
   const [ownFollowers, setOwnFollowers]= useState([])
   const [msgNotif, setMsgNotif]= useState([])
   const [pageId, setPageId]= useState([])
+  const [lastMessage,setLastMessage]= useState([])
 
-    // useEffect(() => {
-    //   const requestRef = ref(db, "page/");
-    //   onValue(requestRef, (snapshot) => {
-    //     let arr=[]
-    //     snapshot.forEach((item) => {
-    //       arr.push(item.key)
-    //     });
-    //     setPageId(arr);
-    //   });
-    // }, [db]);
-    
-  //   useEffect(() => {
-  //   const notificationRef = ref(db, "messagenotification/");
-  //   onValue(notificationRef, (snapshot) => {
-  //     let arr = [];
-  //     snapshot.forEach((item) => {
-  //       const notification = item.val();
+  useEffect(() => {
+    const messageRef = ref(db, "message/");
+    const unsubscribe = onValue(messageRef, (snapshot) => {
+      let arr = [];
 
-  //       if (notification.reciverid == currentUser?.uid) {
-  //         arr.push(notification.senderid);
-  //       }
-  //     });
-  //     setMsgNotification(arr);
-  //   });
-  // }, [currentUser?.uid, db]);
+      snapshot.forEach((item) => {
+        const message = item.val();
+        const messageId = item.key;
+        arr.push({ ...message, id: messageId });
+      });
+      setLastMessage(arr);
+    });
 
+    return () => unsubscribe();
+  }, [db]);
 
     useEffect(() => {
     const notificationRef = ref(db, "messagenotification/");
@@ -79,7 +69,6 @@ const PageMessage = () => {
         setMsgNotif(arr);
       })
     },[db, id])
-console.log(msgNotif, "msgNotif in page");
     useEffect(() => {
     const notificationRef = ref(db, "messagenotification/");
     onValue(notificationRef, (snapshot) => {
@@ -135,11 +124,11 @@ return (
         <div className="w-[30%] bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 p-4 overflow-y-auto h-[85vh]">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Active Friends
+              Your Followers
             </h2>
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-              {/* {friendList.length==0 ? "No Friends": friendList.length==1 ? `${friendList.length} Friend`: `${friendList.length} Friends`}  */} 00
+              {ownFollowers.length==0 ? "No Follower": ownFollowers.length==1 ? `${ownFollowers.length} Follower`: `${ownFollowers.length} Followers`}  
             </div>
           </div>
 
@@ -164,10 +153,32 @@ return (
                   />
                   {/* <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div> */}
                 </div>
+                <div className='flex flex-col justify-center items-start'>
                 <span className="font-medium text-gray-800 truncate">
                   {friend.followername}
                 </span>
+                <span className="font-medium truncate text-sm text-gray-500">
+  {
+    (() => {
+      const msgs = lastMessage.filter(
+        (msg) =>
+          (msg.senderid === friend.followerid && msg.reciverid === friend.followingid) ||
+          (msg.senderid === friend.followingid && msg.reciverid === friend.followerid)
+      );
+
+      if (msgs.length === 0) return "No messages yet";
+
+      // Get last message
+      const last = msgs[msgs.length - 1];
+      return last.message.length > 20
+        ? last.message.slice(0, 20) + "..."
+        : last.message;
+    })()
+  }
+</span>
               </div>
+
+                </div>
               </Link>
             ))}
           </div>

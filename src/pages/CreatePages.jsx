@@ -1,43 +1,70 @@
-import { getDatabase, onValue, ref } from 'firebase/database';
-import React, { useEffect, useState } from 'react';
-import { BiPlus, BiX, BiImage, BiCategory, BiInfoCircle, BiSearch, BiFilter } from 'react-icons/bi';
-import { useSelector } from 'react-redux';
-import { Link } from 'react-router';
+import { getDatabase, onValue, ref } from "firebase/database";
+import React, { useEffect, useState } from "react";
+import {
+  BiPlus,
+  BiX,
+  BiImage,
+  BiCategory,
+  BiInfoCircle,
+  BiSearch,
+  BiFilter,
+} from "react-icons/bi";
+import { useSelector } from "react-redux";
+import { Link } from "react-router";
 
 const CreatePages = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const user = useSelector((state) => state.user.user);
-  const [pages, setPages]= useState([])
-  const db= getDatabase()
+  const [pages, setPages] = useState([]);
+  const db = getDatabase();
+  const [msgNotif, setMsgNotif] = useState([]);
 
-
-    useEffect(() => {
-      const requestRef = ref(db, "page/");
-      onValue(requestRef, (snapshot) => {
-        let arr = [];
-        snapshot.forEach((item) => {
-          const page = item.val();
-          if (page.adminId==user?.uid) {
-            arr.push({...page, id:item.key});
-          }
-        });
-        setPages(arr);
+  useEffect(() => {
+    const requestRef = ref(db, "page/");
+    onValue(requestRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        const page = item.val();
+        if (page.adminId == user?.uid) {
+          arr.push({ ...page, id: item.key });
+        }
       });
-    }, [db]);
-
-
+      setPages(arr);
+    });
+  }, [db]);
+  useEffect(() => {
+    const notificationRef = ref(db, "messagenotification/");
+    onValue(notificationRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        arr.push(item.val().reciverid);
+      });
+      setMsgNotif(arr);
+    });
+  }, [db]);
 
   const categories = [
-    "All", "Business", "Technology", "Food & Dining", "Travel", "Fashion", 
-    "Health & Fitness", "Entertainment", "Education", "Sports", "Art & Design"
+    "All",
+    "Business",
+    "Technology",
+    "Food & Dining",
+    "Travel",
+    "Fashion",
+    "Health & Fitness",
+    "Entertainment",
+    "Education",
+    "Sports",
+    "Art & Design",
   ];
 
-  const filteredPages = pages.filter(page => {
-    const matchesSearch = page.pageName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         page.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || page.category === selectedCategory;
+  const filteredPages = pages.filter((page) => {
+    const matchesSearch =
+      page.pageName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      page.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "all" || page.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -47,7 +74,9 @@ const CreatePages = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Pages</h1>
-          <p className="text-gray-600">Manage your pages and create new ones to connect with your audience</p>
+          <p className="text-gray-600">
+            Manage your pages and create new ones to connect with your audience
+          </p>
         </div>
 
         {/* Search and Filter Bar */}
@@ -71,7 +100,7 @@ const CreatePages = () => {
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all duration-200 bg-white"
                 >
-                  {categories.map(category => (
+                  {categories.map((category) => (
                     <option key={category} value={category.toLowerCase()}>
                       {category}
                     </option>
@@ -91,8 +120,11 @@ const CreatePages = () => {
 
         {/* Pages Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPages.map(page => (
-            <div key={page.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300">
+          {filteredPages.map((page) => (
+            <div
+              key={page.id}
+              className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300"
+            >
               <div className="relative">
                 <img
                   src={page.image}
@@ -106,8 +138,12 @@ const CreatePages = () => {
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-2 text-lg">{page.pageName}</h3>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">{page.about}</p>
+                <h3 className="font-semibold text-gray-900 mb-2 text-lg">
+                  {page.pageName}
+                </h3>
+                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                  {page.about}
+                </p>
                 <div className="flex items-center justify-between text-sm text-gray-500">
                   <span className="flex items-center gap-1">
                     {/* 👥 {page.followers.toLocaleString() || 0} followers */}
@@ -116,14 +152,17 @@ const CreatePages = () => {
                 </div>
                 <div className="mt-4 flex gap-2">
                   <Link to={`/page-profile/${page.id}`}>
-                  <button className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">
-                    View Page
-                  </button>
+                    <button className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">
+                      View Page
+                    </button>
                   </Link>
                   <Link to={`/pagemessages/${page.id}`}>
-                  <button className="px-4 py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors duration-200 text-sm font-medium">
-                    Messages
-                  </button>
+                    <button className="px-4 py-2 relative border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors duration-200 text-sm font-medium">
+                      Messages
+                      {msgNotif.includes(page.id) && (
+                        <span className="w-3 h-3 bg-red-500 rounded-full top-0 right-0 absolute"></span>
+                      )}
+                    </button>
                   </Link>
                 </div>
               </div>
@@ -137,8 +176,12 @@ const CreatePages = () => {
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <BiSearch className="text-3xl text-gray-400" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No pages found</h3>
-            <p className="text-gray-600">Try adjusting your search or filter criteria</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No pages found
+            </h3>
+            <p className="text-gray-600">
+              Try adjusting your search or filter criteria
+            </p>
           </div>
         )}
       </div>
@@ -149,7 +192,9 @@ const CreatePages = () => {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900">Create New Page</h2>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Create New Page
+              </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
@@ -174,7 +219,9 @@ const CreatePages = () => {
                     <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-sm font-medium">
                       Choose Image
                     </button>
-                    <p className="text-xs text-gray-500 mt-1">Recommended: 400x400px, max 5MB</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Recommended: 400x400px, max 5MB
+                    </p>
                   </div>
                 </div>
               </div>
@@ -200,7 +247,7 @@ const CreatePages = () => {
                 </label>
                 <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all duration-200 bg-white">
                   <option value="">Select a category...</option>
-                  {categories.slice(1).map(category => (
+                  {categories.slice(1).map((category) => (
                     <option key={category} value={category}>
                       {category}
                     </option>
@@ -227,16 +274,32 @@ const CreatePages = () => {
                 <h3 className="font-medium text-gray-900">Page Settings</h3>
                 <div className="space-y-3">
                   <label className="flex items-center gap-3">
-                    <input type="checkbox" className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" />
-                    <span className="text-sm text-gray-700">Allow others to find this page in search</span>
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    />
+                    <span className="text-sm text-gray-700">
+                      Allow others to find this page in search
+                    </span>
                   </label>
                   <label className="flex items-center gap-3">
-                    <input type="checkbox" className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" />
-                    <span className="text-sm text-gray-700">Enable notifications for new followers</span>
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    />
+                    <span className="text-sm text-gray-700">
+                      Enable notifications for new followers
+                    </span>
                   </label>
                   <label className="flex items-center gap-3">
-                    <input type="checkbox" className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" defaultChecked />
-                    <span className="text-sm text-gray-700">Show follower count publicly</span>
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      defaultChecked
+                    />
+                    <span className="text-sm text-gray-700">
+                      Show follower count publicly
+                    </span>
                   </label>
                 </div>
               </div>
