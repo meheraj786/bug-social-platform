@@ -1,5 +1,6 @@
-import { getDatabase, onValue, ref } from "firebase/database";
+import { getDatabase, onValue, push, ref, set } from "firebase/database";
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import {
   BiPlus,
   BiX,
@@ -16,11 +17,66 @@ const CreatePages = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const user = useSelector((state) => state.user.user);
   const [pages, setPages] = useState([]);
-  const db = getDatabase();
   const [msgNotif, setMsgNotif] = useState([]);
 
+  // Create page states
+  const [pageName, setPageName] = useState("");
+  const [category, setCategory] = useState("");
+  const [about, setAbout] = useState("");
+  const [preview, setPreview] = useState("");
+  const [imgLoading, setImgLoading] = useState(false);
+
+  const user = useSelector((state) => state.user.user);
+  const db = getDatabase();
+  const coudinaryApi = import.meta.env.VITE_CLOUDINARY_API;
+
+  // Upload image
+  const handleChangeImage = async (e) => {
+    setImgLoading(true);
+    const file = e.target.files[0];
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "e-com app with firebase");
+    data.append("cloud_name", "dlrycnxnh");
+
+    const res = await fetch(coudinaryApi, {
+      method: "POST",
+      body: data,
+    });
+    const result = await res.json();
+    setPreview(result.secure_url);
+    setImgLoading(false);
+  };
+
+  // Create page
+  const handleCreatePage = () => {
+    if (!pageName || !category || !about || !preview) {
+      toast.error("Please fill in all fields and upload an image");
+      return;
+    }
+
+    const newPageRef = push(ref(db, "page/"));
+    set(newPageRef, {
+      about,
+      adminId: user?.uid,
+      adminName: user?.displayName || "",
+      category,
+      image: preview,
+      pageName,
+    }).then(()=>{
+      toast.success("Page Successfully Created")
+    })
+
+    // Reset form
+    setPageName("");
+    setCategory("");
+    setAbout("");
+    setPreview("");
+    setIsModalOpen(false);
+  };
+
+  // Fetch user's pages
   useEffect(() => {
     const requestRef = ref(db, "page/");
     onValue(requestRef, (snapshot) => {
@@ -34,6 +90,8 @@ const CreatePages = () => {
       setPages(arr);
     });
   }, [db]);
+
+  // Fetch message notifications
   useEffect(() => {
     const notificationRef = ref(db, "messagenotification/");
     onValue(notificationRef, (snapshot) => {
@@ -144,12 +202,6 @@ const CreatePages = () => {
                 <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                   {page.about}
                 </p>
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <span className="flex items-center gap-1">
-                    {/* 👥 {page.followers.toLocaleString() || 0} followers */}
-                  </span>
-                  {/* <span>Created {new Date(page.created).toLocaleDateString() || 0}</span> */}
-                </div>
                 <div className="mt-4 flex gap-2">
                   <Link to={`/page-profile/${page.id}`}>
                     <button className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">
@@ -211,29 +263,28 @@ const CreatePages = () => {
                   <BiImage className="text-lg" />
                   Page Image
                 </label>
-                <div className="flex items-center gap-4">
-                  <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300 hover:border-purple-500 transition-colors duration-200 cursor-pointer">
-                    <BiImage className="text-2xl text-gray-400" />
-                  </div>
-                  <div className="flex-1">
-                    <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-sm font-medium">
-                      Choose Image
-                    </button>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Recommended: 400x400px, max 5MB
-                    </p>
-                  </div>
-                </div>
+                <input type="file" onChange={handleChangeImage} />
+                {preview && (
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="w-20 h-20 rounded-lg object-cover mt-2"
+                  />
+                )}
+                {imgLoading && (
+                  <p className="text-xs text-gray-500">Uploading...</p>
+                )}
               </div>
 
               {/* Page Name */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <span className="text-lg" />
+                <label className="text-sm font-medium text-gray-700">
                   Page Name
                 </label>
                 <input
                   type="text"
+                  value={pageName}
+                  onChange={(e) => setPageName(e.target.value)}
                   placeholder="Enter your page name..."
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all duration-200"
                 />
@@ -245,7 +296,11 @@ const CreatePages = () => {
                   <BiCategory className="text-lg" />
                   Category
                 </label>
-                <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all duration-200 bg-white">
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all duration-200 bg-white"
+                >
                   <option value="">Select a category...</option>
                   {categories.slice(1).map((category) => (
                     <option key={category} value={category}>
@@ -262,46 +317,16 @@ const CreatePages = () => {
                   About Your Page
                 </label>
                 <textarea
+                  value={about}
+                  onChange={(e) => setAbout(e.target.value)}
                   placeholder="Tell people what your page is about..."
                   rows={4}
+                  maxLength={500}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all duration-200 resize-none"
                 ></textarea>
-                <p className="text-xs text-gray-500">0/500 characters</p>
-              </div>
-
-              {/* Page Settings */}
-              <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-medium text-gray-900">Page Settings</h3>
-                <div className="space-y-3">
-                  <label className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                    />
-                    <span className="text-sm text-gray-700">
-                      Allow others to find this page in search
-                    </span>
-                  </label>
-                  <label className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                    />
-                    <span className="text-sm text-gray-700">
-                      Enable notifications for new followers
-                    </span>
-                  </label>
-                  <label className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                      defaultChecked
-                    />
-                    <span className="text-sm text-gray-700">
-                      Show follower count publicly
-                    </span>
-                  </label>
-                </div>
+                <p className="text-xs text-gray-500">
+                  {about.length}/500 characters
+                </p>
               </div>
             </div>
 
@@ -313,7 +338,10 @@ const CreatePages = () => {
               >
                 Cancel
               </button>
-              <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl font-medium">
+              <button
+                onClick={handleCreatePage}
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
+              >
                 Create Page
               </button>
             </div>

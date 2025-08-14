@@ -422,6 +422,7 @@ const PageProfile = () => {
                     Follow
                   </button>
                 ) : id !== user?.uid && followingId.includes(pageData?.id) ? (
+                  <>
                   <button
                     onClick={() => unFollowHandler(pageData)}
                     className="bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-blue-300 px-6 py-3 rounded-2xl text-gray-700 hover:text-blue-600 font-semibold shadow-lg transition-all duration-300 flex items-center gap-2"
@@ -429,8 +430,17 @@ const PageProfile = () => {
                     <UserRoundX />
                     Unfollow
                   </button>
+                  <button
+                    onClick={() => sendMessageHandler()}
+                    className="bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-blue-300 px-6 py-3 rounded-2xl text-gray-700 hover:text-blue-600 font-semibold shadow-lg transition-all duration-300 flex items-center gap-2"
+                  >
+                    <MessageCircleCode />
+                    Message
+                  </button>
+                  
+                  </>
                 ) : null}
-                {
+                {/* {
                   pageData.adminId !== user?.uid && <button
                     onClick={() => sendMessageHandler()}
                     className="bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-blue-300 px-6 py-3 rounded-2xl text-gray-700 hover:text-blue-600 font-semibold shadow-lg transition-all duration-300 flex items-center gap-2"
@@ -438,7 +448,7 @@ const PageProfile = () => {
                     <MessageCircleCode />
                     Message
                   </button>
-                }
+                } */}
                                   
               </div>
             </div>

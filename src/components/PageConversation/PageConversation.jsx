@@ -26,7 +26,6 @@ import EmojiPicker from "emoji-picker-react";
 import ImageUploadPop from "../../layouts/ImageUploadPop";
 import { Ban } from "lucide-react";
 import DeleteMessagePopup from "../../layouts/DeleteMessagePopup";
-import UnfriendPopup from "../../layouts/UnfriendPopup";
 
 const PageConversation = ({ msgNotif, page }) => {
   const db = getDatabase();
@@ -42,8 +41,6 @@ const PageConversation = ({ msgNotif, page }) => {
   const [imgUploadPop, setImgUploadPop] = useState(false);
   const [msgDeletePop, setMsgDeletePop] = useState(false);
   const [selectedMsg, setSelectedMsg] = useState(null);
-  const [friendList, setFriendList] = useState([]);
-  const [unFirendModalActive, setUnfriendModalActive] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
 
@@ -258,25 +255,6 @@ const PageConversation = ({ msgNotif, page }) => {
               </svg>
             </button>
 
-            {showDropdown && (
-              <>
-                <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-                  <button
-                    onClick={() => {
-                      setShowDropdown(false);
-                      setUnfriendModalActive(true);
-                    }}
-                    className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors"
-                  >
-                    Unfriend
-                  </button>
-                </div>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setShowDropdown(false)}
-                ></div>
-              </>
-            )}
           </div>
         </div>
       </motion.div>
