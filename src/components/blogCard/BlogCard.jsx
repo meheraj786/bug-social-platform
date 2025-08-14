@@ -232,7 +232,7 @@ const BlogCard = ({ blog }) => {
         <Flex className="justify-between items-start">
           <Flex className="gap-4 items-center flex-1">
             <Link
-              to={`/profile/${blog.sharedBloggerId}`}
+              to={blog.isPageShare ? `/page-profile/${blog.sharedBloggerId}`: `/profile/${blog.sharedBloggerId}`}
               className="flex items-center gap-3 text-gray-800 hover:text-purple-600 transition-all duration-300 group/profile"
             >
               <div className="relative">
@@ -276,6 +276,45 @@ const BlogCard = ({ blog }) => {
           <div className="text-gray-800 text-base leading-relaxed whitespace-pre-wrap font-medium">
             {blog.sharedDescription}
           </div>
+                  {/* Extra Content Based on Type */}
+        {blog.eventDate && (
+          <div className="mt-4 p-4 bg-blue-50 rounded-2xl border border-blue-100">
+            <Flex className="items-center gap-3">
+              <FaCalendar className="text-blue-600" />
+              <div>
+                <p className="font-semibold text-blue-900">Event Details</p>
+                <p className="text-sm text-blue-700">
+                  {moment(blog.eventDate).format('MMMM Do, YYYY')}
+                  {blog.eventTime && ` at ${blog.eventTime}`}
+                </p>
+              </div>
+            </Flex>
+          </div>
+        )}
+
+        {blog.jobSalary && (
+          <div className="mt-4 p-4 bg-green-50 rounded-2xl border border-green-100">
+            <Flex className="items-center gap-3">
+              <FaBriefcase className="text-green-600" />
+              <div>
+                <p className="font-semibold text-green-900">Salary Range</p>
+                <p className="text-sm text-green-700">{blog.jobSalary}</p>
+              </div>
+            </Flex>
+          </div>
+        )}
+
+        {blog.productPrice && (
+          <div className="mt-4 p-4 bg-purple-50 rounded-2xl border border-purple-100">
+            <Flex className="items-center gap-3">
+              <FaShoppingCart className="text-purple-600" />
+              <div>
+                <p className="font-semibold text-purple-900">Price</p>
+                <p className="text-sm text-purple-700">{blog.productPrice}</p>
+              </div>
+            </Flex>
+          </div>
+        )}
 
         {blog.postImage &&  (
           <div className="mt-5 relative overflow-hidden rounded-2xl group/image">

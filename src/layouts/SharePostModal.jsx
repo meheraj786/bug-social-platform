@@ -6,6 +6,7 @@ import Flex from './Flex';
 import { Link } from 'react-router';
 import { MdOutlineDateRange } from 'react-icons/md';
 import { FaUser } from 'react-icons/fa6';
+import { FaBriefcase, FaCalendar, FaShoppingCart } from 'react-icons/fa';
 
 const SharePostModal = ({ blog, shareHandler, shareCaption, setShareCaption, setSharePop }) => {
   const user = useSelector((state) => state.user.user);
@@ -21,7 +22,6 @@ const SharePostModal = ({ blog, shareHandler, shareCaption, setShareCaption, set
   };
 
   const handleShare = () => {
-    console.log('Sharing post with caption:', shareCaption);
     shareHandler()
     handleClose();
   };
@@ -145,6 +145,45 @@ const SharePostModal = ({ blog, shareHandler, shareCaption, setShareCaption, set
               <div className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap font-medium mb-3">
                 {blog.description}
               </div>
+              {/* Extra Content Based on Type */}
+                      {blog.eventDate && (
+                        <div className="mt-4 p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                          <Flex className="items-center gap-3">
+                            <FaCalendar className="text-blue-600" />
+                            <div>
+                              <p className="font-semibold text-blue-900">Event Details</p>
+                              <p className="text-sm text-blue-700">
+                                {moment(blog.eventDate).format('MMMM Do, YYYY')}
+                                {blog.eventTime && ` at ${blog.eventTime}`}
+                              </p>
+                            </div>
+                          </Flex>
+                        </div>
+                      )}
+              
+                      {blog.jobSalary && (
+                        <div className="mt-4 p-4 bg-green-50 rounded-2xl border border-green-100">
+                          <Flex className="items-center gap-3">
+                            <FaBriefcase className="text-green-600" />
+                            <div>
+                              <p className="font-semibold text-green-900">Salary Range</p>
+                              <p className="text-sm text-green-700">{blog.jobSalary}</p>
+                            </div>
+                          </Flex>
+                        </div>
+                      )}
+              
+                      {blog.productPrice && (
+                        <div className="mt-4 p-4 bg-purple-50 rounded-2xl border border-purple-100">
+                          <Flex className="items-center gap-3">
+                            <FaShoppingCart className="text-purple-600" />
+                            <div>
+                              <p className="font-semibold text-purple-900">Price</p>
+                              <p className="text-sm text-purple-700">{blog.productPrice}</p>
+                            </div>
+                          </Flex>
+                        </div>
+                      )}
 
               {blog.postImage && (
                 <div className="relative overflow-hidden rounded-xl group/image">
@@ -159,6 +198,7 @@ const SharePostModal = ({ blog, shareHandler, shareCaption, setShareCaption, set
             </div>
           </div>
         </div>
+
 
         {/* Modal Footer */}
         <div className="flex items-center justify-between p-4 border-t border-gray-200 bg-gray-50">

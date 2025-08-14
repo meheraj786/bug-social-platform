@@ -115,7 +115,7 @@ const PageProfile = () => {
     }, [db, id]);
 
 
-      useEffect(() => {
+  useEffect(() => {
     const followRef = ref(db, "follow/");
     onValue(followRef, (snapshot) => {
       let arr = [];

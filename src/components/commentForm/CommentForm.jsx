@@ -13,11 +13,19 @@ import {
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import time from "../../layouts/time";
-import { FaComment, FaHeart, FaRegComments, FaRegShareSquare } from "react-icons/fa";
+import {
+  FaComment,
+  FaHeart,
+  FaRegComments,
+  FaRegShareSquare,
+} from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
 import moment from "moment";
 import FullScreenOverlay from "../../layouts/FullscreenOverlay";
 import SharePostModal from "../../layouts/SharePostModal";
+import { Paperclip, Star } from "lucide-react";
+import { BiCartAdd } from "react-icons/bi";
+import CustomToast from "../../layouts/CustomToast";
 
 const CommentForm = ({ post, commentLength }) => {
   const navigate = useNavigate();
@@ -30,9 +38,10 @@ const CommentForm = ({ post, commentLength }) => {
   const [reactLength, setReactLength] = useState([]);
   const db = getDatabase();
   const [reactionPop, setReactionPop] = useState(false);
-  const [shareCaption, setShareCaption]= useState("I shared this post")
-  const [sharePop, setSharePop]= useState(false)
-  const [selectSharePost, setSelectSharePost]= useState(null)
+  const [shareCaption, setShareCaption] = useState("I shared this post");
+  const [sharePop, setSharePop] = useState(false);
+  const [selectSharePost, setSelectSharePost] = useState(null);
+  const [followerId, setFollowerId] = useState([]);
 
   useEffect(() => {
     const reactRef = ref(db, "react/");
@@ -61,7 +70,20 @@ const CommentForm = ({ post, commentLength }) => {
       setReactors(arr);
     });
   }, [db, user, post]);
-  console.log("react", reactors);
+  useEffect(() => {
+    const followRef = ref(db, "follow/");
+    onValue(followRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((data) => {
+        const follow = data.val();
+        if (follow.followingid == post.bloggerId) {
+          arr.push(follow.followerid);
+        }
+      });
+      setFollowerId(arr);
+    });
+  }, [db, post]);
+  console.log(post, "post");
 
   useEffect(() => {
     const reactRef = ref(db, "react/");
@@ -93,7 +115,6 @@ const CommentForm = ({ post, commentLength }) => {
   }, [db, post]);
 
   const cancelReactHandler = () => {
-    console.log(post.bloggerId !== user?.uid);
     react.forEach((rec) => {
       if (rec.reactorId == user?.uid && rec.blogId == post.id) {
         remove(ref(db, "react/" + rec.id)).then(() => {
@@ -115,7 +136,6 @@ const CommentForm = ({ post, commentLength }) => {
   };
 
   const reactHandler = () => {
-    console.log(post.bloggerId !== user?.uid);
     const reactData = {
       name: user?.displayName,
       date: time(),
@@ -162,50 +182,181 @@ const CommentForm = ({ post, commentLength }) => {
         setComment("");
         setError("");
         set(push(ref(db, "notification/")), {
-        notifyReciver: post.bloggerId,
-        type: "comment",
-        reactorId: user?.uid,
-        time: moment().format(),
-        content: `${
-          user?.displayName
-        } comment on your post "${post.description.slice(0, 30)}..."`,
-      });
+          notifyReciver: post.bloggerId,
+          type: "comment",
+          reactorId: user?.uid,
+          time: moment().format(),
+          content: `${
+            user?.displayName
+          } comment on your post "${post.description.slice(0, 30)}..."`,
+        });
       })
       .catch(() => toast.error("Failed to publish comment."));
   };
-  const shareHandler=()=>{
-    
-      const blogData = {
+  const shareHandler = () => {
+    let blogData = null;
+    if (post.adminId) {
+      blogData = {
         name: user?.displayName,
-        description:  shareCaption,
+        description: shareCaption,
         time: moment().format(),
         sharedBlogTime: post.time,
         bloggerId: user?.uid,
         imageUrl: user?.photoURL,
-        postImage: post.postImage || "", 
+        postImage: post.postImage || "",
         sharedBloggerId: post.bloggerId,
         sharedBloggerName: post.name,
         sharedDescription: post.description,
         sharedBloggerImg: post.imageUrl,
-        postType: "share"
+        postType: "share",
+        isPageShare: true,
+        eventDate: post.eventDate,
+        eventTime: post.eventTime,
+        jobSalary: post.jobSalary,
+        productPrice: post.productPrice,
       };
-      set(push(ref(db, "blogs/")), blogData)
-              .then(() => {
-                toast.success("Post Shared Successfully!");
-                set(push(ref(db, "notification/")), {
-        notifyReciver: post.bloggerId,
-        type: "react",
-        reactorId: user?.uid,
+    } else {
+      blogData = {
+        name: user?.displayName,
+        description: shareCaption,
         time: moment().format(),
-        content: `${
-          user?.displayName
-        } shared your post "${post.description.slice(0, 30)}..."`,
+        sharedBlogTime: post.time,
+        bloggerId: user?.uid,
+        imageUrl: user?.photoURL,
+        postImage: post.postImage || "",
+        sharedBloggerId: post.bloggerId,
+        sharedBloggerName: post.name,
+        sharedDescription: post.description,
+        sharedBloggerImg: post.imageUrl,
+        postType: "share",
+      };
+    }
+
+    set(push(ref(db, "blogs/")), blogData)
+      .then(() => {
+        toast.success("Post Shared Successfully!");
+        set(push(ref(db, "notification/")), {
+          notifyReciver: post.bloggerId,
+          type: "react",
+          reactorId: user?.uid,
+          time: moment().format(),
+          content: `${
+            user?.displayName
+          } shared your post "${post.description.slice(0, 30)}..."`,
+        });
+      })
+      .catch(() => {
+        toast.error("Something went wrong!");
       });
-              })
-              .catch(() => {
-                toast.error("Something went wrong!");
-              });
-  }
+  };
+
+  const followHandler = () => {
+    set(push(ref(db, "follow/")), {
+      followerid: user?.uid,
+      followername: user?.displayName,
+      followingid: post.bloggerId,
+      followerimg: user?.photoURL,
+      followingname: post.name,
+      followingimg: post.imageUrl,
+      adminid: post.adminId,
+      time: moment().format(),
+    });
+    toast.custom((t) => (
+      <CustomToast
+        t={t}
+        img={post.image}
+        name={post.pageName}
+        content={`You're Following ${post.name}`}
+      />
+    ));
+    set(push(ref(db, "notification/")), {
+      notifyReciver: post.adminId,
+      type: "positive",
+      time: moment().format(),
+      content: `${user?.displayName} starts following your page ${post.name}!`,
+    });
+  };
+
+  const sentMessageHandler = (type) => {
+    const senderid = user?.uid;
+    const sendername = post.bloggerId;
+
+    let reciverid, recivername;
+    reciverid = post.bloggerId;
+    recivername = post.name;
+    let replymsg = post.description.slice(0, 30);
+
+    if (type == "product") {
+      set(push(ref(db, "message")), {
+        senderid: senderid,
+        sendername: sendername,
+        reciverid: reciverid,
+        recivername: recivername,
+        message: "I want to buy this product, can you please guide me?",
+        msgImg: post.postImage,
+        replyMsg: replymsg+" - "+post.productPrice,
+        status: "",
+        time: moment().format(),
+      })
+        .then(() => {
+          set(push(ref(db, "messagenotification/")), {
+            senderid: senderid,
+            reciverid: reciverid,
+          });
+          navigate(`/messages/chat/${post.bloggerId}`);
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error("Failed to send message.");
+        });
+    } else if (type == "event") {
+      set(push(ref(db, "message")), {
+        senderid: senderid,
+        sendername: sendername,
+        reciverid: reciverid,
+        recivername: recivername,
+        message: "I want to join this event, can you please guide me?",
+        msgImg: post.postImage,
+        replyMsg: replymsg+" - "+post.eventDate,
+        status: "",
+        time: moment().format(),
+      })
+        .then(() => {
+          set(push(ref(db, "messagenotification/")), {
+            senderid: senderid,
+            reciverid: reciverid,
+          });
+          navigate(`/messages/chat/${post.bloggerId}`);
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error("Failed to send message.");
+        });
+    } else if (type == "job") {
+      set(push(ref(db, "message")), {
+        senderid: senderid,
+        sendername: sendername,
+        reciverid: reciverid,
+        recivername: recivername,
+        message: "I want to apply this job, can you please guide me?",
+        msgImg: post.postImage,
+        replyMsg: replymsg+" - "+post.jobSalary,
+        status: "",
+        time: moment().format(),
+      })
+        .then(() => {
+          set(push(ref(db, "messagenotification/")), {
+            senderid: senderid,
+            reciverid: reciverid,
+          });
+          navigate(`/messages/chat/${post.bloggerId}`);
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error("Failed to send message.");
+        });
+    }
+  };
 
   return (
     <div className="bg-gradient-to-r font-secondary from-gray-50/80 to-white/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-200/50">
@@ -215,9 +366,14 @@ const CommentForm = ({ post, commentLength }) => {
           setReactionPop={setReactionPop}
         />
       )}
-  {
-    sharePop && <SharePostModal shareHandler={shareHandler} blog={selectSharePost} setShareCaption={setShareCaption} setSharePop={setSharePop}/>
-  }
+      {sharePop && (
+        <SharePostModal
+          shareHandler={shareHandler}
+          blog={selectSharePost}
+          setShareCaption={setShareCaption}
+          setSharePop={setSharePop}
+        />
+      )}
       {/* Like and Comment Stats */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-6">
@@ -247,7 +403,6 @@ const CommentForm = ({ post, commentLength }) => {
               </span>
             </button>
           )}
-          
 
           {/* Comment Count */}
           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
@@ -256,22 +411,107 @@ const CommentForm = ({ post, commentLength }) => {
               {commentLength} comments
             </span>
           </div>
-          {
-            user && post.postType !== "share" && (
-
-          <div onClick={()=>{
-            setSelectSharePost(post)
-setSharePop(true)
-          }} className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-green-700 border border-green-200">
-            <FaRegShareSquare size={18} />
-            <span className="font-semibold text-sm">
-              Share
-            </span>
-          </div>
-            )
-          }
+          {user && post.postType !== "share" && (
+            <div
+              onClick={() => {
+                setSelectSharePost(post);
+                setSharePop(true);
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-green-700 border border-green-200"
+            >
+              <FaRegShareSquare size={18} />
+              <span className="font-semibold text-sm">Share</span>
+            </div>
+          )}
+          {(post.postType == "pagePost" &&
+            post.contentType == "event" &&
+            followerId.includes(user?.uid) &&
+            post.adminId !== user?.uid) ||
+          post.isPageShare ? (
+            <div
+              onClick={() => {
+                sentMessageHandler("event");
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-blue-700 border border-blue-200"
+            >
+              <Star size={18} />
+              <span className="font-semibold text-sm">Interested</span>
+            </div>
+          ) : (post.postType == "pagePost" &&
+              post.contentType == "product" &&
+              followerId.includes(user?.uid) &&
+              post.adminId !== user?.uid) ||
+            post.isPageShare ? (
+            <div
+              onClick={() => {
+                sentMessageHandler("product");
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-purple-700 border border-purple-200"
+            >
+              <BiCartAdd size={18} />
+              <span className="font-semibold text-sm">Buy</span>
+            </div>
+          ) : (post.postType == "pagePost" &&
+              post.contentType == "job" &&
+              followerId.includes(user?.uid) &&
+              post.adminId !== user?.uid) ||
+            post.isPageShare ? (
+            <div
+              onClick={() => {
+                sentMessageHandler("job");
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-green-700 border border-green-200"
+            >
+              <Paperclip size={18} />
+              <span className="font-semibold text-sm">Apply</span>
+            </div>
+          ) : null}
+          {(post.postType == "pagePost" &&
+            post.contentType == "event" &&
+            !followerId.includes(user?.uid) &&
+            post.adminId !== user?.uid) ||
+          post.isPageShare ? (
+            <div
+              onClick={() => {
+                followHandler();
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-blue-700 border border-blue-200"
+            >
+              <Star size={18} />
+              <span className="font-semibold text-sm">
+                Follow to Interested
+              </span>
+            </div>
+          ) : (post.postType == "pagePost" &&
+              post.contentType == "product" &&
+              !followerId.includes(user?.uid) &&
+              post.adminId !== user?.uid) ||
+            post.isPageShare ? (
+            <div
+              onClick={() => {
+                followHandler();
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-purple-700 border border-purple-200"
+            >
+              <BiCartAdd size={18} />
+              <span className="font-semibold text-sm">Follow to Buy</span>
+            </div>
+          ) : (post.postType == "pagePost" &&
+              post.contentType == "job" &&
+              !followerId.includes(user?.uid) &&
+              post.adminId !== user?.uid) ||
+            post.isPageShare ? (
+            <div
+              onClick={() => {
+                followHandler();
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-green-700 border border-green-200"
+            >
+              <Paperclip size={18} />
+              <span className="font-semibold text-sm">Follow to Apply</span>
+            </div>
+          ) : null}
         </div>
-        
 
         {/* Additional Actions */}
         <button
