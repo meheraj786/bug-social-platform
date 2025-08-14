@@ -17,7 +17,21 @@ const Messages = () => {
   const dispatch= useDispatch()
   const currentUser = useSelector((state) => state.user.user);
   const [msgNotification, setMsgNotification]= useState([])
+  const [ownFollowing, setOwnFollowing]= useState([])
   const [msgNotif, setMsgNotif]= useState([])
+  const [pageId, setPageId]= useState([])
+
+      useEffect(() => {
+  
+      const requestRef = ref(db, "page/");
+      onValue(requestRef, (snapshot) => {
+        let arr=[]
+        snapshot.forEach((item) => {
+          arr.push(item.key)
+        });
+        setPageId(arr);
+      });
+    }, [db]);
     useEffect(() => {
     const notificationRef = ref(db, "messagenotification/");
     onValue(notificationRef, (snapshot) => {
@@ -46,6 +60,21 @@ const Messages = () => {
       setMsgNotif(arr);
     });
   }, [currentUser?.uid, db]);
+  useEffect(() => {
+    const followRef = ref(db, "follow/");
+    onValue(followRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((data) => {
+        const follow = data.val();
+        arr.push({ ...follow, id: data.key });
+      });
+      setOwnFollowing(
+        arr.filter((follower) => follower.followerid == currentUser?.uid && pageId.includes(follower.followingid))
+      );
+    });
+  }, [db, pageId]);
+    console.log(ownFollowing, "ownFollow");
+    console.log(pageId, "pageId");
     
   const handleMsgNotificationDelete = (friend) => {
     msgNotif.forEach((item) => {
@@ -130,6 +159,32 @@ return (
                 </div>
                 <span className="font-medium text-gray-800 truncate">
                   {friend.name}
+                </span>
+              </div>
+              </Link>
+            ))}
+            {ownFollowing.map((friend) => (
+              <Link to={`/messages/chat/${friend.followingid}`}>
+              <div
+                key={friend.followingid}
+                // onClick={()=>handleMsgNotificationDelete(friend)}
+                className="flex relative items-center gap-4 p-3 bg-white/80 rounded-xl border border-white/60 shadow hover:shadow-lg cursor-pointer transition-all hover:scale-[1.02]"
+                >
+                {/* {
+                  msgNotification.includes(friend.id) && (
+                    <span className='w-3 h-3 absolute top-2 right-2 rounded-full  bg-red-500 animate-pulse'></span>
+                  )
+                } */}
+                <div className="relative">
+                  <img
+                    src={friend.followingimg}
+                    alt={friend.followingname}
+                    className="w-12 h-12 rounded-full object-cover ring-2 ring-white"
+                  />
+                  {/* <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div> */}
+                </div>
+                <span className="font-medium text-gray-800 truncate">
+                  {friend.followingname}
                 </span>
               </div>
               </Link>

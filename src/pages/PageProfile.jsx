@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BiGlobe, BiImage, BiX, BiHeart, BiComment, BiShare, BiStar } from 'react-icons/bi';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { getDatabase, onValue, push, ref, remove, set } from 'firebase/database';
-import { Camera, ThumbsUp, UserPlus, MessageCircle, Share2, UserRoundPlus, UserRoundX } from "lucide-react";
+import { Camera, ThumbsUp, UserPlus, MessageCircle, Share2, UserRoundPlus, UserRoundX, MessageCircleCode } from "lucide-react";
 import { FaImage, FaCalendar, FaBriefcase, FaShoppingCart, FaNewspaper } from 'react-icons/fa';
 import { X } from 'lucide-react';
 import { useSelector } from 'react-redux';
@@ -18,8 +18,8 @@ const PageProfile = () => {
   const [postContent, setPostContent] = useState('');
   const [description,setDescription]= useState("")
   const [preview, setPreview] = useState('');
-   const user = useSelector((state) => state.user.user);
-   const [blogList, setBlogList]= useState([])
+  const user = useSelector((state) => state.user.user);
+  const [blogList, setBlogList]= useState([])
   const db = getDatabase();
   const { id } = useParams();
   const [contentType, setContentType] = useState('general');
@@ -27,10 +27,10 @@ const PageProfile = () => {
   const [eventTime, setEventTime] = useState('');
   const [jobSalary, setJobSalary] = useState('');
   const [productPrice, setProductPrice] = useState('');
-  
   const [followingId, setFollowingId] = useState([]);
   const [followers, setFollowers] = useState([]);
   const [ownFollwers, setOwnFollowers] = useState([]);
+  const navigate=useNavigate()
   const [ownFollowing, setOwnFollowing] = useState([]);
 
   // Content type options
@@ -50,6 +50,12 @@ const PageProfile = () => {
     }
   };
 
+  const sendMessageHandler=()=>{
+    console.log("Message Send");
+    navigate(`/messages/chat/${pageData?.id}`)
+  }
+  
+
   const handleSubmit = () => {
     const postData = {
       adminId: pageData?.adminId,
@@ -68,7 +74,6 @@ const PageProfile = () => {
     };
 
     set(push(ref(db, "blogs/")), postData).then(()=>{
-      console.log('Post Data:', postData);
       resetForm()
       toast.success("Post Successfully Published")
     })
@@ -160,7 +165,6 @@ const PageProfile = () => {
   }, [db, user, id, pageData]);
 
       const followHandler = (following) => {
-        console.log(following);
         set(push(ref(db, "follow/")), {
           followerid: user?.uid,
           followername: user?.displayName,
@@ -426,6 +430,16 @@ const PageProfile = () => {
                     Unfollow
                   </button>
                 ) : null}
+                {
+                  pageData.adminId !== user?.uid && <button
+                    onClick={() => sendMessageHandler()}
+                    className="bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-blue-300 px-6 py-3 rounded-2xl text-gray-700 hover:text-blue-600 font-semibold shadow-lg transition-all duration-300 flex items-center gap-2"
+                  >
+                    <MessageCircleCode />
+                    Message
+                  </button>
+                }
+                                  
               </div>
             </div>
           </motion.div>

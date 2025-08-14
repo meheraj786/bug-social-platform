@@ -337,7 +337,6 @@ export default function Profile() {
   }, [db, user, userProfile, id]);
 
   const followHandler = (following) => {
-    console.log(following);
     set(push(ref(db, "follow/")), {
       followerid: currentUser.uid,
       followername: currentUser.displayName,
@@ -361,7 +360,6 @@ export default function Profile() {
       time: moment().format(),
       content: `${user?.displayName} starts following you!`,
     });
-    console.log("Image URL:", following.imageUrl);
   };
   const unFollowHandler = (followId) => {
     followers.forEach((follow) => {
