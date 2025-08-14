@@ -120,9 +120,11 @@ const CreatePages = () => {
                     View Page
                   </button>
                   </Link>
+                  <Link to={`/pagemessages/${page.id}`}>
                   <button className="px-4 py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors duration-200 text-sm font-medium">
-                    Edit
+                    Messages
                   </button>
+                  </Link>
                 </div>
               </div>
             </div>
