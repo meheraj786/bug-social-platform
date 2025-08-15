@@ -15,7 +15,7 @@ import { getAuth, signOut } from "firebase/auth";
 import { IoChevronDownOutline, IoNotificationsOutline } from "react-icons/io5";
 import { getDatabase, onValue, ref } from "firebase/database";
 import { AiOutlineMessage } from "react-icons/ai";
-import { PanelsTopLeft } from "lucide-react";
+import { PanelsTopLeft, Users } from "lucide-react";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -233,6 +233,16 @@ const Navbar = () => {
                             <PanelsTopLeft className="text-sm text-gray-600 group-hover:text-blue-600" />
                           </div>
                           <span className="font-medium">Manage Your Pages</span>
+                        </NavLink>
+                        <NavLink
+                          to="/create-groups"
+                          className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-all duration-200 group"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors duration-200">
+                            <Users className="text-sm text-gray-600 group-hover:text-blue-600" />
+                          </div>
+                          <span className="font-medium">Manage Your Groups</span>
                         </NavLink>
 
                         {/* Settings */}

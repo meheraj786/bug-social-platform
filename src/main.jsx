@@ -22,6 +22,8 @@ import CreatePages from "./pages/CreatePages.jsx";
 import PageProfile from "./pages/PageProfile.jsx";
 import PageMessage from "./pages/PageMessage.jsx";
 import PageConversation from "./components/PageConversation/PageConversation.jsx";
+import CreateGroups from "./pages/CreateGroups.jsx";
+import GroupProfile from "./pages/GroupProfile.jsx";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +50,8 @@ const router = createBrowserRouter([
       },
       { path: "/auth", Component: AuthPage },
       { path: "/create-pages", Component: CreatePages },
+      { path: "/create-groups", Component: CreateGroups },
+      { path: "/group-profile/:id", Component: GroupProfile },
       { path: "/page-profile/:id", Component: PageProfile },
       { path: "/login", Component: Login },
       { path: "/signup", Component: Signup },
