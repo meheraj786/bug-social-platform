@@ -16,8 +16,32 @@ const BlogList = () => {
   const [blogList, setBlogList] = useState([]);
   const [followBlogList, setFollowBlogList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(localStorage.getItem("activeTab") || "global");
+  const [groupId, setGroupId]= useState([])
+  const [groupPost, setGroupPost]=useState([])
+    const [activeTab, setActiveTab] = useState("global");
 
+  // Load saved tab from localStorage on component mount
+  useEffect(() => {
+    const savedTab = localStorage.getItem("activeTab");
+    if (savedTab) {
+      setActiveTab(savedTab);
+    }
+  }, []);
+
+  useEffect(() => {
+    const followRef = ref(db, "member/");
+    onValue(followRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((data) => {
+        const member = data.val();
+        if (member.memberId == user?.uid) {
+          arr.push(member.groupId);
+        }
+      });
+      setGroupId(arr);
+    });
+  }, [db, user]);
+  
   useEffect(() => {
     const followRef = ref(db, "follow/");
     onValue(followRef, (snapshot) => {
@@ -39,7 +63,9 @@ const BlogList = () => {
       snapshot.forEach((blog) => {
         const content = blog.val();
         const id = blog.key;
-        arr.unshift({ ...content, id: id });
+        if (content.visibility!="private") {
+          arr.unshift({ ...content, id: id });
+        }
       });
       setIsLoading(false);
       setBlogList(arr);
@@ -52,7 +78,7 @@ const BlogList = () => {
       snapshot.forEach((blog) => {
         const content = blog.val();
         const id = blog.key;
-        if (followingId.includes(content.bloggerId)) {
+        if (followingId.includes(content.bloggerId) && content.visibility=="public" && !content.isAnonymous) {
           arr.unshift({ ...content, id: id });
         }
       });
@@ -60,70 +86,117 @@ const BlogList = () => {
       setFollowBlogList(arr);
     });
   }, [db, followingId]);
+  useEffect(() => {
+    const blogsRef = ref(db, "blogs/");
+    onValue(blogsRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((blog) => {
+        const content = blog.val();
+        const id = blog.key;
+        if (groupId.includes(content.groupId)) {
+          arr.unshift({ ...content, id: id });
+        }
+      });
+      setIsLoading(false);
+      setGroupPost(arr);
+    });
+  }, [db, groupId]);
+  
 
   return (
     <div className="py-3 font-secondary">
       <Container>
         {
-          user && <div className="flex justify-center my-4 w-full">
-          <div className="relative bg-gray-100  rounded-full p-1 flex items-center shadow-lg">
-            {/* Background slider */}
-            <div
-              className={`absolute top-1 bottom-1 w-1/2 bg-white  rounded-full shadow-md transition-all duration-300 ease-out ${
-                activeTab === "following" ? "translate-x-full" : "translate-x-0"
-              }`}
-            />
+          user && 
+          <div className="flex justify-center my-6 w-full">
+      <div className="relative bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-1.5 flex items-center shadow-xl border border-gray-200/50">
+        {/* Background slider */}
+        <div
+          className={`absolute top-1.5 bottom-1.5 w-1/3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg transition-all duration-500 ease-out ${
+            activeTab === "following" 
+              ? "translate-x-full" 
+              : activeTab === "groups" 
+              ? "translate-x-[200%]" 
+              : "translate-x-0"
+          }`}
+        />
 
-            {/* Global Button */}
-            <button
-              onClick={() => {setActiveTab("global")
-                localStorage.setItem("activeTab", "global")
-              }}
-              className={`relative z-10 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-300 ease-out ${
-                activeTab === "global"
-                  ? "text-blue-600 "
-                  : "text-gray-600  hover:text-gray-800 "
-              }`}
-            >
-              🌍 Global
-            </button>
+        {/* Global Button */}
+        <button
+          onClick={() => {
+            setActiveTab("global");
+            localStorage.setItem("activeTab", "global");
+          }}
+          className={`relative z-10 px-8 py-4 rounded-xl font-semibold text-sm transition-all duration-500 ease-out flex items-center gap-2 min-w-[120px] justify-center ${
+            activeTab === "global"
+              ? "text-white transform scale-105"
+              : "text-gray-600 hover:text-gray-800 hover:bg-white/50"
+          }`}
+        >
+          🌍 <span>Global</span>
+        </button>
 
-            {/* Following Button */}
-            <button
-              onClick={() => {setActiveTab("following")
-                localStorage.setItem("activeTab", "following")
-              }}
-              className={`relative z-10 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-300 ease-out ${
-                activeTab === "following"
-                  ? "text-blue-600 "
-                  : "text-gray-600  hover:text-gray-800 "
-              }`}
-            >
-              👥 Following
-            </button>
-          </div>
+        {/* Following Button */}
+        <button
+          onClick={() => {
+            setActiveTab("following");
+            localStorage.setItem("activeTab", "following");
+          }}
+          className={`relative z-10 px-8 py-4 rounded-xl font-semibold text-sm transition-all duration-500 ease-out flex items-center gap-2 min-w-[120px] justify-center ${
+            activeTab === "following"
+              ? "text-white transform scale-105"
+              : "text-gray-600 hover:text-gray-800 hover:bg-white/50"
+          }`}
+        >
+          👥 <span>Following</span>
+        </button>
 
-          {/* Optional: Show current selection */}
-          <div className="ml-4 flex items-center">
-            <div className="text-xs text-gray-500  bg-gray-100  px-3 py-2 rounded-full">
-              Showing {activeTab === "global" ? "all posts" : "followed users"}
-            </div>
-          </div>
+        {/* Groups Button - FIXED */}
+        <button
+          onClick={() => {
+            setActiveTab("groups");
+            localStorage.setItem("activeTab", "groups");
+          }}
+          className={`relative z-10 px-8 py-4 rounded-xl font-semibold text-sm transition-all duration-500 ease-out flex items-center gap-2 min-w-[120px] justify-center ${
+            activeTab === "groups"
+              ? "text-white transform scale-105"
+              : "text-gray-600 hover:text-gray-800 hover:bg-white/50"
+          }`}
+        >
+          🏠 <span>Groups</span>
+        </button>
+      </div>
+
+      {/* Status indicator */}
+      <div className="ml-6 flex items-center">
+        <div className="text-sm text-gray-600 bg-white/80 backdrop-blur-sm border border-gray-200/50 px-4 py-2.5 rounded-full shadow-sm flex items-center gap-2">
+          <div className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+            activeTab === "global" ? "bg-blue-500" :
+            activeTab === "following" ? "bg-purple-500" : "bg-green-500"
+          }`} />
+          <span className="font-medium">
+            Showing {activeTab === "global" ? "all posts" : activeTab === "groups" ? "group posts" : "followed users"}
+          </span>
         </div>
+      </div>
+    </div>
         }
         
 {isLoading ? (
   <BlogCardSkeleton />
-) : blogList.length === 0 && activeTab === "global" ? (
+) : activeTab === "global" && blogList.length === 0 ? (
   <NoBlog />
 ) : activeTab === "following" && followBlogList.length === 0 ? (
+  <NoBlog />
+) : activeTab === "groups" && groupPost.length === 0 ? (
   <NoBlog />
 ) : activeTab === "global" ? (
   blogList.map((blog) => <BlogCard key={blog.id} blog={blog} />)
 ) : activeTab === "following" ? (
   followBlogList.map((blog) => <BlogCard key={blog.id} blog={blog} />)
+) : activeTab === "groups" ? (
+  groupPost.map((blog) => <BlogCard key={blog.id} blog={blog} />)
 ) : null}
-
       </Container>
     </div>
   );

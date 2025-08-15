@@ -1,4 +1,11 @@
-import { getDatabase, onValue, push, ref, set } from "firebase/database";
+import {
+  getDatabase,
+  onValue,
+  push,
+  ref,
+  remove,
+  set,
+} from "firebase/database";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -52,50 +59,49 @@ const CreateGroups = () => {
   };
 
   // Create page
-const handleCreateGroup = () => {
-  if (!groupName || !category || !about || !preview) {
-    toast.error("Please fill in all fields and upload an image");
-    return;
-  }
+  const handleCreateGroup = () => {
+    if (!groupName || !category || !about || !preview) {
+      toast.error("Please fill in all fields and upload an image");
+      return;
+    }
 
-  const newPageRef = push(ref(db, "group/"));
-  const newGroupData = {
-    about,
-    adminId: user?.uid,
-    adminName: user?.displayName || "",
-    category,
-    image: preview,
-    groupName,
-    visibility,
-  };
-
-  // 1. Create the group
-  set(newPageRef, newGroupData).then(() => {
-    toast.success("Page Successfully Created");
-
-    // 2. Automatically add admin as member
-    set(push(ref(db, "member/")), {
-      memberId: user?.uid,
-      memberName: user?.displayName,
-      groupId: newPageRef.key,
-      memberImg: user?.photoURL,
+    const newPageRef = push(ref(db, "group/"));
+    const newGroupData = {
+      about,
       adminId: user?.uid,
+      adminName: user?.displayName || "",
+      category,
+      image: preview,
       groupName,
-      groupImage: preview,
-      time: moment().format(),
-    }).then(() => {
-      toast.success("You are now a member of your group!");
+      visibility,
+    };
+
+    // 1. Create the group
+    set(newPageRef, newGroupData).then(() => {
+      toast.success("Page Successfully Created");
+
+      // 2. Automatically add admin as member
+      set(push(ref(db, "member/")), {
+        memberId: user?.uid,
+        memberName: user?.displayName,
+        groupId: newPageRef.key,
+        memberImg: user?.photoURL,
+        adminId: user?.uid,
+        groupName,
+        groupImage: preview,
+        time: moment().format(),
+      }).then(() => {
+        toast.success("You are now a member of your group!");
+      });
     });
-  });
 
-  // Reset form
-  setGroupName("");
-  setCategory("");
-  setAbout("");
-  setPreview("");
-  setIsModalOpen(false);
-};
-
+    // Reset form
+    setGroupName("");
+    setCategory("");
+    setAbout("");
+    setPreview("");
+    setIsModalOpen(false);
+  };
 
   // Fetch user's pages
   useEffect(() => {
@@ -112,7 +118,11 @@ const handleCreateGroup = () => {
     });
   }, [db]);
 
-
+  const deleteGroupHandler = (groupId) => {
+    remove(ref(db, "group/" + groupId)).then(() => {
+      toast.success("Group Delete Successfull");
+    });
+  };
 
   // Fetch message notifications
   useEffect(() => {
@@ -241,6 +251,12 @@ const handleCreateGroup = () => {
                       )}
                     </button>
                   </Link>
+                    <button
+                      onClick={() => deleteGroupHandler(page.id)}
+                      className="px-4 py-2 ml-2 relative border border-orange-600 text-red-600 rounded-lg hover:bg-orange-50 transition-colors duration-200 text-sm font-medium"
+                    >
+                      Delete
+                    </button>
                 </div>
               </div>
             </div>

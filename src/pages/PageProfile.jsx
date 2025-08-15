@@ -33,6 +33,7 @@ const PageProfile = () => {
   const navigate=useNavigate()
   const [ownFollowing, setOwnFollowing] = useState([]);
   const [followersPop, setFollowersPop]= useState(false)
+  
 
   // Content type options
   const contentTypes = [

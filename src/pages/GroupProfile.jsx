@@ -6,15 +6,20 @@ import {
   remove,
   set,
 } from "firebase/database";
-import { Lock, User } from "lucide-react";
+import { Lock, Upload, User } from "lucide-react";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router";
 import CustomToast from "../layouts/CustomToast";
+import { UserX } from "lucide-react";
+import BlogCard from "../components/blogCard/BlogCard";
+import NoBlog from "../components/noBlog/NoBlog";
+import { FaHackerNews, FaUserSecret } from "react-icons/fa6";
 
 const GroupProfile = () => {
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [group, setGroup] = useState(null);
   const { id } = useParams();
   const user = useSelector((state) => state.user.user);
@@ -32,6 +37,63 @@ const GroupProfile = () => {
     addMembers: false,
     joinRequests: false,
   });
+  const [description, setDescription] = useState("");
+  const [preview, setPreview] = useState("");
+  const [groupPost, setGroupPost] = useState([]);
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "e-com app with firebase");
+    data.append("cloud_name", "dlrycnxnh");
+
+    const res = await fetch(coudinaryApi, {
+      method: "POST",
+      body: data,
+    });
+    const result = await res.json();
+    setPreview(result.secure_url);
+  };
+
+  const handlePost = () => {
+    if (!description && !preview) {
+      toast.error("Please add some text or image to post.");
+      return;
+    }
+
+    const postData = {
+      adminId: group?.adminId,
+      groupName: group?.groupName,
+      groupImage: group?.image,
+      groupId: group?.id,
+      bloggerId: user?.uid,
+      bloggerImg: user?.photoURL,
+      bloggerName: user?.displayName,
+      description: description,
+      visibility: group?.visibility,
+      postImage: preview,
+      postType: "groupPost",
+      isAnonymous: isAnonymous,
+      time: moment().format(),
+    };
+console.log(group.visibility);
+
+    set(push(ref(db, "blogs/")), postData)
+      .then(() => {
+        resetForm();
+        toast.success("Post Successfully Published");
+      })
+      .catch((err) => {
+        toast.error("Error publishing post!");
+        console.error(err);
+      });
+  };
+
+  const resetForm = () => {
+    setDescription("");
+    setPreview("");
+  };
 
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
@@ -137,6 +199,22 @@ const GroupProfile = () => {
       setFriendList(arr);
     });
   }, [db, membersId, sameRequestedId]);
+
+  useEffect(() => {
+  const blogsRef = ref(db, "blogs/");
+  onValue(blogsRef, (snapshot) => {
+    let arr = [];
+    snapshot.forEach((blog) => {
+      const content = blog.val();
+      const blogId = blog.key;
+      
+      if (group?.id && String(content.groupId) === String(group.id)) {
+        arr.unshift({ ...content, id: blogId });
+      }
+    });
+    setGroupPost(arr);
+  });
+}, [db, group]);
 
   const addFriendAsMember = (friend) => {
     if (!group) return;
@@ -286,7 +364,7 @@ const GroupProfile = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br h-[150vh] font-secondary from-gray-50 via-blue-50/30 to-purple-50/30 min-h-screen">
+    <div className="bg-gradient-to-br min-h-[150vh] font-secondary from-gray-50 via-blue-50/30 to-purple-50/30">
       {/* Followers Modal Dummy */}
       {/* <FollowersModal /> */}
 
@@ -321,14 +399,18 @@ const GroupProfile = () => {
                 {/* Stats */}
                 <div className="flex gap-8 mb-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-800">12</div>
+                    <div className="text-2xl font-bold text-gray-800">
+                      {groupPost.length}
+                    </div>
                     <div className="text-sm text-gray-500 font-medium">
                       Posts
                     </div>
                   </div>
 
                   <div className="text-center cursor-pointer">
-                    <div className="text-2xl font-bold text-gray-800">34</div>
+                    <div className="text-2xl font-bold text-gray-800">
+                      {members.length}
+                    </div>
                     <div className="text-sm font-medium text-gray-500">
                       Members
                     </div>
@@ -355,7 +437,7 @@ const GroupProfile = () => {
                       Join Request
                     </button>
                   ))}
-                {membersId.includes(user?.uid) && (
+                {membersId.includes(user?.uid) && group?.adminId!=user?.uid && (
                   <>
                     <button className="px-6 py-3 rounded-2xl font-semibold shadow-lg flex items-center gap-2 border-2 transition-all duration-200 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
                       Message
@@ -391,358 +473,424 @@ const GroupProfile = () => {
               </h3>
               <p className="text-gray-700 font-medium">{group?.about}</p>
             </div>
-                    {
-            group?.adminId==user?.uid && (
+            {group?.adminId == user?.uid && (
               <>
-
-
-            {/* Members Section - Collapsible */}
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 overflow-hidden">
-              {/* Header - Always visible */}
-              <div
-                onClick={() => toggleSection("members")}
-                className="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50/50 transition-all duration-200"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
-                  <h3 className="font-semibold text-gray-800 text-lg">
-                    Members
-                  </h3>
-                  <span className="text-sm text-gray-500 ml-2">
-                    ({members.length})
-                  </span>
-                </div>
-                <div
-                  className={`transform transition-transform duration-200 ${
-                    expandedSections.members ? "rotate-180" : ""
-                  }`}
-                >
-                  <svg
-                    className="w-5 h-5 text-gray-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                {/* Members Section - Collapsible */}
+                <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 overflow-hidden">
+                  {/* Header - Always visible */}
+                  <div
+                    onClick={() => toggleSection("members")}
+                    className="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50/50 transition-all duration-200"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </div>
-              </div>
-
-              {/* Content - Collapsible */}
-              <div
-                className={`transition-all duration-300 ease-in-out ${
-                  expandedSections.members
-                    ? "max-h-96 opacity-100"
-                    : "max-h-0 opacity-0"
-                }`}
-              >
-                <div className="px-6 pb-6 max-h-80 overflow-y-auto space-y-4">
-                  {members.map((member, idx) => (
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
+                      <h3 className="font-semibold text-gray-800 text-lg">
+                        Members
+                      </h3>
+                      <span className="text-sm text-gray-500 ml-2">
+                        ({members.length})
+                      </span>
+                    </div>
                     <div
-                      key={idx}
-                      className="flex items-center justify-between gap-4 p-4 bg-gradient-to-r from-gray-50/80 to-white/80 rounded-2xl border border-gray-200/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
+                      className={`transform transition-transform duration-200 ${
+                        expandedSections.members ? "rotate-180" : ""
+                      }`}
                     >
-                      {/* Left: Image + Info */}
-                      <div className="flex items-center gap-4 flex-1">
-                        <img
-                          src={member.memberImg}
-                          alt={member.memberName}
-                          className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                      <svg
+                        className="w-5 h-5 text-gray-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
                         />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-gray-900 font-semibold text-sm truncate">
-                            {member.memberName}
-                          </p>
-                        </div>
-                      </div>
-                      {member.adminId == user?.uid && (
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => kickoutHandler(member)}
-                            className="text-xs bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-3 py-1 rounded-full shadow-md hover:shadow-lg transition-all duration-200 font-medium"
-                          >
-                            Kickout
-                          </button>
-                        </div>
-                      )}
-                      {member.adminId == member.memberId && (
-                        <div className="flex items-center gap-2">
-                          <button className="text-xs bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-3 py-1 rounded-full shadow-md hover:shadow-lg transition-all duration-200 font-medium">
-                            Admin
-                          </button>
-                        </div>
-                      )}
+                      </svg>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Add Members Section - Collapsible */}
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 overflow-hidden">
-              {/* Header - Always visible */}
-              <div
-                onClick={() => toggleSection("addMembers")}
-                className="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50/50 transition-all duration-200"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-1 h-6 bg-gradient-to-b from-green-500 to-teal-500 rounded-full"></div>
-                  <h3 className="font-semibold text-gray-800 text-lg">
-                    Add Members
-                  </h3>
-                  <span className="text-sm text-gray-500 ml-2">
-                    ({friendList.length})
-                  </span>
-                </div>
-                <div
-                  className={`transform transition-transform duration-200 ${
-                    expandedSections.addMembers ? "rotate-180" : ""
-                  }`}
-                >
-                  <svg
-                    className="w-5 h-5 text-gray-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </div>
-              </div>
-
-              {/* Content - Collapsible */}
-              <div
-                className={`transition-all duration-300 ease-in-out ${
-                  expandedSections.addMembers
-                    ? "max-h-96 opacity-100"
-                    : "max-h-0 opacity-0"
-                }`}
-              >
-                <div className="px-6 pb-6 max-h-80 overflow-y-auto space-y-4">
-                  {friendList.map((friend, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between gap-4 p-4 bg-gradient-to-r from-gray-50/80 to-white/80 rounded-2xl border border-gray-200/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
-                    >
-                      {/* Left: Image + Info */}
-                      <div className="flex items-center gap-4 flex-1">
-                        <img
-                          src={friend.image}
-                          alt={friend.name}
-                          className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-gray-900 font-semibold text-sm truncate">
-                            {friend.name}
-                          </p>
-                          <p className="text-gray-500 text-xs truncate">
-                            {friend.email}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Right: Add Button */}
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => addFriendAsMember(friend)}
-                          className="text-xs bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white px-3 py-1 rounded-full shadow-md hover:shadow-lg transition-all duration-200 font-medium"
-                        >
-                          Add
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* Empty State */}
-                  {friendList.length === 0 && (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">
-                        No friends available to add.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Join Requests Section - Collapsible */}
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 overflow-hidden">
-              {/* Header - Always visible */}
-              <div
-                onClick={() => toggleSection("joinRequests")}
-                className="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50/50 transition-all duration-200"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-1 h-6 bg-gradient-to-b from-orange-500 to-red-500 rounded-full"></div>
-                  <h3 className="font-semibold text-gray-800 text-lg">
-                    Join Requests
-                  </h3>
-                  {ownRequest.length > 0 && (
-                    <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full ml-2">
-                      {ownRequest.length}
-                    </span>
-                  )}
-                </div>
-                <div
-                  className={`transform transition-transform duration-200 ${
-                    expandedSections.joinRequests ? "rotate-180" : ""
-                  }`}
-                >
-                  <svg
-                    className="w-5 h-5 text-gray-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </div>
-              </div>
-
-              {/* Content - Collapsible */}
-              <div
-                className={`transition-all duration-300 ease-in-out ${
-                  expandedSections.joinRequests
-                    ? "max-h-96 opacity-100"
-                    : "max-h-0 opacity-0"
-                }`}
-              >
-                <div className="px-6 pb-6 max-h-80 overflow-y-auto space-y-4">
-                  {ownRequest.map((req, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between gap-4 p-4 bg-gradient-to-r from-gray-50/80 to-white/80 rounded-2xl border border-gray-200/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group"
-                    >
-                      {/* Left side: Image + Info */}
-                      <div className="flex items-center gap-4 flex-1">
-                        <img
-                          src={req.requestedImage}
-                          alt={req.requestedName}
-                          className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 group-hover:border-blue-400 transition-colors duration-300"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-gray-900 font-semibold text-sm truncate">
-                            {req.requestedName}
-                          </p>
-                          <p className="text-gray-500 text-xs truncate">
-                            {req.groupName}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Right side: Buttons */}
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleAccept(req)}
-                          className="text-xs bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-200 font-medium"
-                        >
-                          Accept
-                        </button>
-                        <button
-                          onClick={() => handleReject(req)}
-                          className="text-xs bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-200 font-medium"
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-
-                  {ownRequest.length === 0 && (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">No pending join requests.</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Followers Preview - Remains the same */}
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-primary font-bold text-gray-800">
-                  Members Preview
-                </h3>
-                <span className="text-sm text-gray-500 cursor-pointer">
-                  34 Members
-                </span>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i}>
-                    <img
-                      src="https://via.placeholder.com/80"
-                      alt="member"
-                      className="w-full aspect-square rounded-2xl object-cover shadow-md"
-                    />
                   </div>
-                ))}
-              </div>
-            </div>
+
+                  {/* Content - Collapsible */}
+                  <div
+                    className={`transition-all duration-300 ease-in-out ${
+                      expandedSections.members
+                        ? "max-h-96 opacity-100"
+                        : "max-h-0 opacity-0"
+                    }`}
+                  >
+                    <div className="px-6 pb-6 max-h-80 overflow-y-auto space-y-4">
+                      {members.map((member, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between gap-4 p-4 bg-gradient-to-r from-gray-50/80 to-white/80 rounded-2xl border border-gray-200/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
+                        >
+                          {/* Left: Image + Info */}
+                          <div className="flex items-center gap-4 flex-1">
+                            <img
+                              src={member.memberImg}
+                              alt={member.memberName}
+                              className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-gray-900 font-semibold text-sm truncate">
+                                {member.memberName}
+                              </p>
+                            </div>
+                          </div>
+                          {member.adminId == user?.uid && (
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => kickoutHandler(member)}
+                                className="text-xs bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-3 py-1 rounded-full shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+                              >
+                                Kickout
+                              </button>
+                            </div>
+                          )}
+                          {member.adminId == member.memberId && (
+                            <div className="flex items-center gap-2">
+                              <button className="text-xs bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-3 py-1 rounded-full shadow-md hover:shadow-lg transition-all duration-200 font-medium">
+                                Admin
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Add Members Section - Collapsible */}
+                <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 overflow-hidden">
+                  {/* Header - Always visible */}
+                  <div
+                    onClick={() => toggleSection("addMembers")}
+                    className="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50/50 transition-all duration-200"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-6 bg-gradient-to-b from-green-500 to-teal-500 rounded-full"></div>
+                      <h3 className="font-semibold text-gray-800 text-lg">
+                        Add Members
+                      </h3>
+                      <span className="text-sm text-gray-500 ml-2">
+                        ({friendList.length})
+                      </span>
+                    </div>
+                    <div
+                      className={`transform transition-transform duration-200 ${
+                        expandedSections.addMembers ? "rotate-180" : ""
+                      }`}
+                    >
+                      <svg
+                        className="w-5 h-5 text-gray-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Content - Collapsible */}
+                  <div
+                    className={`transition-all duration-300 ease-in-out ${
+                      expandedSections.addMembers
+                        ? "max-h-96 opacity-100"
+                        : "max-h-0 opacity-0"
+                    }`}
+                  >
+                    <div className="px-6 pb-6 max-h-80 overflow-y-auto space-y-4">
+                      {friendList.map((friend, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between gap-4 p-4 bg-gradient-to-r from-gray-50/80 to-white/80 rounded-2xl border border-gray-200/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
+                        >
+                          {/* Left: Image + Info */}
+                          <div className="flex items-center gap-4 flex-1">
+                            <img
+                              src={friend.image}
+                              alt={friend.name}
+                              className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-gray-900 font-semibold text-sm truncate">
+                                {friend.name}
+                              </p>
+                              <p className="text-gray-500 text-xs truncate">
+                                {friend.email}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Right: Add Button */}
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => addFriendAsMember(friend)}
+                              className="text-xs bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white px-3 py-1 rounded-full shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+                            >
+                              Add
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Empty State */}
+                      {friendList.length === 0 && (
+                        <div className="text-center py-8">
+                          <p className="text-gray-500">
+                            No friends available to add.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Join Requests Section - Collapsible */}
+                <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 overflow-hidden">
+                  {/* Header - Always visible */}
+                  <div
+                    onClick={() => toggleSection("joinRequests")}
+                    className="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50/50 transition-all duration-200"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-6 bg-gradient-to-b from-orange-500 to-red-500 rounded-full"></div>
+                      <h3 className="font-semibold text-gray-800 text-lg">
+                        Join Requests
+                      </h3>
+                      {ownRequest.length > 0 && (
+                        <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full ml-2">
+                          {ownRequest.length}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      className={`transform transition-transform duration-200 ${
+                        expandedSections.joinRequests ? "rotate-180" : ""
+                      }`}
+                    >
+                      <svg
+                        className="w-5 h-5 text-gray-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Content - Collapsible */}
+                  <div
+                    className={`transition-all duration-300 ease-in-out ${
+                      expandedSections.joinRequests
+                        ? "max-h-96 opacity-100"
+                        : "max-h-0 opacity-0"
+                    }`}
+                  >
+                    <div className="px-6 pb-6 max-h-80 overflow-y-auto space-y-4">
+                      {ownRequest.map((req, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between gap-4 p-4 bg-gradient-to-r from-gray-50/80 to-white/80 rounded-2xl border border-gray-200/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group"
+                        >
+                          {/* Left side: Image + Info */}
+                          <div className="flex items-center gap-4 flex-1">
+                            <img
+                              src={req.requestedImage}
+                              alt={req.requestedName}
+                              className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 group-hover:border-blue-400 transition-colors duration-300"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-gray-900 font-semibold text-sm truncate">
+                                {req.requestedName}
+                              </p>
+                              <p className="text-gray-500 text-xs truncate">
+                                {req.groupName}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Right side: Buttons */}
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleAccept(req)}
+                              className="text-xs bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+                            >
+                              Accept
+                            </button>
+                            <button
+                              onClick={() => handleReject(req)}
+                              className="text-xs bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+
+                      {ownRequest.length === 0 && (
+                        <div className="text-center py-8">
+                          <p className="text-gray-500">
+                            No pending join requests.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Followers Preview - Remains the same */}
+                <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-primary font-bold text-gray-800">
+                      Members Preview
+                    </h3>
+                    <span className="text-sm text-gray-500 cursor-pointer">
+                      34 Members
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i}>
+                        <img
+                          src="https://via.placeholder.com/80"
+                          alt="member"
+                          className="w-full aspect-square rounded-2xl object-cover shadow-md"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </>
-            )
-          }
+            )}
           </div>
 
           {/* Posts Section */}
           <div className="w-full lg:w-2/3 space-y-6">
             {/* Create Post Card */}
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
-              <div className="flex items-start gap-4">
-                <img
-                  src="https://via.placeholder.com/50"
-                  alt="avatar"
-                  className="w-12 h-12 rounded-full object-cover border-2 border-purple-200"
-                />
-                <textarea
-                  rows={3}
-                  placeholder="What's on your mind?"
-                  className="w-full p-4 rounded-2xl border-2 border-gray-200 bg-gray-50/50"
-                />
-              </div>
-              <div className="mt-4 flex justify-end gap-3">
-                <button className="bg-gray-200 px-6 py-3 rounded-2xl font-semibold">
-                  Clear
-                </button>
-                <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-2xl font-semibold">
-                  Post
-                </button>
-              </div>
-            </div>
+            {membersId.includes(user?.uid) && (
+              <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
+                <div className="flex items-start gap-4">
+                  {
+                    isAnonymous ?                   <div
+                    className="w-12 h-12 flex justify-center items-center rounded-full object-cover border-2 border-purple-200"
+                  > <FaUserSecret size={30}/> </div> :                   <img
+                    src={user?.photoURL || "https://via.placeholder.com/50"}
+                    alt="avatar"
+                    className="w-12 h-12 rounded-full object-cover border-2 border-purple-200"
+                  />
+                  }
 
-            {/* Post List */}
-            {[1, 2].map((post) => (
-              <div key={post} className="bg-white/80 p-6 rounded-3xl shadow-xl">
-                <h4 className="font-bold text-lg mb-2">
-                  Dummy Post Title {post}
-                </h4>
-                <p className="text-gray-600">
-                  This is a dummy post description. Replace it with your actual
-                  data.
-                </p>
+                  <textarea
+                    rows={3}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="What's on your mind?"
+                    className="w-full p-4 rounded-2xl border-2 border-gray-200 bg-gray-50/50"
+                  />
+                </div>
+                {/* Anonymous Option */}
+                <div className="flex items-center gap-3 mt-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsAnonymous(!isAnonymous)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-full border transition 
+    ${
+      isAnonymous
+        ? "bg-gray-800 text-white border-gray-800"
+        : "bg-gray-100 border-gray-300 text-gray-600"
+    }`}
+                  >
+                    {isAnonymous ? <UserX size={18} /> : <User size={18} />}
+                    <span className="text-sm">
+                      {isAnonymous
+                        ? "Posting as Anonymous"
+                        : "Post with my name"}
+                    </span>
+                  </button>
+                </div>
+
+                {/* Image Preview */}
+                {preview && (
+                  <div className="mt-4">
+                    <img
+                      src={preview}
+                      alt="preview"
+                      className="w-full max-h-60 object-cover rounded-2xl"
+                    />
+                  </div>
+                )}
+
+                <div className="mt-4 flex justify-between items-center gap-3">
+                  <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 transition">
+                    <Upload className="w-5 h-5 text-gray-500" />
+                    <span className="text-sm text-gray-600">Upload image</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={resetForm}
+                      className="bg-gray-200 px-6 py-3 rounded-2xl font-semibold"
+                    >
+                      Clear
+                    </button>
+                    <button
+                      onClick={handlePost}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-2xl font-semibold"
+                    >
+                      Post
+                    </button>
+                  </div>
+                </div>
               </div>
+            )}
+
+           {
+            group?.visibility == "public" ? (<>
+                        {groupPost.map((blog) => (
+              <BlogCard key={blog.id} blog={blog} />
             ))}
+            </>) :  group?.visibility == "private" && membersId.includes(user?.uid) ? (<>
+                        {groupPost.map((blog) => (
+              <BlogCard key={blog.id} blog={blog} />
+            ))}
+            </>) : group?.visibility == "private" && !membersId.includes(user?.uid)  ? (<>
+            <NoBlog/>
+            </>) : null
+           }
+
+
 
             {/* Empty State Example */}
-            {/* <div className="bg-white/80 p-12 text-center rounded-3xl shadow-xl">
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">No posts yet</h3>
-            <p className="text-gray-600">This user hasn't posted anything yet.</p>
-          </div> */}
+
+            {groupPost.length == 0 && (
+              <div className="bg-white/80 p-12 text-center rounded-3xl shadow-xl">
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                  No posts yet
+                </h3>
+                <p className="text-gray-600">This group hasn't any post yet.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -188,7 +188,7 @@ export default function Profile() {
       snapshot.forEach((blog) => {
         const content = blog.val();
         const blogId = blog.key;
-        if (content.bloggerId == id) {
+        if (content.bloggerId == id && !content.visibility && !content.isAnonymous) {
           arr.unshift({ ...content, id: blogId });
         }
       });

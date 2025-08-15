@@ -13,7 +13,7 @@ import Flex from "../../layouts/Flex";
 import moment from "moment";
 import { motion } from "motion/react";
 import { Edit, Ellipsis, Trash2, X } from "lucide-react";
-import { FaCalendar, FaBriefcase, FaShoppingCart, FaNewspaper } from 'react-icons/fa';
+import { FaCalendar, FaBriefcase, FaShoppingCart, FaNewspaper, FaUsers, FaUserSecret } from 'react-icons/fa';
 
 const BlogCard = ({ blog }) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -112,6 +112,8 @@ const BlogCard = ({ blog }) => {
       {
   blog.postType == "share" ? (
     <>
+
+
     {/* Header Section */}
     <div className="p-6 font-primary pb-4">
         <Flex className="justify-between items-start">
@@ -328,7 +330,8 @@ const BlogCard = ({ blog }) => {
         )}
       </div>
     </>
-  ) : blog.postType == "pagePost" ? 
+  )
+  : blog.postType == "pagePost" ? 
   (
     <>
       {/* Header Section */}
@@ -488,7 +491,224 @@ const BlogCard = ({ blog }) => {
       </div>
     </>
   )
-  :
+  : blog.postType == "groupPost" ? 
+  (
+    <>
+      {/* Group Header Section */}
+      <div className="p-6 bg-gradient-to-r from-indigo-50 to-purple-50 font-primary pb-4 border-b border-indigo-100">
+        <Flex className="justify-between items-start">
+          <Flex className="gap-4 items-center flex-1">
+            <Link
+              to={`/group-profile/${blog.groupId}`}
+              className="flex items-center gap-3 text-gray-800 hover:text-indigo-600 transition-all duration-300 group/group"
+            >
+              <div className="relative">
+                {blog.groupImage ? (
+                  <img
+                    src={blog.groupImage}
+                    className="w-12 h-12 rounded-xl object-cover border-2 border-indigo-200 group-hover/group:border-indigo-400 transition-colors duration-300 shadow-md"
+                    alt="Group"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-200 to-purple-300 flex items-center justify-center border-2 border-indigo-200">
+                    <FaUsers className="w-5 h-5 text-indigo-600" />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-1">
+                <Flex className="items-center gap-2">
+                  <p className="font-bold text-gray-900 group-hover/group:text-indigo-600 transition-colors duration-300">
+                    {blog.groupName}
+                  </p>
+                  <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-medium rounded-full">
+                    Group
+                  </span>
+                </Flex>
+                <Flex className="gap-2 items-center text-xs text-gray-500 mt-0.5">
+                  <MdOutlineDateRange size={14} className="text-gray-400" />
+                  <span className="font-medium">
+                    {moment(blog.time).fromNow()}
+                  </span>
+                  <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                  <span className="text-gray-400">{blog.visibility}</span>
+                </Flex>
+              </div>
+            </Link>
+          </Flex>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2">
+            {user?.uid === blog.adminId && !editMode ? (
+              <div className="relative">
+                <button
+                  onClick={() => setShowMenu(!showMenu)}
+                  className="p-2 flex items-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-white/60 transition-all duration-200"
+                >
+                  <Ellipsis size={16}/>
+                </button>
+                {showMenu && (
+                  <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50 animate-fadeInUp">
+                    <button
+                      onClick={() => {
+                        setEditMode(true);
+                        setShowMenu(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                    >
+                      <Edit size={16} />
+                      <span>Edit Post</span>
+                    </button>
+                    <div className="h-px bg-gray-100 my-1"></div>
+                    <button
+                      onClick={() => {setShowMenu(false)
+                        deleteHandler(blog.id)
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
+                    >
+                      <Trash2 size={16} />
+                      <span>Delete Post</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : user?.uid === blog.adminId && editMode ? (
+              <button
+                onClick={() => {setEditMode(false)
+                  editBlogHandler()
+                }}
+                className="flex rounded-lg items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-white/60 hover:text-green-600 transition-colors duration-200"
+              >
+                <Edit size={16} />
+                <span>Save</span>
+              </button>
+            ) : null}
+          </div>
+        </Flex>
+      </div>
+
+      {/* Blogger Info Section - Only show if not anonymous */}
+      {!blog.isAnonymous && (
+        <div className="p-6 bg-white font-primary pb-4 border-b border-gray-100">
+          <Flex className="gap-4 items-center">
+            <Link
+              to={`/profile/${blog.bloggerId}`}
+              className="flex items-center gap-3 text-gray-800 hover:text-purple-600 transition-all duration-300 group/blogger"
+            >
+              <div className="relative">
+                {blog.bloggerImg ? (
+                  <img
+                    src={blog.bloggerImg}
+                    className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 group-hover/blogger:border-purple-400 transition-colors duration-300 shadow-sm"
+                    alt="Blogger"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center border-2 border-gray-200">
+                    <FaUser className="w-4 h-4 text-gray-500" />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <p className="font-semibold text-sm text-gray-900 group-hover/blogger:text-purple-600 transition-colors duration-300">
+                  {blog.bloggerName}
+                </p>
+                <p className="text-xs text-gray-500">Group Member</p>
+              </div>
+            </Link>
+          </Flex>
+        </div>
+      )}
+
+      {/* Anonymous Indicator - Only show if anonymous */}
+      {blog.isAnonymous && (
+        <div className="p-6 bg-white font-primary pb-4 border-b border-gray-100">
+          <Flex className="gap-3 items-center">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center">
+              <FaUserSecret className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <p className="font-semibold text-sm text-gray-700">Anonymous Member</p>
+              <p className="text-xs text-gray-500">Posted anonymously</p>
+            </div>
+          </Flex>
+        </div>
+      )}
+
+      {/* Content Section */}
+      <div className="px-6 pb-4 bg-white">
+        {editMode ? (
+          <textarea
+            className="w-full rounded-lg border border-gray-300 hover:border-purple-500 p-3 min-h-[120px] resize-vertical"
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+            placeholder="What's on your mind?"
+          />
+        ) : (
+          <div className="text-gray-800 text-base leading-relaxed whitespace-pre-wrap font-medium">
+            {blog.description}
+          </div>
+        )}
+
+        {editMode && (
+          <div className="flex items-center justify-between mb-4 mt-4">
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 cursor-pointer text-indigo-600 hover:text-purple-600 transition-colors duration-200 px-4 py-2 rounded-full hover:bg-indigo-50 group/media">
+                <FaImage className="text-lg group-hover/media:scale-110 transition-transform duration-200" />
+                <span className="text-sm font-semibold">Add Photo</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleChangeImage}
+                  disabled={!user}
+                />
+              </label>
+            </div>
+          </div>
+        )}
+
+        {editMode && preview && (
+          <div className="mb-4 relative group/preview">
+            <img
+              src={preview}
+              alt="Preview"
+              className="rounded-2xl w-full max-h-64 object-cover shadow-lg"
+            />
+            <button
+              onClick={() => {
+                setPreview("");
+                setEditImg("");
+              }}
+              className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg opacity-0 group-hover/preview:opacity-100 transition-opacity duration-200"
+            >
+              <X />
+            </button>
+            <div
+              onClick={() => {
+                setPreview("");
+                setEditImg("");
+              }}
+              className="absolute bottom-3 left-3 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium cursor-pointer"
+            >
+              Click to remove
+            </div>
+          </div>
+        )}
+
+        {blog.postImage && !editMode && (
+          <div className="mt-5 relative overflow-hidden rounded-2xl group/image">
+            <img
+              src={blog.postImage}
+              alt="Post"
+              className="w-full max-h-96 object-cover transition-transform duration-500 group-hover/image:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/5 transition-colors duration-300"></div>
+          </div>
+        )}
+      </div>
+    </>
+  ) :
   (
     <>
       {/* Header Section */}

@@ -241,7 +241,7 @@ const CommentForm = ({ post, commentLength }) => {
         sharedDescription: post.description,
         sharedBloggerImg: post.imageUrl,
         postType: "share",
-      };
+      }
     }
 
     set(push(ref(db, "blogs/")), blogData)
@@ -423,7 +423,7 @@ const CommentForm = ({ post, commentLength }) => {
               {commentLength} comments
             </span>
           </div>
-          {user && post.postType !== "share" && (
+          {user && post.postType !== "share" && !post.groupId && (
             <div
               onClick={() => {
                 setSelectSharePost(post);
@@ -659,21 +659,6 @@ const CommentForm = ({ post, commentLength }) => {
           )}
         </div>
       </div>
-
-      {/* Quick Reactions */}
-      {/* <div className="mt-4 flex items-center gap-2">
-      <span className="text-xs text-gray-500 font-medium">Quick reactions:</span>
-      <div className="flex items-center gap-1">
-        {['👍', '❤️', '😂', '😮', '😢', '😡'].map((emoji, index) => (
-          <button
-            key={index}
-            className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-lg hover:scale-125 transition-all duration-200"
-          >
-            {emoji}
-          </button>
-        ))}
-      </div>
-    </div> */}
     </div>
   );
 };
