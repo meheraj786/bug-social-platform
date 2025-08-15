@@ -24,6 +24,7 @@ import PageMessage from "./pages/PageMessage.jsx";
 import PageConversation from "./components/PageConversation/PageConversation.jsx";
 import CreateGroups from "./pages/CreateGroups.jsx";
 import GroupProfile from "./pages/GroupProfile.jsx";
+import GroupConversation from "./components/groupConversation/GroupConversation.jsx";
 
 const router = createBrowserRouter([
   {
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
           {
             path: "/messages/chat/:id",
             Component: Conversation,
+          },
+          {
+            path: "/messages/groupchat/:id",
+            Component: GroupConversation,
           },
         ],
       },

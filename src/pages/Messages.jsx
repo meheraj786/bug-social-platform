@@ -4,10 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import Container from "../layouts/Container";
 import { roomUser } from "../features/chatRoom/chatRoom";
 import Conversation from "../components/conversation/Conversation";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { motion } from "motion/react";
+import GroupConversation from "../components/groupConversation/GroupConversation";
 
 const Messages = () => {
+  const [chatType, setChatType] = useState("friend");
+
+  const isGroupChat = location.pathname.includes("/messages/groupchat/");
   const [friendList, setFriendList] = useState([]);
   const [friendListLoading, setFriendListLoading] = useState(true);
   const [message, setMessage] = useState("");
@@ -19,6 +23,7 @@ const Messages = () => {
   const [msgNotif, setMsgNotif] = useState([]);
   const [pageId, setPageId] = useState([]);
   const [lastMessage, setLastMessage] = useState([]);
+  const [groups, setGroups] = useState([]);
 
   useEffect(() => {
     const requestRef = ref(db, "page/");
@@ -74,6 +79,20 @@ const Messages = () => {
       );
     });
   }, [db, pageId]);
+  useEffect(() => {
+    const requestRef = ref(db, "member/");
+    onValue(requestRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        const member = item.val();
+        if (member.memberId == currentUser?.uid) {
+          arr.push({ ...member, id: item.key });
+        }
+      });
+      setGroups(arr);
+    });
+  }, [db]);
+  console.log(groups);
 
   const handleMsgNotificationDelete = (friend) => {
     msgNotif.forEach((item) => {
@@ -168,7 +187,10 @@ const Messages = () => {
 
             <div className="flex flex-col gap-4">
               {friendList.map((friend) => (
-                <Link to={`/messages/chat/${friend.id}`}>
+                <Link
+                  to={`/messages/chat/${friend.id}`}
+                  onClick={() => setChatType("friend")}
+                >
                   <div
                     key={friend.id}
                     onClick={() => handleMsgNotificationDelete(friend)}
@@ -212,8 +234,59 @@ const Messages = () => {
                   </div>
                 </Link>
               ))}
+              {groups.map((friend) => (
+                <Link
+                  to={`/messages/groupchat/${friend.groupId}`}
+                  onClick={() => setChatType("group")}
+                >
+                  <div
+                    key={friend.groupId}
+                    // onClick={() => handleMsgNotificationDelete(friend)}
+                    className="flex relative items-center gap-4 p-3 bg-white/80 rounded-xl border border-white/60 shadow hover:shadow-lg cursor-pointer transition-all hover:scale-[1.02]"
+                  >
+                    {/* {msgNotification.includes(friend.followingid) && (
+                      <span className="w-3 h-3 absolute top-2 right-2 rounded-full  bg-red-500 animate-pulse"></span>
+                    )} */}
+                    <div className="relative ">
+                      <img
+                        src={friend.groupImage}
+                        alt={friend.groupName}
+                        className="w-12 h-12 rounded-full object-cover ring-2 ring-white"
+                      />
+                      {/* <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div> */}
+                    </div>
+                    <div className="flex flex-col items-start justify-center">
+                      <span className="font-medium text-gray-800 truncate">
+                        {friend.groupName}
+                      </span>
+                      <span className="font-medium truncate text-sm text-gray-500">
+                        {(() => {
+                          const msgs = lastMessage.filter(
+                            (msg) =>
+                              (msg.senderid === currentUser.uid &&
+                                msg.reciverid === friend.followingid) ||
+                              (msg.senderid === friend.followingid &&
+                                msg.reciverid === currentUser.uid)
+                          );
+
+                          if (msgs.length === 0) return "No messages yet";
+
+                          // Get last message
+                          const last = msgs[msgs.length - 1];
+                          return last.message.length > 20
+                            ? last.message.slice(0, 20) + "..."
+                            : last.message;
+                        })()}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
               {ownFollowing.map((friend) => (
-                <Link to={`/messages/chat/${friend.followingid}`}>
+                <Link
+                  to={`/messages/chat/${friend.followingid}`}
+                  onClick={() => setChatType("friend")}
+                >
                   <div
                     key={friend.followingid}
                     onClick={() => handleMsgNotificationDelete(friend)}
@@ -283,7 +356,11 @@ const Messages = () => {
               transition={{ duration: 0.4, ease: "easeOut" }}
               className="flex-1 p-6 overflow-y-auto"
             >
-              <Conversation msgNotif={msgNotif} />
+              {chatType === "group" ? (
+                <GroupConversation />
+              ) : (
+                <Conversation msgNotif={msgNotif} />
+              )}
             </motion.div>
           </div>
         </div>
