@@ -45,7 +45,40 @@ return (
     {/* Header Section */}
     <div className="flex justify-between items-start mb-4">
       <div className="flex items-center gap-3 flex-1">
-        <Link
+        {
+          comment.isAuthorComment ? <Link
+          to={`/page-profile/${comment.commenterId}`}
+          className="flex items-center gap-3 text-gray-800 hover:text-purple-600 transition-all duration-300 group/profile"
+        >
+          <div className="relative">
+            {comment.imageUrl ? (
+              <img
+                src={comment.imageUrl}
+                className="w-10 h-10 rounded-full object-cover border-2 border-purple-200 group-hover/profile:border-purple-400 shadow-sm transition-colors duration-300"
+                alt="avatar"
+              />
+            ) : (
+              <div className="w-10 h-10 flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300 rounded-full text-gray-600 border-2 border-purple-200 group-hover/profile:border-purple-400 shadow-sm transition-colors duration-300">
+                <FaUser size={16} />
+              </div>
+            )}
+            {/* Online status indicator */}
+            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
+          </div>
+          
+          <div className="flex-1">
+            <p className="font-semibold font-primary text-sm group-hover/profile:text-purple-600 transition-colors duration-300">
+              {comment.name}
+            </p>
+            <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
+              <MdOutlineDateRange size={12} className="text-gray-400" />
+              <span className="font-medium">{moment(comment.date).fromNow()}
+</span>
+              <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+              <span className="text-gray-400">Reply</span>
+            </div>
+          </div>
+        </Link> : <Link
           to={`/profile/${comment.commenterId}`}
           className="flex items-center gap-3 text-gray-800 hover:text-purple-600 transition-all duration-300 group/profile"
         >
@@ -78,11 +111,13 @@ return (
             </div>
           </div>
         </Link>
+        }
+        
       </div>
         {/* {user?.uid === comment.commenterId && ( */}
 
           <div className="flex items-center gap-2">
-            {user?.uid === comment.commenterId && !editMode ? (
+            {(user?.uid === comment.commenterId && !editMode) || (post.adminId==user?.uid && comment.commenterId==post.bloggerId && !editMode) ? (
               <div className="relative">
                 {/* Three Dot Button */}
                 <button
@@ -124,7 +159,7 @@ return (
                   </div>
                 )}
               </div>
-            ) : comment.commenterId==user?.uid && editMode ? (
+            ) : (user?.uid === comment.commenterId && editMode) || (post.adminId==user?.uid && comment.commenterId==post.bloggerId && editMode) ? (
               <button
                 onClick={() => {
                   setEditMode(false);

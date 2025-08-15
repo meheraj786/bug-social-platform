@@ -16,7 +16,6 @@ import FollowersModal from '../layouts/FollowersModal.jsx'
 
 const PageProfile = () => {
   const [pageData, setPageData] = useState(null);
-  const [postContent, setPostContent] = useState('');
   const [description,setDescription]= useState("")
   const [preview, setPreview] = useState('');
   const user = useSelector((state) => state.user.user);

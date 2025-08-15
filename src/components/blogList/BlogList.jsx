@@ -60,7 +60,6 @@ const BlogList = () => {
       setFollowBlogList(arr);
     });
   }, [db, followingId]);
-  console.log(followBlogList, "followBlog");
 
   return (
     <div className="py-3 font-secondary">

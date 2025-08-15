@@ -83,7 +83,6 @@ const CommentForm = ({ post, commentLength }) => {
       setFollowerId(arr);
     });
   }, [db, post]);
-  console.log(post, "post");
 
   useEffect(() => {
     const reactRef = ref(db, "react/");
@@ -167,15 +166,28 @@ const CommentForm = ({ post, commentLength }) => {
       setError("Enter a Comment");
       return;
     }
+    let commentData = null;
 
-    const commentData = {
-      name: user?.displayName,
-      comment: comment,
-      date: moment().format(),
-      commenterId: user?.uid,
-      blogId: post.id,
-      imageUrl: user?.photoURL,
-    };
+    if (post.adminId == user?.uid && post.postType=="pagePost") {
+      commentData = {
+        name: post.name,
+        comment: comment,
+        date: moment().format(),
+        commenterId: post.bloggerId,
+        blogId: post.id,
+        imageUrl: post.imageUrl,
+        isAuthorComment: true
+      };
+    } else {
+      commentData = {
+        name: user?.displayName,
+        comment: comment,
+        date: moment().format(),
+        commenterId: user?.uid,
+        blogId: post.id,
+        imageUrl: user?.photoURL,
+      };
+    }
 
     set(push(ref(db, "comments/")), commentData)
       .then(() => {
@@ -294,7 +306,7 @@ const CommentForm = ({ post, commentLength }) => {
         recivername: recivername,
         message: "I want to buy this product, can you please guide me?",
         msgImg: post.postImage,
-        replyMsg: replymsg+" - "+post.productPrice,
+        replyMsg: replymsg + " - " + post.productPrice,
         status: "",
         time: moment().format(),
       })
@@ -317,7 +329,7 @@ const CommentForm = ({ post, commentLength }) => {
         recivername: recivername,
         message: "I want to join this event, can you please guide me?",
         msgImg: post.postImage,
-        replyMsg: replymsg+" - "+post.eventDate,
+        replyMsg: replymsg + " - " + post.eventDate,
         status: "",
         time: moment().format(),
       })
@@ -340,7 +352,7 @@ const CommentForm = ({ post, commentLength }) => {
         recivername: recivername,
         message: "I want to apply this job, can you please guide me?",
         msgImg: post.postImage,
-        replyMsg: replymsg+" - "+post.jobSalary,
+        replyMsg: replymsg + " - " + post.jobSalary,
         status: "",
         time: moment().format(),
       })
@@ -527,11 +539,17 @@ const CommentForm = ({ post, commentLength }) => {
         {/* User Avatar */}
         {user && (
           <div className="flex-shrink-0">
-            <img
+            {
+              post.postType=="pagePost" && post.adminId==user?.uid ? <img
+              src={post.imageUrl || "https://via.placeholder.com/40"}
+              alt="Your avatar"
+              className="w-10 h-10 rounded-full object-cover border-2 border-purple-200 shadow-md"
+            /> :             <img
               src={user.photoURL || "https://via.placeholder.com/40"}
               alt="Your avatar"
               className="w-10 h-10 rounded-full object-cover border-2 border-purple-200 shadow-md"
             />
+            }
           </div>
         )}
 
