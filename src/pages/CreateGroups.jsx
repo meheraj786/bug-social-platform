@@ -1,4 +1,5 @@
 import { getDatabase, onValue, push, ref, set } from "firebase/database";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import {
@@ -51,32 +52,50 @@ const CreateGroups = () => {
   };
 
   // Create page
-  const handleCreateGroup = () => {
-    if (!groupName || !category || !about || !preview) {
-      toast.error("Please fill in all fields and upload an image");
-      return;
-    }
+const handleCreateGroup = () => {
+  if (!groupName || !category || !about || !preview) {
+    toast.error("Please fill in all fields and upload an image");
+    return;
+  }
 
-    const newPageRef = push(ref(db, "group/"));
-    set(newPageRef, {
-      about,
-      adminId: user?.uid,
-      adminName: user?.displayName || "",
-      category,
-      image: preview,
-      groupName,
-      visibility,
-    }).then(() => {
-      toast.success("Page Successfully Created");
-    });
-
-    // Reset form
-    setGroupName("");
-    setCategory("");
-    setAbout("");
-    setPreview("");
-    setIsModalOpen(false);
+  const newPageRef = push(ref(db, "group/"));
+  const newGroupData = {
+    about,
+    adminId: user?.uid,
+    adminName: user?.displayName || "",
+    category,
+    image: preview,
+    groupName,
+    visibility,
   };
+
+  // 1. Create the group
+  set(newPageRef, newGroupData).then(() => {
+    toast.success("Page Successfully Created");
+
+    // 2. Automatically add admin as member
+    set(push(ref(db, "member/")), {
+      memberId: user?.uid,
+      memberName: user?.displayName,
+      groupId: newPageRef.key,
+      memberImg: user?.photoURL,
+      adminId: user?.uid,
+      groupName,
+      groupImage: preview,
+      time: moment().format(),
+    }).then(() => {
+      toast.success("You are now a member of your group!");
+    });
+  });
+
+  // Reset form
+  setGroupName("");
+  setCategory("");
+  setAbout("");
+  setPreview("");
+  setIsModalOpen(false);
+};
+
 
   // Fetch user's pages
   useEffect(() => {
@@ -92,6 +111,8 @@ const CreateGroups = () => {
       setPages(arr);
     });
   }, [db]);
+
+
 
   // Fetch message notifications
   useEffect(() => {
