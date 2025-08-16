@@ -20,8 +20,8 @@ function App() {
       <ProfileSidebar/>
       <GroupListSidebar/>
       <PageSidebar/>
-      {/* <FriendList/> */}
       <BlogPostForm />
+      <FriendList/>
       <BlogList />
     </>
   );
