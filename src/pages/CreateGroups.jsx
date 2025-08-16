@@ -243,7 +243,7 @@ const CreateGroups = () => {
                       View Group
                     </button>
                   </Link>
-                  <Link to={`/pagemessages/${page.id}`}>
+                  <Link to={`/messages/groupchat/${page.id}`}>
                     <button className="px-4 py-2 relative border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors duration-200 text-sm font-medium">
                       Messages
                       {msgNotif.includes(page.id) && (
@@ -251,12 +251,12 @@ const CreateGroups = () => {
                       )}
                     </button>
                   </Link>
-                    <button
+                    {/* <button
                       onClick={() => deleteGroupHandler(page.id)}
                       className="px-4 py-2 ml-2 relative border border-orange-600 text-red-600 rounded-lg hover:bg-orange-50 transition-colors duration-200 text-sm font-medium"
                     >
                       Delete
-                    </button>
+                    </button> */}
                 </div>
               </div>
             </div>

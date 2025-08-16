@@ -613,7 +613,10 @@ const BlogCard = ({ blog }) => {
                 <p className="font-semibold text-sm text-gray-900 group-hover/blogger:text-purple-600 transition-colors duration-300">
                   {blog.bloggerName}
                 </p>
-                <p className="text-xs text-gray-500">Group Member</p>
+                {
+                  blog.bloggerId==blog.adminId ? <p className="text-sm text-purple-500">Group Admin</p> : <p className="text-xs text-gray-500">Group Member</p>
+                }
+                
               </div>
             </Link>
           </Flex>

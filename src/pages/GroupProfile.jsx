@@ -77,7 +77,7 @@ const GroupProfile = () => {
       isAnonymous: isAnonymous,
       time: moment().format(),
     };
-console.log(group.visibility);
+    console.log(group.visibility);
 
     set(push(ref(db, "blogs/")), postData)
       .then(() => {
@@ -201,20 +201,20 @@ console.log(group.visibility);
   }, [db, membersId, sameRequestedId]);
 
   useEffect(() => {
-  const blogsRef = ref(db, "blogs/");
-  onValue(blogsRef, (snapshot) => {
-    let arr = [];
-    snapshot.forEach((blog) => {
-      const content = blog.val();
-      const blogId = blog.key;
-      
-      if (group?.id && String(content.groupId) === String(group.id)) {
-        arr.unshift({ ...content, id: blogId });
-      }
+    const blogsRef = ref(db, "blogs/");
+    onValue(blogsRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((blog) => {
+        const content = blog.val();
+        const blogId = blog.key;
+
+        if (group?.id && String(content.groupId) === String(group.id)) {
+          arr.unshift({ ...content, id: blogId });
+        }
+      });
+      setGroupPost(arr);
     });
-    setGroupPost(arr);
-  });
-}, [db, group]);
+  }, [db, group]);
 
   const addFriendAsMember = (friend) => {
     if (!group) return;
@@ -437,27 +437,29 @@ console.log(group.visibility);
                       Join Request
                     </button>
                   ))}
-                {membersId.includes(user?.uid) && group?.adminId!=user?.uid && (
-                  <>
-                    <button className="px-6 py-3 rounded-2xl font-semibold shadow-lg flex items-center gap-2 border-2 transition-all duration-200 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
-                      Message
-                    </button>
-                    <button
-                      onClick={() =>
-                        kickoutHandler({
-                          memberId: user?.uid,
-                          memberName: user?.displayName,
-                          memberImg: user?.photoURL,
-                          groupName: group?.groupName,
-                          id: members.find((m) => m.memberId === user?.uid)?.id,
-                        })
-                      }
-                      className="px-6 py-3 rounded-2xl font-semibold shadow-lg flex items-center gap-2 border-2 transition-all duration-200 bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100"
-                    >
-                      Leave
-                    </button>
-                  </>
-                )}
+                {membersId.includes(user?.uid) &&
+                  group?.adminId != user?.uid && (
+                    <>
+                      <button className="px-6 py-3 rounded-2xl font-semibold shadow-lg flex items-center gap-2 border-2 transition-all duration-200 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
+                        Message
+                      </button>
+                      <button
+                        onClick={() =>
+                          kickoutHandler({
+                            memberId: user?.uid,
+                            memberName: user?.displayName,
+                            memberImg: user?.photoURL,
+                            groupName: group?.groupName,
+                            id: members.find((m) => m.memberId === user?.uid)
+                              ?.id,
+                          })
+                        }
+                        className="px-6 py-3 rounded-2xl font-semibold shadow-lg flex items-center gap-2 border-2 transition-all duration-200 bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100"
+                      >
+                        Leave
+                      </button>
+                    </>
+                  )}
               </div>
             </div>
           </div>
@@ -752,31 +754,47 @@ console.log(group.visibility);
                     </div>
                   </div>
                 </div>
-
-                {/* Followers Preview - Remains the same */}
-                <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-primary font-bold text-gray-800">
-                      Members Preview
-                    </h3>
-                    <span className="text-sm text-gray-500 cursor-pointer">
-                      34 Members
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    {[1, 2, 3].map((i) => (
+              </>
+            )}
+            {/* Followers Preview - Remains the same */}
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-primary font-bold text-gray-800">
+                  Members Preview
+                </h3>
+                <span className="text-sm text-gray-500 cursor-pointer">
+                  {members.length} Members
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {group?.visibility == "private" &&
+                membersId.includes(user?.uid) ? (
+                  <>
+                    {members.map((i) => (
                       <div key={i}>
                         <img
-                          src="https://via.placeholder.com/80"
+                          src={i.memberImg}
                           alt="member"
                           className="w-full aspect-square rounded-2xl object-cover shadow-md"
                         />
                       </div>
                     ))}
-                  </div>
-                </div>
-              </>
-            )}
+                  </>
+                ) : group?.visibility == "public" ? (
+                  <>
+                    {members.map((i) => (
+                      <div key={i}>
+                        <img
+                          src={i.memberImg}
+                          alt="member"
+                          className="w-full aspect-square rounded-2xl object-cover shadow-md"
+                        />
+                      </div>
+                    ))}
+                  </>
+                ) : group?.visibility == "private" ? null : null}
+              </div>
+            </div>
           </div>
 
           {/* Posts Section */}
@@ -785,15 +803,18 @@ console.log(group.visibility);
             {membersId.includes(user?.uid) && (
               <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
                 <div className="flex items-start gap-4">
-                  {
-                    isAnonymous ?                   <div
-                    className="w-12 h-12 flex justify-center items-center rounded-full object-cover border-2 border-purple-200"
-                  > <FaUserSecret size={30}/> </div> :                   <img
-                    src={user?.photoURL || "https://via.placeholder.com/50"}
-                    alt="avatar"
-                    className="w-12 h-12 rounded-full object-cover border-2 border-purple-200"
-                  />
-                  }
+                  {isAnonymous ? (
+                    <div className="w-12 h-12 flex justify-center items-center rounded-full object-cover border-2 border-purple-200">
+                      {" "}
+                      <FaUserSecret size={30} />{" "}
+                    </div>
+                  ) : (
+                    <img
+                      src={user?.photoURL || "https://via.placeholder.com/50"}
+                      alt="avatar"
+                      className="w-12 h-12 rounded-full object-cover border-2 border-purple-200"
+                    />
+                  )}
 
                   <textarea
                     rows={3}
@@ -865,21 +886,25 @@ console.log(group.visibility);
               </div>
             )}
 
-           {
-            group?.visibility == "public" ? (<>
-                        {groupPost.map((blog) => (
-              <BlogCard key={blog.id} blog={blog} />
-            ))}
-            </>) :  group?.visibility == "private" && membersId.includes(user?.uid) ? (<>
-                        {groupPost.map((blog) => (
-              <BlogCard key={blog.id} blog={blog} />
-            ))}
-            </>) : group?.visibility == "private" && !membersId.includes(user?.uid)  ? (<>
-            <NoBlog/>
-            </>) : null
-           }
-
-
+            {group?.visibility == "public" ? (
+              <>
+                {groupPost.map((blog) => (
+                  <BlogCard key={blog.id} blog={blog} />
+                ))}
+              </>
+            ) : group?.visibility == "private" &&
+              membersId.includes(user?.uid) ? (
+              <>
+                {groupPost.map((blog) => (
+                  <BlogCard key={blog.id} blog={blog} />
+                ))}
+              </>
+            ) : group?.visibility == "private" &&
+              !membersId.includes(user?.uid) ? (
+              <>
+                <NoBlog />
+              </>
+            ) : null}
 
             {/* Empty State Example */}
 

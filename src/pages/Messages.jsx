@@ -19,8 +19,10 @@ const Messages = () => {
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user.user);
   const [msgNotification, setMsgNotification] = useState([]);
+  const [grpNotification, setGrpNotification] = useState([]);
   const [ownFollowing, setOwnFollowing] = useState([]);
   const [msgNotif, setMsgNotif] = useState([]);
+  const [grpMsgNotif, setGrpMsgNotif] = useState([]);
   const [pageId, setPageId] = useState([]);
   const [lastMessage, setLastMessage] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -42,7 +44,27 @@ const Messages = () => {
       snapshot.forEach((item) => {
         const notification = item.val();
 
-        if (notification.reciverid == currentUser?.uid) {
+        if (
+          notification.reciverid == currentUser?.uid &&
+          notification.groupid
+        ) {
+          arr.push(notification.groupid);
+        }
+      });
+      setGrpNotification(arr);
+    });
+  }, [currentUser?.uid, db]);
+  useEffect(() => {
+    const notificationRef = ref(db, "messagenotification/");
+    onValue(notificationRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        const notification = item.val();
+
+        if (
+          notification.reciverid == currentUser?.uid &&
+          !notification.groupid
+        ) {
           arr.push(notification.senderid);
         }
       });
@@ -55,7 +77,26 @@ const Messages = () => {
       let arr = [];
       snapshot.forEach((item) => {
         const notification = item.val();
-        if (notification.reciverid == currentUser?.uid) {
+        if (
+          notification.reciverid == currentUser?.uid &&
+          notification.groupid
+        ) {
+          arr.push({ ...notification, id: item.key });
+        }
+      });
+      setGrpMsgNotif(arr);
+    });
+  }, [currentUser?.uid, db]);
+  useEffect(() => {
+    const notificationRef = ref(db, "messagenotification/");
+    onValue(notificationRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        const notification = item.val();
+        if (
+          notification.reciverid == currentUser?.uid &&
+          !notification.groupid
+        ) {
           arr.push({ ...notification, id: item.key });
         }
       });
@@ -92,8 +133,18 @@ const Messages = () => {
       setGroups(arr);
     });
   }, [db]);
-  console.log(groups);
 
+  const handleGrpMsgNotificationDelete = (friend) => {
+    grpMsgNotif.forEach((item) => {
+      if (
+        item.groupid == friend.groupId &&
+        item.reciverid == currentUser?.uid
+      ) {
+        const notificationRef = ref(db, "messagenotification/" + item.id);
+        remove(notificationRef);
+      }
+    });
+  };
   const handleMsgNotificationDelete = (friend) => {
     msgNotif.forEach((item) => {
       if (
@@ -241,12 +292,12 @@ const Messages = () => {
                 >
                   <div
                     key={friend.groupId}
-                    // onClick={() => handleMsgNotificationDelete(friend)}
+                    onClick={() => handleGrpMsgNotificationDelete(friend)}
                     className="flex relative items-center gap-4 p-3 bg-white/80 rounded-xl border border-white/60 shadow hover:shadow-lg cursor-pointer transition-all hover:scale-[1.02]"
                   >
-                    {/* {msgNotification.includes(friend.followingid) && (
+                    {grpNotification.includes(friend.groupId) && (
                       <span className="w-3 h-3 absolute top-2 right-2 rounded-full  bg-red-500 animate-pulse"></span>
-                    )} */}
+                    )}
                     <div className="relative ">
                       <img
                         src={friend.groupImage}
@@ -262,11 +313,7 @@ const Messages = () => {
                       <span className="font-medium truncate text-sm text-gray-500">
                         {(() => {
                           const msgs = lastMessage.filter(
-                            (msg) =>
-                              (msg.senderid === currentUser.uid &&
-                                msg.reciverid === friend.followingid) ||
-                              (msg.senderid === friend.followingid &&
-                                msg.reciverid === currentUser.uid)
+                            (msg) => msg.reciverid === friend.groupId
                           );
 
                           if (msgs.length === 0) return "No messages yet";
@@ -357,7 +404,7 @@ const Messages = () => {
               className="flex-1 p-6 overflow-y-auto"
             >
               {chatType === "group" ? (
-                <GroupConversation />
+                <GroupConversation msgNotif={grpMsgNotif} />
               ) : (
                 <Conversation msgNotif={msgNotif} />
               )}

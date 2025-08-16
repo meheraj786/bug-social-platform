@@ -42,6 +42,7 @@ const CommentForm = ({ post, commentLength }) => {
   const [sharePop, setSharePop] = useState(false);
   const [selectSharePost, setSelectSharePost] = useState(null);
   const [followerId, setFollowerId] = useState([]);
+  const [groupAdmin, setGroupAdmin] = useState([]);
 
   useEffect(() => {
     const reactRef = ref(db, "react/");
@@ -101,6 +102,18 @@ const CommentForm = ({ post, commentLength }) => {
   }, [db, user, post]);
 
   useEffect(() => {
+    const groupRef = ref(db, "group/");
+    onValue(groupRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((grp) => {
+        if (grp.val().id === post.sharedBloggerId) {
+          arr.push(grp.val().adminId);
+        }
+      });
+      setGroupAdmin(arr);
+    });
+  }, [db, post]);
+  useEffect(() => {
     const reactRef = ref(db, "react/");
     onValue(reactRef, (snapshot) => {
       let reactArr = [];
@@ -133,6 +146,7 @@ const CommentForm = ({ post, commentLength }) => {
       }
     });
   };
+  console.log(post, "postcomment");
 
   const reactHandler = () => {
     const reactData = {
@@ -168,7 +182,7 @@ const CommentForm = ({ post, commentLength }) => {
     }
     let commentData = null;
 
-    if (post.adminId == user?.uid && post.postType=="pagePost") {
+    if (post.adminId == user?.uid && post.postType == "pagePost") {
       commentData = {
         name: post.name,
         comment: comment,
@@ -176,7 +190,7 @@ const CommentForm = ({ post, commentLength }) => {
         commenterId: post.bloggerId,
         blogId: post.id,
         imageUrl: post.imageUrl,
-        isAuthorComment: true
+        isAuthorComment: true,
       };
     } else {
       commentData = {
@@ -241,7 +255,7 @@ const CommentForm = ({ post, commentLength }) => {
         sharedDescription: post.description,
         sharedBloggerImg: post.imageUrl,
         postType: "share",
-      }
+      };
     }
 
     set(push(ref(db, "blogs/")), blogData)
@@ -369,6 +383,7 @@ const CommentForm = ({ post, commentLength }) => {
         });
     }
   };
+console.log(groupAdmin, "groupAdmin");
 
   return (
     <div className="bg-gradient-to-r font-secondary from-gray-50/80 to-white/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-200/50">
@@ -435,94 +450,97 @@ const CommentForm = ({ post, commentLength }) => {
               <span className="font-semibold text-sm">Share</span>
             </div>
           )}
-          {(post.postType == "pagePost" &&
-            post.contentType == "event" &&
-            followerId.includes(user?.uid) &&
-            post.adminId !== user?.uid) ||
-          post.isPageShare ? (
-            <div
-              onClick={() => {
-                sentMessageHandler("event");
-              }}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-blue-700 border border-blue-200"
-            >
-              <Star size={18} />
-              <span className="font-semibold text-sm">Interested</span>
-            </div>
-          ) : (post.postType == "pagePost" &&
-              post.contentType == "product" &&
-              followerId.includes(user?.uid) &&
-              post.adminId !== user?.uid) ||
-            post.isPageShare ? (
-            <div
-              onClick={() => {
-                sentMessageHandler("product");
-              }}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-purple-700 border border-purple-200"
-            >
-              <BiCartAdd size={18} />
-              <span className="font-semibold text-sm">Buy</span>
-            </div>
-          ) : (post.postType == "pagePost" &&
-              post.contentType == "job" &&
-              followerId.includes(user?.uid) &&
-              post.adminId !== user?.uid) ||
-            post.isPageShare ? (
-            <div
-              onClick={() => {
-                sentMessageHandler("job");
-              }}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-green-700 border border-green-200"
-            >
-              <Paperclip size={18} />
-              <span className="font-semibold text-sm">Apply</span>
-            </div>
-          ) : null}
-          {(post.postType == "pagePost" &&
-            post.contentType == "event" &&
-            !followerId.includes(user?.uid) &&
-            post.adminId !== user?.uid) ||
-          post.isPageShare ? (
-            <div
-              onClick={() => {
-                followHandler();
-              }}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-blue-700 border border-blue-200"
-            >
-              <Star size={18} />
-              <span className="font-semibold text-sm">
-                Follow to Interested
-              </span>
-            </div>
-          ) : (post.postType == "pagePost" &&
-              post.contentType == "product" &&
-              !followerId.includes(user?.uid) &&
-              post.adminId !== user?.uid) ||
-            post.isPageShare ? (
-            <div
-              onClick={() => {
-                followHandler();
-              }}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-purple-700 border border-purple-200"
-            >
-              <BiCartAdd size={18} />
-              <span className="font-semibold text-sm">Follow to Buy</span>
-            </div>
-          ) : (post.postType == "pagePost" &&
-              post.contentType == "job" &&
-              !followerId.includes(user?.uid) &&
-              post.adminId !== user?.uid) ||
-            post.isPageShare ? (
-            <div
-              onClick={() => {
-                followHandler();
-              }}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-green-700 border border-green-200"
-            >
-              <Paperclip size={18} />
-              <span className="font-semibold text-sm">Follow to Apply</span>
-            </div>
-          ) : null}
+          {/* Interested / Buy / Apply buttons for followers */}
+{post.postType == "pagePost" &&
+ post.contentType == "event" &&
+ followerId.includes(user?.uid) &&
+ post.adminId !== user?.uid &&
+ !post.isPageShare ? (
+  <div
+    onClick={() => {
+      sentMessageHandler("event");
+    }}
+    className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-blue-700 border border-blue-200"
+  >
+    <Star size={18} />
+    <span className="font-semibold text-sm">Interested</span>
+  </div>
+) : post.postType == "pagePost" &&
+  post.contentType == "product" &&
+  followerId.includes(user?.uid) &&
+  post.adminId !== user?.uid &&
+  !post.isPageShare ? (
+  <div
+    onClick={() => {
+      sentMessageHandler("product");
+    }}
+    className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-purple-700 border border-purple-200"
+  >
+    <BiCartAdd size={18} />
+    <span className="font-semibold text-sm">Buy</span>
+  </div>
+) : post.postType == "pagePost" &&
+  post.contentType == "job" &&
+  followerId.includes(user?.uid) &&
+  post.adminId !== user?.uid &&
+  !post.isPageShare ? (
+  <div
+    onClick={() => {
+      sentMessageHandler("job");
+    }}
+    className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-green-700 border border-green-200"
+  >
+    <Paperclip size={18} />
+    <span className="font-semibold text-sm">Apply</span>
+  </div>
+) : null}
+
+{/* Follow to Interested / Buy / Apply buttons for non-followers */}
+{post.postType == "pagePost" &&
+ post.contentType == "event" &&
+ !followerId.includes(user?.uid) &&
+ post.adminId !== user?.uid &&
+ !post.isPageShare ? (
+  <div
+    onClick={() => {
+      followHandler();
+    }}
+    className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-blue-700 border border-blue-200"
+  >
+    <Star size={18} />
+    <span className="font-semibold text-sm">Follow to Interested</span>
+  </div>
+) : post.postType == "pagePost" &&
+  post.contentType == "product" &&
+  !followerId.includes(user?.uid) &&
+  post.adminId !== user?.uid &&
+  !post.isPageShare ? (
+  <div
+    onClick={() => {
+      followHandler();
+    }}
+    className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-purple-700 border border-purple-200"
+  >
+    <BiCartAdd size={18} />
+    <span className="font-semibold text-sm">Follow to Buy</span>
+  </div>
+) : post.postType == "pagePost" &&
+  post.contentType == "job" &&
+  !followerId.includes(user?.uid) &&
+  post.adminId !== user?.uid &&
+  !post.isPageShare ? (
+  <div
+    onClick={() => {
+      followHandler();
+    }}
+    className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-green-700 border border-green-200"
+  >
+    <Paperclip size={18} />
+    <span className="font-semibold text-sm">Follow to Apply</span>
+  </div>
+) : null}
+
+
         </div>
 
         {/* Additional Actions */}
@@ -539,17 +557,19 @@ const CommentForm = ({ post, commentLength }) => {
         {/* User Avatar */}
         {user && (
           <div className="flex-shrink-0">
-            {
-              post.postType=="pagePost" && post.adminId==user?.uid ? <img
-              src={post.imageUrl || "https://via.placeholder.com/40"}
-              alt="Your avatar"
-              className="w-10 h-10 rounded-full object-cover border-2 border-purple-200 shadow-md"
-            /> :             <img
-              src={user.photoURL || "https://via.placeholder.com/40"}
-              alt="Your avatar"
-              className="w-10 h-10 rounded-full object-cover border-2 border-purple-200 shadow-md"
-            />
-            }
+            {post.postType == "pagePost" && post.adminId == user?.uid ? (
+              <img
+                src={post.imageUrl || "https://via.placeholder.com/40"}
+                alt="Your avatar"
+                className="w-10 h-10 rounded-full object-cover border-2 border-purple-200 shadow-md"
+              />
+            ) : (
+              <img
+                src={user.photoURL || "https://via.placeholder.com/40"}
+                alt="Your avatar"
+                className="w-10 h-10 rounded-full object-cover border-2 border-purple-200 shadow-md"
+              />
+            )}
           </div>
         )}
 
