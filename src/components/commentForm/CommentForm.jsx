@@ -146,7 +146,6 @@ const CommentForm = ({ post, commentLength }) => {
       }
     });
   };
-  console.log(post, "postcomment");
 
   const reactHandler = () => {
     const reactData = {
@@ -383,7 +382,6 @@ const CommentForm = ({ post, commentLength }) => {
         });
     }
   };
-console.log(groupAdmin, "groupAdmin");
 
   return (
     <div className="bg-gradient-to-r font-secondary from-gray-50/80 to-white/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-200/50">

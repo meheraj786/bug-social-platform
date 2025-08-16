@@ -190,7 +190,7 @@ export default function UserList() {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="w-full font-secondary lg:w-[400px] h-1/2 fixed mt-[80px] top-0 right-0 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl border border-gray-200/50 p-6 space-y-5 overflow-y-auto"
+      className="w-full font-secondary lg:w-[400px] h-[40%] fixed mt-[80px] top-0 right-0 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl border border-gray-200/50 p-6 space-y-5 overflow-y-auto"
     >
       {/* Header */}
       <div className="flex items-center justify-between">

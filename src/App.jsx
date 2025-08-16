@@ -9,6 +9,8 @@ import BlogList from "./components/blogList/BlogList";
 import ProfileSidebar from "./components/profileSidebar/ProfileSidebar";
 import FriendList from "./components/userList/UserList";
 import FeatureImage from "./components/featureImage/FeatureImage";
+import PageSidebar from "./layouts/PageSidebar";
+import GroupListSidebar from "./layouts/GroupListSidebar";
 
 function App() {
   return (
@@ -16,7 +18,9 @@ function App() {
       {/* <Banner /> */}
       <FeatureImage/>
       <ProfileSidebar/>
-      <FriendList/>
+      <GroupListSidebar/>
+      <PageSidebar/>
+      {/* <FriendList/> */}
       <BlogPostForm />
       <BlogList />
     </>
