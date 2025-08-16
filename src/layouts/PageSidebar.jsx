@@ -18,7 +18,7 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import moment from "moment";
 import CustomToast from "./CustomToast";
-import { Link } from "react-router";
+import { Link, Navigate } from "react-router";
 
 const PageSidebar = () => {
   const [followedPages, setFollowedPages] = useState([]);
@@ -208,7 +208,9 @@ const PageSidebar = () => {
 
     return colors[category] || "bg-gradient-to-r from-gray-500 to-gray-600";
   };
-
+  if (!currentUser) {
+  return <Navigate to="/"/>;
+}
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}

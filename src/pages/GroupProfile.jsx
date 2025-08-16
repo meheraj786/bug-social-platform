@@ -11,7 +11,7 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router";
+import { Navigate, useParams } from "react-router";
 import CustomToast from "../layouts/CustomToast";
 import { UserX } from "lucide-react";
 import BlogCard from "../components/blogCard/BlogCard";
@@ -362,6 +362,10 @@ const GroupProfile = () => {
       ));
     });
   };
+
+      if (!user) {
+    return <Navigate to="/login"/>;
+  }
 
   return (
     <div className="bg-gradient-to-br min-h-[150vh] font-secondary from-gray-50 via-blue-50/30 to-purple-50/30">

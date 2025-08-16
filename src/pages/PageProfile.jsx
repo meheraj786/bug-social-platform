@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BiGlobe, BiImage, BiX, BiHeart, BiComment, BiShare, BiStar } from 'react-icons/bi';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, Navigate, useNavigate, useParams } from 'react-router';
 import { getDatabase, onValue, push, ref, remove, set } from 'firebase/database';
 import { Camera, ThumbsUp, UserPlus, MessageCircle, Share2, UserRoundPlus, UserRoundX, MessageCircleCode } from "lucide-react";
 import { FaImage, FaCalendar, FaBriefcase, FaShoppingCart, FaNewspaper } from 'react-icons/fa';
@@ -213,7 +213,9 @@ const PageProfile = () => {
           });
         });
       };
-
+    if (!user) {
+  return <Navigate to="/login"/>;
+}
   if (!pageData) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-500">

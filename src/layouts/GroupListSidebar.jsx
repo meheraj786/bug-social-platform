@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Users, Plus, UserCheck, MessageCircle, Rss } from "lucide-react";
-import { Link } from "react-router";
+import { Link, Navigate } from "react-router";
 import { useSelector } from "react-redux";
 import { getDatabase, onValue, push, ref, remove, set } from "firebase/database";
 import toast from "react-hot-toast";
@@ -101,6 +101,9 @@ const cancelJoinRequest = (group) => {
       content: `${currentUser?.displayName} send join request to your group ${group?.groupName}!`,
     });
   };
+    if (!currentUser) {
+  return <Navigate to="/"/>;
+}
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
