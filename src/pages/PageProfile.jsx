@@ -52,7 +52,6 @@ const PageProfile = () => {
   };
 
   const sendMessageHandler=()=>{
-    console.log("Message Send");
     navigate(`/messages/chat/${pageData?.id}`)
   }
   

@@ -29,7 +29,6 @@ const FollowingModal = ({ following, setFollowingPop }) => {
       content: `${currentUser?.displayName} unfollow you!`,
     });
   };
-  console.log(following, "from modal");
 
   return createPortal(
     <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex justify-center items-center z-[9999] p-4">

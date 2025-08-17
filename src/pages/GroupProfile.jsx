@@ -77,7 +77,6 @@ const GroupProfile = () => {
       isAnonymous: isAnonymous,
       time: moment().format(),
     };
-    console.log(group.visibility);
 
     set(push(ref(db, "blogs/")), postData)
       .then(() => {
@@ -122,7 +121,6 @@ const GroupProfile = () => {
     onValue(requestRef, (snapshot) => {
       snapshot.forEach((item) => {
         const group = item.val();
-        console.log(group, "allGroup");
 
         if (item.key == id) {
           setGroup({ ...group, id: item.key });

@@ -27,7 +27,6 @@ useEffect(() => {
   });
 }, [db, user]);
   const followHandler = (following) => {
-    console.log(following);
     set(push(ref(db, "follow/")), {
       followerid: user?.uid,
       followername: user?.displayName,

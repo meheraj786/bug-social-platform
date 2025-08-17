@@ -58,7 +58,6 @@ const PageSidebar = () => {
     });
   }, [db]);
 
-  console.log(followedPages, " followedPages");
   
       const followHandler = (following) => {
         set(push(ref(db, "follow/")), {

@@ -30,7 +30,6 @@ const Messages = () => {
   useEffect(() => {
     // setChatType()
   },[location.pathname])
-  console.log(chatType);
   
 
   useEffect(() => {

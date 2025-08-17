@@ -26,8 +26,6 @@ return (
                       className="h-10 w-10 rounded-full object-cover"
                       src={img}
                       alt="Profile"
-                      onLoad={() => console.log('Image loaded successfully')}
-                      onError={() => console.log('Image failed to load:', img)}
                     />
                   ) : (
                     <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-white text-sm font-semibold">

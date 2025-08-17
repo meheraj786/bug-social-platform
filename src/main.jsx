@@ -5,7 +5,6 @@ import App from "./App.jsx";
 import firebaseConfig from "./components/firebase/firebase.js";
 import RootLayout from "./pages/RootLayout.jsx";
 import { createRoot } from "react-dom/client";
-import Blogs from "./pages/Blogs.jsx";
 import Profile from "./pages/Profile.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import { store } from "./app/store";
@@ -33,14 +32,7 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
     children: [
       { index: true, element: <App /> },
-      {
-        path: "/blogs",
-        element: (
-          <AuthProtect>
-            <Blogs />
-          </AuthProtect>
-        ),
-      },
+
       {
         path: "/profile/:id",
         element: (
