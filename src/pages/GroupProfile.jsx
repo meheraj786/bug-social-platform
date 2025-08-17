@@ -11,7 +11,7 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { Navigate, useParams } from "react-router";
+import { Link, Navigate, useParams } from "react-router";
 import CustomToast from "../layouts/CustomToast";
 import { UserX } from "lucide-react";
 import BlogCard from "../components/blogCard/BlogCard";
@@ -444,9 +444,12 @@ const GroupProfile = () => {
                 {membersId.includes(user?.uid) &&
                   group?.adminId != user?.uid && (
                     <>
+                    <Link to={`/messages/groupchat/${group?.id}`}>
                       <button className="px-6 py-3 rounded-2xl font-semibold shadow-lg flex items-center gap-2 border-2 transition-all duration-200 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
                         Message
                       </button>
+                    
+                    </Link>
                       <button
                         onClick={() =>
                           kickoutHandler({
@@ -463,6 +466,14 @@ const GroupProfile = () => {
                         Leave
                       </button>
                     </>
+                  )}
+                  {group?.adminId == user?.uid && (
+                    <Link to={`/messages/groupchat/${group?.id}`}>
+                      <button className="px-6 py-3 rounded-2xl font-semibold shadow-lg flex items-center gap-2 border-2 transition-all duration-200 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
+                        Message
+                      </button>
+                    
+                    </Link>
                   )}
               </div>
             </div>
@@ -774,8 +785,8 @@ const GroupProfile = () => {
                 {group?.visibility == "private" &&
                 membersId.includes(user?.uid) ? (
                   <>
-                    {members.map((i) => (
-                      <div key={i}>
+                    {members.map((i, idx) => (
+                      <div key={idx}>
                         <img
                           src={i.memberImg}
                           alt="member"

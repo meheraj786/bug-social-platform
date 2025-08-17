@@ -166,7 +166,7 @@ const cancelJoinRequest = (group) => {
                     Post
                   </button>
                   </Link>
-                  <Link to={`/messages/groupchat/${group.id}`}>
+                  <Link to={`/messages/groupchat/${group.groupId}`}>
                     <button className="text-xs bg-white border border-gray-300 text-gray-600 hover:text-blue-600 px-3 py-1.5 rounded-full shadow-md hover:scale-105 transition-all font-medium flex items-center gap-1">
                       <MessageCircle className="w-3 h-3" />
                       Chat

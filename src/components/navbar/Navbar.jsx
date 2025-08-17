@@ -9,11 +9,17 @@ import { NavLink, useNavigate } from "react-router";
 import Logo from "../../layouts/Logo";
 import { useDispatch, useSelector } from "react-redux";
 import { clearUser } from "../../features/user/userSlice";
-import { BiCog, BiHelpCircle, BiLogOutCircle, BiPlus, BiUser } from "react-icons/bi";
+import {
+  BiCog,
+  BiHelpCircle,
+  BiLogOutCircle,
+  BiPlus,
+  BiUser,
+} from "react-icons/bi";
 import toast, { Toaster } from "react-hot-toast";
 import { getAuth, signOut } from "firebase/auth";
 import { IoChevronDownOutline, IoNotificationsOutline } from "react-icons/io5";
-import { getDatabase, onValue, ref } from "firebase/database";
+import { getDatabase, onValue, ref, update } from "firebase/database";
 import { AiOutlineMessage } from "react-icons/ai";
 import { PanelsTopLeft, Users } from "lucide-react";
 
@@ -25,11 +31,6 @@ const Navbar = () => {
   const user = useSelector((state) => state.user.user);
   const db = getDatabase();
   const [msgNotification, setMsgNotification] = useState([]);
-
-
-
-
-
 
   useEffect(() => {
     const requestRef = ref(db, "friendlist/");
@@ -79,6 +80,7 @@ const Navbar = () => {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [unSeenNotifi, setUnseenNotifi]= useState([])
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -101,8 +103,20 @@ const Navbar = () => {
         }
       });
       setNotification(arr);
+      setUnseenNotifi(arr.filter((n)=>!n.isSeen))
     });
   }, [db, user]);
+
+  
+  const notificationSeen = () => {
+    setTimeout(() => {
+      notification.map((n) => {
+        update(ref(db, "notification/" + n.id), {
+          isSeen: true,
+        });
+      });
+    }, 2000);
+  };
 
   return (
     <div className="bg-gradient-to-r from-purple-700 via-blue-600 to-blue-800 fixed w-full z-[999] font-secondary text-white py-3 shadow-md">
@@ -136,6 +150,7 @@ const Navbar = () => {
               <>
                 <NavLink
                   to="/notification"
+                  onClick={notificationSeen}
                   className={({ isActive }) =>
                     `flex relative items-center gap-x-2 px-4 py-2 rounded-full text-sm font-medium  hover:bg-white/10 transition-all duration-200 hover:scale-105 ${
                       isActive
@@ -144,9 +159,9 @@ const Navbar = () => {
                     }`
                   }
                 >
-                  {notification.length > 0 && (
+                  {unSeenNotifi.length >= 1 && (
                     <span className="w-4 h-4 flex justify-center items-center bg-red-600 text-white rounded-full absolute top-0 right-0 text-[11px] z-10">
-                      {notification.length}
+                      {unSeenNotifi.length}
                     </span>
                   )}
                   <IoNotificationsOutline size={25} />
@@ -196,7 +211,11 @@ const Navbar = () => {
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-lg">
                             {/* {(user?.displayName || "U").charAt(0).toUpperCase()} */}
-                            <img src={user?.photoURL} className="w-11 h-11 rounded-full" alt="" />
+                            <img
+                              src={user?.photoURL}
+                              className="w-11 h-11 rounded-full"
+                              alt=""
+                            />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-gray-900 truncate">
@@ -242,7 +261,9 @@ const Navbar = () => {
                           <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors duration-200">
                             <Users className="text-sm text-gray-600 group-hover:text-blue-600" />
                           </div>
-                          <span className="font-medium">Manage Your Groups</span>
+                          <span className="font-medium">
+                            Manage Your Groups
+                          </span>
                         </NavLink>
 
                         {/* Settings */}

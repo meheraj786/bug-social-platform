@@ -9,9 +9,8 @@ import { motion } from "motion/react";
 import GroupConversation from "../components/groupConversation/GroupConversation";
 
 const Messages = () => {
-  const [chatType, setChatType] = useState("friend");
-
-  const isGroupChat = location.pathname.includes("/messages/groupchat/");
+  const location = useLocation(); 
+  const [chatType, setChatType] = useState(location.pathname.includes("/messages/groupchat/") ? "group" : "friend");
   const [friendList, setFriendList] = useState([]);
   const [friendListLoading, setFriendListLoading] = useState(true);
   const [message, setMessage] = useState("");
@@ -26,6 +25,13 @@ const Messages = () => {
   const [pageId, setPageId] = useState([]);
   const [lastMessage, setLastMessage] = useState([]);
   const [groups, setGroups] = useState([]);
+   
+
+  useEffect(() => {
+    // setChatType()
+  },[location.pathname])
+  console.log(chatType);
+  
 
   useEffect(() => {
     const requestRef = ref(db, "page/");
@@ -403,7 +409,7 @@ const Messages = () => {
               transition={{ duration: 0.4, ease: "easeOut" }}
               className="flex-1 p-6 overflow-y-auto"
             >
-              {chatType === "group" ? (
+              {chatType == "group" ? (
                 <GroupConversation msgNotif={grpMsgNotif} />
               ) : (
                 <Conversation msgNotif={msgNotif} />

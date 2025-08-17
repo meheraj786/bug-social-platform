@@ -70,7 +70,6 @@ const CommentList = ({ post, comment }) => {
               <div className="flex-1">
                 <p className="font-semibold flex flex-col gap-y-1 font-primary text-sm group-hover/profile:text-purple-600 transition-colors duration-300">
                   {comment.name}
-                  <span className="text-xs text-purple-500">Group Admin</span>
                 </p>
                 <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
                   <MdOutlineDateRange size={12} className="text-gray-400" />

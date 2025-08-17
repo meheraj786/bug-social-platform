@@ -137,11 +137,11 @@ return (
   animate={{ opacity: 1, scale: 1 }}   
   transition={{ duration: 0.4, ease: "easeOut" }}
                 key={notif.id}
-                className={`group relative bg-white/70 backdrop-blur-xl rounded-2xl border shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden
+                className={`group ${!notif.isSeen && "!animate-pulse !bg-red/70"} relative bg-white/70 backdrop-blur-xl rounded-2xl border shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden
                   ${notif.type === 'positive' 
                     ? 'border-green-200 hover:border-green-300' 
                     : notif.type === 'negative' 
-                    ? 'border-red-200 hover:border-red-300' 
+                    ? 'border-red-200  hover:border-red-300' 
                     : 'border-gray-200 hover:border-gray-300'
                   }
                   hover:scale-[1.02] hover:-translate-y-1
