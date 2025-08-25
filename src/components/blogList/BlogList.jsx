@@ -8,6 +8,7 @@ import BlogCardSkeleton from "../blogCardSkeleton/BlogCardSkeleton";
 import NoBlog from "../noBlog/NoBlog";
 import Flex from "../../layouts/Flex";
 import { useSelector } from "react-redux";
+import CustomLoader from "../../layouts/CustomLoader";
 
 const BlogList = () => {
   const db = getDatabase();
@@ -19,6 +20,7 @@ const BlogList = () => {
   const [groupId, setGroupId] = useState([]);
   const [groupPost, setGroupPost] = useState([]);
   const [activeTab, setActiveTab] = useState("global");
+  const [loading, setLoading] = useState(true);
 
   // Load saved tab from localStorage on component mount
   useEffect(() => {
@@ -91,6 +93,7 @@ const BlogList = () => {
       });
       setIsLoading(false);
       setFollowBlogList(arr);
+      setLoading(false);
     });
   }, [db, followingId]);
   useEffect(() => {
@@ -108,6 +111,9 @@ const BlogList = () => {
       setGroupPost(arr);
     });
   }, [db, groupId]);
+
+
+  if (loading) return <CustomLoader/>
 
   return (
     <div className="py-3 font-secondary">

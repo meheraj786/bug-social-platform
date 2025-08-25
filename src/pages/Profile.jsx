@@ -6,6 +6,7 @@ import {
   ref,
   remove,
   set,
+  update,
 } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,7 +19,7 @@ import moment from "moment";
 
 import { motion } from "motion/react";
 import { FaImage } from "react-icons/fa6";
-import { Plus, UserRoundPlus, UserRoundX, X } from "lucide-react";
+import { Edit, Plus, UserRoundPlus, UserRoundX, X } from "lucide-react";
 import CustomToast from "../layouts/CustomToast";
 import FriendsModal from "../layouts/FriendsModal";
 import FollowersModal from "../layouts/FollowersModal";
@@ -58,7 +59,9 @@ export default function Profile() {
 
   const [unFriendPop, setUnfriendPop] = useState(false);
   const [selectFriend, setSelectFriend] = useState(null);
-  const [loading, setLoading]= useState(true)
+  const [loading, setLoading] = useState(true);
+  const [coverImage, setCoverImage] = useState("");
+  const [coverImageLoading, setCoverImageLoader]= useState(false)
   useEffect(() => {
     const requestRef = ref(db, "friendlist/");
     onValue(requestRef, (snapshot) => {
@@ -113,6 +116,25 @@ export default function Profile() {
     });
     setPreview(result.secure_url);
     setImgLoading(false);
+  };
+  const handleCoverImageChange = async (e) => {
+    setCoverImageLoader(true);
+    const file = e.target.files[0];
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "e-com app with firebase");
+    data.append("cloud_name", "dlrycnxnh");
+
+    const res = await fetch(coudinaryApi, {
+      method: "POST",
+      body: data,
+    });
+    const result = await res.json();
+    setCoverImage(result.secure_url);
+    update(ref(db, "users/"),{
+      coverImage: result.secure_url
+    })
+    setCoverImageLoader(false);
   };
 
   const handleSubmit = () => {
@@ -190,7 +212,11 @@ export default function Profile() {
       snapshot.forEach((blog) => {
         const content = blog.val();
         const blogId = blog.key;
-        if (content.bloggerId == id && !content.visibility && !content.isAnonymous) {
+        if (
+          content.bloggerId == id &&
+          !content.visibility &&
+          !content.isAnonymous
+        ) {
           arr.unshift({ ...content, id: blogId });
         }
       });
@@ -217,7 +243,7 @@ export default function Profile() {
     const userRef = ref(db, "users/" + id);
     onValue(userRef, (snapshot) => {
       setCurrentUserInfo({ ...snapshot.val(), id: snapshot.key });
-      setLoading(false)
+      setLoading(false);
     });
   }, []);
 
@@ -397,7 +423,7 @@ export default function Profile() {
     });
   };
 
-  if (loading) return <CustomLoader/>
+  if (loading) return <CustomLoader />;
 
   return (
     <div className="bg-gradient-to-br font-secondary from-gray-50 via-blue-50/30 to-purple-50/30 min-h-screen ">
@@ -431,14 +457,28 @@ export default function Profile() {
         />
       )}
       {/* Cover Section with Glass Effect */}
-      <div className="relative w-full h-80 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden">
+      {
+        currentUser?.coverImage ?       <div className="relative w-full h-80 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden">
+        <img src={currentUser?.coverImage} className="w-full h-full object-cover object-center" alt="" />
+        <span className="bg-white p-4 absolute bottom-0 right-0 rounded-full">
+          <Edit/>
+          <input type="file" onChange={handleCoverImageChange} className="hidden" />
+        </span>
+      </div> :  <div className="relative w-full h-80 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl animate-pulse"></div>
           <div className="absolute bottom-20 right-20 w-24 h-24 bg-white rounded-full blur-lg animate-bounce"></div>
           <div className="absolute top-1/2 left-1/2 w-16 h-16 bg-white rounded-full blur-md animate-ping"></div>
+          <span className="bg-white p-4 absolute bottom-0 right-0 rounded-full">
+          <Edit/>
+          <input type="file" onChange={handleCoverImageChange} className="hidden" />
+        </span>
         </div>
+        span
       </div>
+      }
+
 
       <Container>
         {/* Profile Info Card */}
@@ -616,25 +656,23 @@ export default function Profile() {
                       Add Friend
                     </button>
                   </div>
-                ) : (
-                  // <button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2">
-                  //   <svg
-                  //     className="w-5 h-5"
-                  //     fill="none"
-                  //     stroke="currentColor"
-                  //     viewBox="0 0 24 24"
-                  //   >
-                  //     <path
-                  //       strokeLinecap="round"
-                  //       strokeLinejoin="round"
-                  //       strokeWidth={2}
-                  //       d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                  //     />
-                  //   </svg>
-                  //   Edit Profile
-                  // </button>
-                  null
-                )}
+                ) : // <button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2">
+                //   <svg
+                //     className="w-5 h-5"
+                //     fill="none"
+                //     stroke="currentColor"
+                //     viewBox="0 0 24 24"
+                //   >
+                //     <path
+                //       strokeLinecap="round"
+                //       strokeLinejoin="round"
+                //       strokeWidth={2}
+                //       d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                //     />
+                //   </svg>
+                //   Edit Profile
+                // </button>
+                null}
               </div>
               {id !== user?.uid && !followingId.includes(userProfile?.id) ? (
                 <button

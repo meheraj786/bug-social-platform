@@ -19,7 +19,6 @@ const ProfileSidebar = () => {
   const user = useSelector((state) => state.user.user);
   const [userProfile, setUserProfile] = useState(null);
   const [followers, setFollowers]= useState([])
-  const [loading, setLoading]= useState(true)
   
     const [friendList, setFriendList] = useState([]);
     useEffect(() => {
@@ -55,7 +54,6 @@ const ProfileSidebar = () => {
         const userdb = data.val();
         if (user?.uid === data.key) {
           setUserProfile(userdb);
-          setLoading(false)
         }
       });
     });
@@ -86,7 +84,6 @@ const ProfileSidebar = () => {
       .catch((error) => console.log(error.message));
   };
 
-  if (loading) return <CustomLoader/>
 
 
 
@@ -97,17 +94,25 @@ return (
     <motion.aside initial={{ opacity: 0, scale: 0.9 }}
   animate={{ opacity: 1, scale: 1 }}   
   transition={{ duration: 0.4, ease: "easeOut" }} className="w-full lg:w-[400px] font-secondary bg-white/80 backdrop-blur-xl mb-10 border border-gray-200/50 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300  fixed mt-[80px] top-0 h-auto overflow-y-auto">
+      {/* cover image  */}
+
+      <div className="absolute top-0 left-0 w-full h-[100px] bg-gradient-to-r from-purple-500 to-blue-500">
+
+      </div>
+
+
+
       {/* Profile Section */}
       <div className="flex flex-col items-center text-center">
         <div className="relative group">
-          <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-gradient-to-r from-purple-500 to-pink-500 shadow-lg group-hover:scale-105 transition-transform duration-300">
+          <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white border-gradient-to-r from-purple-500 to-pink-500 shadow-lg group-hover:scale-105 transition-transform duration-300">
             <img
               src={userProfile?.imageUrl}
               alt="Profile"
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
+          <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-4 border-gradient-to-r from-purple-500 to-pink-500 border-white flex items-center justify-center">
             <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
           </div>
         </div>

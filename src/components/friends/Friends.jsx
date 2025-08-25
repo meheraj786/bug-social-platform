@@ -66,6 +66,8 @@ export default function Friends() {
     });
   }, []);
 
+  if (!currentUser) return
+
   if (friendListLoading) {
     return <div className="w-full lg:w-[400px] h-[45%]  bg-gray-100 fixed bottom-0 right-0 shadow-md rounded-xl p-4 space-y-4">Loading friends...</div>;
   }
