@@ -16,10 +16,17 @@ import BlogCard from "../components/blogCard/BlogCard";
 import toast from "react-hot-toast";
 import time from "../layouts/time";
 import moment from "moment";
-
+import { MoonLoader } from "react-spinners";
 import { motion } from "motion/react";
 import { FaImage } from "react-icons/fa6";
-import { Edit, Plus, UserRoundPlus, UserRoundX, X } from "lucide-react";
+import {
+  CircleIcon,
+  Edit,
+  Plus,
+  UserRoundPlus,
+  UserRoundX,
+  X,
+} from "lucide-react";
 import CustomToast from "../layouts/CustomToast";
 import FriendsModal from "../layouts/FriendsModal";
 import FollowersModal from "../layouts/FollowersModal";
@@ -61,7 +68,7 @@ export default function Profile() {
   const [selectFriend, setSelectFriend] = useState(null);
   const [loading, setLoading] = useState(true);
   const [coverImage, setCoverImage] = useState("");
-  const [coverImageLoading, setCoverImageLoader]= useState(false)
+  const [coverImageLoading, setCoverImageLoader] = useState(false);
   useEffect(() => {
     const requestRef = ref(db, "friendlist/");
     onValue(requestRef, (snapshot) => {
@@ -131,9 +138,9 @@ export default function Profile() {
     });
     const result = await res.json();
     setCoverImage(result.secure_url);
-    update(ref(db, "users/"),{
-      coverImage: result.secure_url
-    })
+    update(ref(db, "users/" + user?.uid), {
+      coverImage: result.secure_url,
+    });
     setCoverImageLoader(false);
   };
 
@@ -245,7 +252,7 @@ export default function Profile() {
       setCurrentUserInfo({ ...snapshot.val(), id: snapshot.key });
       setLoading(false);
     });
-  }, []);
+  }, [db]);
 
   useEffect(() => {
     const requestRef = ref(db, "friendRequest/");
@@ -422,8 +429,24 @@ export default function Profile() {
       content: `${currentUser?.displayName} unfriend you!`,
     });
   };
+  console.log(currentUser, "currentUser");
 
   if (loading) return <CustomLoader />;
+
+  const UploadButton = ({ onChange }) => (
+    <>
+      {coverImageLoading ? (
+        <span className="bg-white w-12 h-12 flex justify-center items-center z-[555] absolute bottom-10 right-10 rounded-full cursor-pointer shadow-md hover:scale-105 transition">
+          <MoonLoader size={40}  color="#ca64cc" />
+        </span>
+      ) : (
+        <label className="bg-white w-12 h-12 flex justify-center items-center z-[555] absolute bottom-10 right-10 rounded-full cursor-pointer shadow-md hover:scale-105 transition">
+          <Edit className="text-gray-700" />
+          <input type="file" onChange={onChange} className="hidden" />
+        </label>
+      )}
+    </>
+  );
 
   return (
     <div className="bg-gradient-to-br font-secondary from-gray-50 via-blue-50/30 to-purple-50/30 min-h-screen ">
@@ -457,28 +480,26 @@ export default function Profile() {
         />
       )}
       {/* Cover Section with Glass Effect */}
-      {
-        currentUser?.coverImage ?       <div className="relative w-full h-80 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden">
-        <img src={currentUser?.coverImage} className="w-full h-full object-cover object-center" alt="" />
-        <span className="bg-white p-4 absolute bottom-0 right-0 rounded-full">
-          <Edit/>
-          <input type="file" onChange={handleCoverImageChange} className="hidden" />
-        </span>
-      </div> :  <div className="relative w-full h-80 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-24 h-24 bg-white rounded-full blur-lg animate-bounce"></div>
-          <div className="absolute top-1/2 left-1/2 w-16 h-16 bg-white rounded-full blur-md animate-ping"></div>
-          <span className="bg-white p-4 absolute bottom-0 right-0 rounded-full">
-          <Edit/>
-          <input type="file" onChange={handleCoverImageChange} className="hidden" />
-        </span>
+      {userProfile?.coverImage ? (
+        <div className="relative w-full h-100  overflow-hidden">
+          <img
+            src={userProfile?.coverImage}
+            className="w-full h-full object-cover object-center"
+            alt="cover"
+          />
+          <UploadButton onChange={handleCoverImageChange} />
         </div>
-        span
-      </div>
-      }
-
+      ) : (
+        <div className="relative w-full h-100 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden">
+          {/* Animated Background Elements */}
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl animate-pulse"></div>
+            <div className="absolute bottom-20 right-20 w-24 h-24 bg-white rounded-full blur-lg animate-bounce"></div>
+            <div className="absolute top-1/2 left-1/2 w-16 h-16 bg-white rounded-full blur-md animate-ping"></div>
+          </div>
+          <UploadButton onChange={handleCoverImageChange} />
+        </div>
+      )}
 
       <Container>
         {/* Profile Info Card */}
