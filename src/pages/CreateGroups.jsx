@@ -20,6 +20,7 @@ import {
 } from "react-icons/bi";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
+import CustomLoader from "../layouts/CustomLoader";
 
 const CreateGroups = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,6 +36,7 @@ const CreateGroups = () => {
   const [about, setAbout] = useState("");
   const [preview, setPreview] = useState("");
   const [imgLoading, setImgLoading] = useState(false);
+  const [loading, setLoading]=useState(true)
 
   const user = useSelector((state) => state.user.user);
   const db = getDatabase();
@@ -115,6 +117,7 @@ const CreateGroups = () => {
         }
       });
       setPages(arr);
+      setLoading(false)
     });
   }, [db]);
 
@@ -160,6 +163,8 @@ const CreateGroups = () => {
       selectedCategory === "all" || page.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  if (loading) return <CustomLoader/>
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

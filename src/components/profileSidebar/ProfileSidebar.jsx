@@ -9,6 +9,8 @@ import { setUser } from "../../features/user/userSlice";
 import FollowerSuggestionSidebar from "../friends/Friends";
 import Flex from "../../layouts/Flex";
 import { motion } from "motion/react";
+import GroupListSidebar from "../../layouts/GroupListSidebar";
+import CustomLoader from "../../layouts/CustomLoader";
 
 const ProfileSidebar = () => {
   const db = getDatabase();
@@ -17,6 +19,7 @@ const ProfileSidebar = () => {
   const user = useSelector((state) => state.user.user);
   const [userProfile, setUserProfile] = useState(null);
   const [followers, setFollowers]= useState([])
+  const [loading, setLoading]= useState(true)
   
     const [friendList, setFriendList] = useState([]);
     useEffect(() => {
@@ -52,6 +55,7 @@ const ProfileSidebar = () => {
         const userdb = data.val();
         if (user?.uid === data.key) {
           setUserProfile(userdb);
+          setLoading(false)
         }
       });
     });
@@ -81,13 +85,18 @@ const ProfileSidebar = () => {
       })
       .catch((error) => console.log(error.message));
   };
+
+  if (loading) return <CustomLoader/>
+
+
+
   if (!user) return
   
 return (
   <>
     <motion.aside initial={{ opacity: 0, scale: 0.9 }}
   animate={{ opacity: 1, scale: 1 }}   
-  transition={{ duration: 0.4, ease: "easeOut" }} className="w-full lg:w-[400px] font-secondary bg-white/80 backdrop-blur-xl mb-10 border border-gray-200/50 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300  fixed mt-[80px] top-0 h-[55%] overflow-y-auto">
+  transition={{ duration: 0.4, ease: "easeOut" }} className="w-full lg:w-[400px] font-secondary bg-white/80 backdrop-blur-xl mb-10 border border-gray-200/50 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300  fixed mt-[80px] top-0 h-auto overflow-y-auto">
       {/* Profile Section */}
       <div className="flex flex-col items-center text-center">
         <div className="relative group">
@@ -103,34 +112,17 @@ return (
           </div>
         </div>
         
-        <h2 className="mt-4 font-primary text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+        <h2 className="mt-2 font-primary text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
           {userProfile?.username}
         </h2>
         <p className="text-sm text-gray-500 font-medium">{userProfile?.email}</p>
       </div>
 
-      {/* Stats Section */}
-      <div className="flex gap-3 mt-6">
-        <div className="flex-1 text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 rounded-2xl border border-purple-200/50 transition-all duration-300 hover:scale-105 cursor-pointer">
-          <div className="text-2xl font-bold text-purple-700">{friendList.length}</div>
-          <div className="text-sm font-medium text-purple-600 capitalize">Friends</div>
-        </div>
-        <div className="flex-1 text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-2xl border border-blue-200/50 transition-all duration-300 hover:scale-105 cursor-pointer">
-          <div className="text-2xl font-bold text-blue-700">{followers.length}</div>
-          <div className="text-sm font-medium text-blue-600 capitalize">Followers</div>
-        </div>
-      </div>
 
-      {/* Bio Section */}
-      <div className="mt-6 p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200/50 min-h-[100px] flex items-center justify-center">
-        <p className="text-gray-700 text-sm leading-relaxed text-center font-medium">
-          {userProfile?.bio || "No bio available"}
-        </p>
-      </div>
 
       {/* Action Button */}
       <Link to={`/profile/${user?.uid}`}>
-        <button className="mt-6 bg-gradient-to-r from-purple-600 via-purple-700 to-blue-600 hover:from-purple-700 hover:via-purple-800 hover:to-blue-700 text-white w-full py-3 rounded-2xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg active:scale-95 focus:outline-none focus:ring-4 focus:ring-purple-300/50">
+        <button className="mt-3 bg-gradient-to-r from-purple-600 via-purple-700 to-blue-600 hover:from-purple-700 hover:via-purple-800 hover:to-blue-700 text-white w-full py-2 rounded-2xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg active:scale-95 focus:outline-none focus:ring-4 focus:ring-purple-300/50">
           <span className="flex items-center justify-center gap-2">
             View Profile
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,7 +132,7 @@ return (
         </button>
       </Link>
     </motion.aside>
-    <FollowerSuggestionSidebar/>
+    {/* <FollowerSuggestionSidebar/> */}
   </>
 );
 };

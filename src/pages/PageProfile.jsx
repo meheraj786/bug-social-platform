@@ -13,6 +13,7 @@ import CustomToast from "../layouts/CustomToast";
 import moment from 'moment';
 import toast from 'react-hot-toast';
 import FollowersModal from '../layouts/FollowersModal.jsx'
+import CustomLoader from '../layouts/CustomLoader.jsx';
 
 const PageProfile = () => {
   const [pageData, setPageData] = useState(null);
@@ -33,6 +34,7 @@ const PageProfile = () => {
   const navigate=useNavigate()
   const [ownFollowing, setOwnFollowing] = useState([]);
   const [followersPop, setFollowersPop]= useState(false)
+  const [loading, setLoading]= useState(true)
 
   // Content type options
   const contentTypes = [
@@ -215,10 +217,15 @@ const PageProfile = () => {
     if (!user) {
   return <Navigate to="/login"/>;
 }
-  if (!pageData) {
+
+
+// if (loading) return <CustomLoader/>
+
+
+  if (!pageData && loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-500">
-        Loading page...
+        <CustomLoader/>
       </div>
     );
   }

@@ -7,6 +7,7 @@ import Conversation from '../components/conversation/Conversation';
 import { Link, useParams } from 'react-router';
 import { motion } from 'motion/react';
 import PageConversation from '../components/PageConversation/PageConversation';
+import CustomLoader from '../layouts/CustomLoader';
 
 
 
@@ -24,6 +25,7 @@ const PageMessage = () => {
   const [msgNotif, setMsgNotif]= useState([])
   const [pageId, setPageId]= useState([])
   const [lastMessage,setLastMessage]= useState([])
+  const [loading, setLoading]= useState(true)
 
   useEffect(() => {
     const messageRef = ref(db, "message/");
@@ -95,6 +97,7 @@ const PageMessage = () => {
       setOwnFollowers(
         arr.filter((follower) => follower.followingid == id)
       );
+      setLoading(false)
     });
   }, [db, id]);
 
@@ -112,7 +115,7 @@ const PageMessage = () => {
     });
   };
 
-
+if (loading) return <CustomLoader/>
 
 return (
   <div className="h-screen pt-[50px] bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-6">

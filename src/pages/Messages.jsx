@@ -7,6 +7,7 @@ import Conversation from "../components/conversation/Conversation";
 import { Link, useLocation } from "react-router";
 import { motion } from "motion/react";
 import GroupConversation from "../components/groupConversation/GroupConversation";
+import CustomLoader from "../layouts/CustomLoader";
 
 const Messages = () => {
   const location = useLocation(); 
@@ -25,12 +26,7 @@ const Messages = () => {
   const [pageId, setPageId] = useState([]);
   const [lastMessage, setLastMessage] = useState([]);
   const [groups, setGroups] = useState([]);
-   
-
-  useEffect(() => {
-    // setChatType()
-  },[location.pathname])
-  
+  const [loading, setLoading]= useState(true)
 
   useEffect(() => {
     const requestRef = ref(db, "page/");
@@ -201,6 +197,7 @@ const Messages = () => {
       });
       setFriendList(arr);
       setFriendListLoading(false);
+      // setLoading(false)
     });
   }, []);
 
@@ -215,10 +212,13 @@ const Messages = () => {
         arr.push({ ...message, id: messageId });
       });
       setLastMessage(arr);
+      setLoading(false)
     });
 
     return () => unsubscribe();
   }, [db]);
+
+    if (loading) return <CustomLoader/>
 
   return (
     <div className="h-screen pt-[50px] bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-6">
@@ -278,11 +278,12 @@ const Messages = () => {
                           );
 
                           if (msgs.length === 0) return "No messages yet";
+                          
 
                           // Get last message
                           const last = msgs[msgs.length - 1];
                           return last.message.length > 20
-                            ? last.message.slice(0, 20) + "..."
+                            ? last.message.slice(0, 20) + "..." : last.status=="deleted" ? "❌ Message Deleted" 
                             : last.message;
                         })()}
                       </span>

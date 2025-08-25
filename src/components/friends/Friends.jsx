@@ -15,8 +15,7 @@ export default function Friends() {
   const db = getDatabase();
   const currentUser = useSelector((state) => state.user.user);
   const [selectFriend, setSelectedFriend]= useState(null)
-  
-    const [unFriendPop, setUnfriendPop]= useState(false)
+  const [unFriendPop, setUnfriendPop]= useState(false)
 
   const unFriendHandler = async () => {
     const friendListRef = ref(db, "friendlist/");
@@ -68,12 +67,12 @@ export default function Friends() {
   }, []);
 
   if (friendListLoading) {
-    return <div className="w-full lg:w-[400px] h-[35%] mt-10 bg-gray-100 fixed bottom-0 left-0 shadow-md rounded-xl p-4 space-y-4">Loading friends...</div>;
+    return <div className="w-full lg:w-[400px] h-[45%]  bg-gray-100 fixed bottom-0 right-0 shadow-md rounded-xl p-4 space-y-4">Loading friends...</div>;
   }
 return (
   <motion.div initial={{ opacity: 0, scale: 0.9 }}
   animate={{ opacity: 1, scale: 1 }}   
-  transition={{ duration: 0.4, ease: "easeOut" }} className="w-full lg:w-[400px] font-secondary h-[35%] mt-10 bg-white/90 backdrop-blur-xl fixed bottom-0 left-0 shadow-2xl rounded-t-3xl border-t border-gray-200/50 p-6 space-y-5 overflow-y-auto">
+  transition={{ duration: 0.4, ease: "easeOut" }} className="w-full lg:w-[400px] font-secondary h-[45%]  bg-white/90 backdrop-blur-xl fixed bottom-0 right-0 shadow-2xl rounded-t-3xl border-t border-gray-200/50 p-6 space-y-5 overflow-y-auto">
     
       {
         unFriendPop && <UnfriendPopup name={selectFriend.name} image={selectFriend.image} unfriendPopup={setUnfriendPop} unfriendHandler={unFriendHandler}/>

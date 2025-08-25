@@ -14,7 +14,7 @@ import NotificationSkeleton from '../components/notificationSkeleton/Notificatio
 
 const Notification = () => {
   const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]= useState(true)
   const db = getDatabase();
   const currentUser = useSelector((state) => state.user.user);
 

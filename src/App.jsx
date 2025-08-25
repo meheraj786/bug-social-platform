@@ -11,6 +11,7 @@ import FriendList from "./components/userList/UserList";
 import FeatureImage from "./components/featureImage/FeatureImage";
 import PageSidebar from "./layouts/PageSidebar";
 import GroupListSidebar from "./layouts/GroupListSidebar";
+import Friends from "./components/friends/Friends";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
       <FeatureImage/>
       <ProfileSidebar/>
       <GroupListSidebar/>
+      <Friends/>
       <PageSidebar/>
       <BlogPostForm />
       <FriendList/>

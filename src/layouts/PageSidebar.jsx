@@ -86,93 +86,7 @@ const PageSidebar = () => {
         });
       };
 
-  // // Mock data for pages
-  // const pagesList = [
-  //   {
-  //     id: 'page1',
-  //     pageName: 'Tech Innovators',
-  //     category: 'Technology',
-  //     image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=100&h=100&fit=crop',
-  //     coverImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=300&h=150&fit=crop',
-  //     followers: 45600,
-  //     description: 'Latest tech news, innovations and startup stories.',
-  //     location: 'Silicon Valley, CA',
-  //     verified: true,
-  //     isFollowing: false,
-  //     posts: 234,
-  //     engagement: '12.5K'
-  //   },
-  //   {
-  //     id: 'page2',
-  //     pageName: 'Urban Food Hub',
-  //     category: 'Food & Dining',
-  //     image: 'https://images.unsplash.com/photo-1514533212735-5df27d970db9?w=100&h=100&fit=crop',
-  //     coverImage: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300&h=150&fit=crop',
-  //     followers: 23400,
-  //     description: 'Delicious recipes, restaurant reviews and food culture.',
-  //     location: 'New York, NY',
-  //     verified: true,
-  //     isFollowing: true,
-  //     posts: 189,
-  //     engagement: '8.2K'
-  //   },
-  //   {
-  //     id: 'page3',
-  //     pageName: 'Fitness Revolution',
-  //     category: 'Health & Fitness',
-  //     image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=100&h=100&fit=crop',
-  //     coverImage: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=300&h=150&fit=crop',
-  //     followers: 67800,
-  //     description: 'Transform your body and mind with our fitness programs.',
-  //     location: 'Los Angeles, CA',
-  //     verified: false,
-  //     isFollowing: false,
-  //     posts: 456,
-  //     engagement: '18.9K'
-  //   },
-  //   {
-  //     id: 'page4',
-  //     pageName: 'Creative Studios',
-  //     category: 'Design & Art',
-  //     image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=100&h=100&fit=crop',
-  //     coverImage: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=300&h=150&fit=crop',
-  //     followers: 34500,
-  //     description: 'Inspiring designs, creative tutorials and art showcases.',
-  //     location: 'London, UK',
-  //     verified: true,
-  //     isFollowing: true,
-  //     posts: 312,
-  //     engagement: '15.3K'
-  //   },
-  //   {
-  //     id: 'page5',
-  //     pageName: 'Travel Adventures',
-  //     category: 'Travel & Tourism',
-  //     image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=100&h=100&fit=crop',
-  //     coverImage: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=300&h=150&fit=crop',
-  //     followers: 89200,
-  //     description: 'Explore the world through our travel guides and stories.',
-  //     location: 'Global',
-  //     verified: true,
-  //     isFollowing: false,
-  //     posts: 567,
-  //     engagement: '25.4K'
-  //   },
-  //   {
-  //     id: 'page6',
-  //     pageName: 'Business Growth',
-  //     category: 'Business',
-  //     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
-  //     coverImage: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=300&h=150&fit=crop',
-  //     followers: 56700,
-  //     description: 'Strategies, tips and insights for business success.',
-  //     location: 'Chicago, IL',
-  //     verified: false,
-  //     isFollowing: false,
-  //     posts: 389,
-  //     engagement: '11.8K'
-  //   }
-  // ];
+
 
 
 
@@ -215,25 +129,25 @@ const PageSidebar = () => {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="w-full lg:w-[400px] h-[45%] fixed bottom-0 right-0 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl border border-gray-200/50 p-4 lg:p-6 overflow-y-auto"
+      className="w-full lg:w-[400px] h-[32%] fixed bottom-0 left-0 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl border border-gray-200/50 p-4 lg:p-2 lg:px-4 overflow-y-auto"
     >
       {/* Header */}
-      <div className="flex items-center justify-between sticky top-0 bg-white/90 backdrop-blur-xl py-4 px-2 lg:px-0 border-b border-gray-200/50 z-10">
-        <h2 className="text-transparent bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text font-bold text-xl">
+      <div className="flex items-center justify-between sticky top-0 bg-white backdrop-blur-xl py-2 px-2 lg:px-0 border-b border-gray-200/50 z-10">
+        <h2 className="text-transparent bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text font-bold text-lg">
           Discover Pages
         </h2>
-        <span className="text-sm text-gray-500">
+        <span className="text-[12px] text-gray-500">
           {pagesList.length} pages found
         </span>
       </div>
 
       {/* Followed Pages */}
       {followedPages.length > 0 && (
-        <div className="mt-4 space-y-4">
+        <div className="mt-2 space-y-3">
           <div className="flex items-center gap-2">
-            <div className="w-1 h-6 bg-gradient-to-b from-green-500 to-blue-500 rounded-full"></div>
+            <div className="w-1 h-5 bg-gradient-to-b from-green-500 to-blue-500 rounded-full"></div>
             <h3 className="font-semibold text-gray-800">Following</h3>
-            <span className="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+            <span className="bg-green-500 text-white text-[12px] px-2 py-0.5 rounded-full font-medium">
               {followedPages.length}
             </span>
           </div>
@@ -247,17 +161,17 @@ const PageSidebar = () => {
                 className="relative overflow-hidden bg-gradient-to-r from-green-50/80 to-blue-50/80 rounded-2xl border border-green-200/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group"
               >
                 {/* Content */}
-                <div className="p-4 flex items-center gap-4">
+                <div className="p-2 flex items-center gap-2">
                   <div className="relative flex-shrink-0">
                     <img
                       src={page.followingimg}
                       alt={page.followingname}
-                      className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md group-hover:shadow-lg transition-shadow duration-300"
+                      className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md group-hover:shadow-lg transition-shadow duration-300"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
                     <Link to={`/page-profile/${page.followingid}`}>
-                    <h4 className="text-gray-900 font-semibold text-sm hover:text-green-600 truncate cursor-pointer">
+                    <h4 className="text-gray-900 font-semibold text-[12px] hover:text-green-600 truncate cursor-pointer">
                       {page.followingname}
                     </h4>
                     
@@ -265,9 +179,9 @@ const PageSidebar = () => {
                   </div>
                   
 
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-1">
                     <button
-                      className="text-xs bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-3 py-1.5 rounded-full shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 font-medium flex items-center gap-1"
+                      className="text-[12px] bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-2 py-1 rounded-full shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 font-medium flex items-center gap-1"
                     >
                       <UserCheck className="w-3 h-3" />
                       Following
@@ -275,7 +189,7 @@ const PageSidebar = () => {
                     <Link to={`messages/chat/${page.followingid}`}>
                     <button
                       onClick={() => handleSendMessage(page)}
-                      className="text-xs bg-white hover:bg-gray-50 border border-gray-300 text-gray-600 hover:text-blue-600 px-3 py-1.5 rounded-full shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 font-medium flex items-center gap-1"
+                      className="text-[12px] bg-white hover:bg-gray-50 border border-gray-300 text-gray-600 hover:text-blue-600 px-2 py-1 rounded-full shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 font-medium flex items-center gap-1"
                     >
                       <MessageCircle className="w-3 h-3" />
                       Message
@@ -289,10 +203,10 @@ const PageSidebar = () => {
       )}
 
       {/* Suggested Pages */}
-      <div className="mt-6 space-y-4">
+      <div className="mt-3 space-y-2">
         {followedPages.length > 0 && (
-          <div className="flex items-center gap-2">
-            <div className="w-1 h-6 bg-gradient-to-b from-purple-500 to-blue-500 rounded-full"></div>
+          <div className="flex items-center gap-1">
+            <div className="w-1 h-4 bg-gradient-to-b from-purple-500 to-blue-500 rounded-full"></div>
             <h3 className="font-semibold text-gray-800">Suggested Pages</h3>
           </div>
         )}
@@ -307,36 +221,36 @@ const PageSidebar = () => {
               transition={{ delay: idx * 0.1 }}
               className="relative overflow-hidden bg-gray-50 rounded-2xl border border-gray-200/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group"
             >
-              <div className="p-4 flex items-center gap-4">
+              <div className="p-3 flex items-center gap-2">
                 <div className="relative flex-shrink-0">
                   <img
                     src={page.image}
                     alt={page.pageName}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md group-hover:shadow-lg transition-shadow duration-300"
+                    className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md group-hover:shadow-lg transition-shadow duration-300"
                   />
                 </div>
 
                 <div className="flex-1 min-w-0">
                   
                     <Link to={`/page-profile/${page.id}`}>
-                  <h4 className="text-gray-900 font-semibold text-sm hover:text-purple-600 truncate cursor-pointer">
+                  <h4 className="text-gray-900 font-semibold text-[12px] hover:text-purple-600 truncate cursor-pointer">
                     {page.pageName}
                   </h4>
                   </Link>
                   <div
                     className={`inline-block bg-gradient-to-r ${getCategoryColor(
                       page.category
-                    )} text-white text-xs px-2 py-0.5 rounded-full font-medium mt-1`}
+                    )} text-white text-[12px] px-2 py-0.5 rounded-full font-medium mt-1`}
                   >
                     {page.category}
                   </div>
                 </div>
 
                 {
-                  page.adminId==currentUser?.uid ? null :  <div className="flex flex-col gap-2">
+                  page.adminId==currentUser?.uid ? null :  <div className="flex flex-col gap-1">
                     <button
                       onClick={() => followHandler(page)}
-                      className="text-xs bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-3 py-1.5 rounded-full shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 font-medium flex items-center gap-1"
+                      className="text-[12px] bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-3 py-1 rounded-full shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 font-medium flex items-center gap-1"
                     >
                       <Plus className="w-3 h-3" />
                       Follow
@@ -353,12 +267,12 @@ const PageSidebar = () => {
 
       {/* Empty State */}
       {pagesList.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+        <div className="flex flex-col items-center justify-center py-10 text-center">
+          <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mb-2">
             <Users className="w-8 h-8 text-gray-400" />
           </div>
           <p className="text-gray-500 font-medium mb-2">No pages found</p>
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-400 text-[12px]">
             Check back later for new page suggestions!
           </p>
         </div>

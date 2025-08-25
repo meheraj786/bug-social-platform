@@ -12,6 +12,7 @@ import {
 } from "react-icons/bi";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
+import CustomLoader from "../layouts/CustomLoader";
 
 const CreatePages = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,6 +27,7 @@ const CreatePages = () => {
   const [about, setAbout] = useState("");
   const [preview, setPreview] = useState("");
   const [imgLoading, setImgLoading] = useState(false);
+  const [loading, setLoading]= useState(true)
 
   const user = useSelector((state) => state.user.user);
   const db = getDatabase();
@@ -49,7 +51,6 @@ const CreatePages = () => {
     setImgLoading(false);
   };
 
-  // Create page
   const handleCreatePage = () => {
     if (!pageName || !category || !about || !preview) {
       toast.error("Please fill in all fields and upload an image");
@@ -76,7 +77,6 @@ const CreatePages = () => {
     setIsModalOpen(false);
   };
 
-  // Fetch user's pages
   useEffect(() => {
     const requestRef = ref(db, "page/");
     onValue(requestRef, (snapshot) => {
@@ -88,10 +88,10 @@ const CreatePages = () => {
         }
       });
       setPages(arr);
+      setLoading(false)
     });
   }, [db]);
 
-  // Fetch message notifications
   useEffect(() => {
     const notificationRef = ref(db, "messagenotification/");
     onValue(notificationRef, (snapshot) => {
@@ -125,6 +125,8 @@ const CreatePages = () => {
       selectedCategory === "all" || page.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  if (loading) return <CustomLoader/>
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

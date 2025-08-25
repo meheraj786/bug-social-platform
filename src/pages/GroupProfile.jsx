@@ -17,6 +17,7 @@ import { UserX } from "lucide-react";
 import BlogCard from "../components/blogCard/BlogCard";
 import NoBlog from "../components/noBlog/NoBlog";
 import { FaHackerNews, FaUserSecret } from "react-icons/fa6";
+import CustomLoader from "../layouts/CustomLoader";
 
 const GroupProfile = () => {
   const [isAnonymous, setIsAnonymous] = useState(false);
@@ -40,6 +41,7 @@ const GroupProfile = () => {
   const [description, setDescription] = useState("");
   const [preview, setPreview] = useState("");
   const [groupPost, setGroupPost] = useState([]);
+  const [loading, setLoading]= useState(true)
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
@@ -101,7 +103,6 @@ const GroupProfile = () => {
     }));
   };
 
-  // Fetch group
   useEffect(() => {
     const requestRef = ref(db, "member/");
     onValue(requestRef, (snapshot) => {
@@ -124,6 +125,7 @@ const GroupProfile = () => {
 
         if (item.key == id) {
           setGroup({ ...group, id: item.key });
+          setLoading(false)
         }
       });
     });
@@ -360,6 +362,8 @@ const GroupProfile = () => {
       ));
     });
   };
+
+  if (loading) return <CustomLoader/>
 
       if (!user) {
     return <Navigate to="/login"/>;

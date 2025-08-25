@@ -6,9 +6,8 @@ import { Link } from 'react-router'
 const Logo = () => {
   return (
     <Link to="/">
-    <div className="logo flex font-primary items-center gap-x-2 text-[20px] font-black">
-      <FaBug className='text-white' />
-
+    <div className="logo flex font-primary items-center gap-x-2  text-[20px] font-black">
+      <FaBug className='text-white bug' />
             BUG
           </div>
     

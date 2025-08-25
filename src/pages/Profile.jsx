@@ -24,6 +24,7 @@ import FriendsModal from "../layouts/FriendsModal";
 import FollowersModal from "../layouts/FollowersModal";
 import FollowingModal from "../layouts/FollowingModal";
 import UnfriendPopup from "../layouts/UnfriendPopup";
+import CustomLoader from "../layouts/CustomLoader";
 
 export default function Profile() {
   const db = getDatabase();
@@ -57,6 +58,7 @@ export default function Profile() {
 
   const [unFriendPop, setUnfriendPop] = useState(false);
   const [selectFriend, setSelectFriend] = useState(null);
+  const [loading, setLoading]= useState(true)
   useEffect(() => {
     const requestRef = ref(db, "friendlist/");
     onValue(requestRef, (snapshot) => {
@@ -215,6 +217,7 @@ export default function Profile() {
     const userRef = ref(db, "users/" + id);
     onValue(userRef, (snapshot) => {
       setCurrentUserInfo({ ...snapshot.val(), id: snapshot.key });
+      setLoading(false)
     });
   }, []);
 
@@ -393,6 +396,8 @@ export default function Profile() {
       content: `${currentUser?.displayName} unfriend you!`,
     });
   };
+
+  if (loading) return <CustomLoader/>
 
   return (
     <div className="bg-gradient-to-br font-secondary from-gray-50 via-blue-50/30 to-purple-50/30 min-h-screen ">
