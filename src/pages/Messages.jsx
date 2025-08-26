@@ -398,7 +398,7 @@ const Messages = () => {
   if (loading) return <CustomLoader />;
 
   return (
-    <div className="min-h-screen pt-[50px] bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-3 sm:p-6">
+    <div className="min-h-screen pt-[50px] bg-gradient-to-br mt-20 xl:mt-0 from-indigo-50 via-white to-purple-50 p-3 sm:p-6">
       <Container>
         {/* Mobile Layout */}
         <div className="xl:hidden">
