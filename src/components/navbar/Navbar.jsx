@@ -31,6 +31,7 @@ const Navbar = () => {
   const user = useSelector((state) => state.user.user);
   const db = getDatabase();
   const [msgNotification, setMsgNotification] = useState([]);
+  const [msgNotif, setMsgNotif]= useState([])
 
   useEffect(() => {
     const requestRef = ref(db, "friendlist/");
@@ -65,6 +66,22 @@ const Navbar = () => {
     });
   }, [user?.uid, db, friendList]);
 
+    useEffect(() => {
+    const notificationRef = ref(db, "messagenotification/");
+    onValue(notificationRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        if (item.val().adminId==user?.uid) {
+          arr.push(item.val().reciverid);
+        }
+      });
+      setMsgNotif(arr);
+    });
+  }, [db]);
+
+  console.log(msgNotif, "msgnotif");
+  
+
   const signOutHandler = () => {
     const auth = getAuth();
     signOut(auth)
@@ -77,7 +94,6 @@ const Navbar = () => {
         console.log(error.message);
       });
   };
-
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [unSeenNotifi, setUnseenNotifi]= useState([])
@@ -138,7 +154,7 @@ const Navbar = () => {
               className={({ isActive }) =>
                 `flex relative items-center gap-x-2 px-4 py-2 rounded-full text-sm font-medium  hover:bg-white/10 transition-all duration-200 hover:scale-105 ${
                   isActive
-                    ? "bg-white text-blue-700 shadow-lg"
+                    ? "bg-white text-blue-700 hover:text-white shadow-lg"
                     : "text-white hover:bg-white/10"
                 }`
               }
@@ -154,7 +170,7 @@ const Navbar = () => {
                   className={({ isActive }) =>
                     `flex relative items-center gap-x-2 px-4 py-2 rounded-full text-sm font-medium  hover:bg-white/10 transition-all duration-200 hover:scale-105 ${
                       isActive
-                        ? "bg-white text-blue-700 shadow-lg"
+                        ? "bg-white text-blue-700 hover:text-white shadow-lg"
                         : "text-white hover:bg-white/10"
                     }`
                   }
@@ -172,7 +188,7 @@ const Navbar = () => {
                   className={({ isActive }) =>
                     `flex relative items-center gap-x-2 px-4 py-2 rounded-full text-sm font-medium mr-10  hover:bg-white/10 transition-all duration-200 hover:scale-105 ${
                       isActive
-                        ? "bg-white text-blue-700 shadow-lg"
+                        ? "bg-white text-blue-700 hover:text-white shadow-lg"
                         : "text-white hover:bg-white/10"
                     }`
                   }
@@ -190,6 +206,9 @@ const Navbar = () => {
                     onClick={toggleDropdown}
                     className="flex items-center gap-x-2 p-1 rounded-full text-sm font-medium text-white hover:border hover:border-white  border border-white/0 transition-all duration-200 focus:outline-none"
                   >
+                    {
+                      msgNotif.length>0 && <span className="w-3 h-3 absolute bg-red-500 top-1 right-5 rounded-full animate-pulse"></span>
+                    }
                     <img
                       className="w-7 h-7 rounded-full"
                       src={user?.photoURL}
@@ -245,11 +264,15 @@ const Navbar = () => {
                         {/* Create Page */}
                         <NavLink
                           to="/create-pages"
-                          className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-all duration-200 group"
+                          className="flex items-center relative gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-all duration-200 group"
                           onClick={() => setIsDropdownOpen(false)}
                         >
+                          {
+                      msgNotif.length>0 && <span className="w-3 h-3 absolute bg-red-500 top-2 right-2 rounded-full animate-pulse"></span>
+                    }
                           <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors duration-200">
                             <PanelsTopLeft className="text-sm text-gray-600 group-hover:text-blue-600" />
+                                                
                           </div>
                           <span className="font-medium">Manage Your Pages</span>
                         </NavLink>

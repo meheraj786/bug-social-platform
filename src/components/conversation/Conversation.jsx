@@ -181,6 +181,7 @@ const Conversation = ({ msgNotif }) => {
           set(push(ref(db, "messagenotification/")), {
             senderid: data?.uid,
             reciverid: reciverid,
+            adminId: roomuser?.adminId
           });
         })
         .catch((err) => {
@@ -205,6 +206,7 @@ const Conversation = ({ msgNotif }) => {
           set(push(ref(db, "messagenotification/")), {
             senderid: data?.uid,
             reciverid: reciverid,
+            adminId: roomuser?.adminId
           });
         })
         .catch((err) => {
