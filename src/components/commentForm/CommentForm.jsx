@@ -400,8 +400,8 @@ const CommentForm = ({ post, commentLength }) => {
         />
       )}
       {/* Like and Comment Stats */}
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-6">
+      <div className="flex items-center flex-wrap justify-between mb-5">
+        <div className="flex flex-wrap items-center gap-6">
           {/* Like Button */}
           {reactorId.includes(user?.uid) ? (
             <button
@@ -430,7 +430,7 @@ const CommentForm = ({ post, commentLength }) => {
           )}
 
           {/* Comment Count */}
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+          <div className="flex items-center  gap-2 xl:px-4 xl:py-2 px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
             <FaRegComments size={18} />
             <span className="font-semibold text-sm">
               {commentLength} comments
@@ -449,96 +449,96 @@ const CommentForm = ({ post, commentLength }) => {
             </div>
           )}
           {/* Interested / Buy / Apply buttons for followers */}
-{post.postType == "pagePost" &&
- post.contentType == "event" &&
- followerId.includes(user?.uid) &&
- post.adminId !== user?.uid &&
- !post.isPageShare ? (
-  <div
-    onClick={() => {
-      sentMessageHandler("event");
-    }}
-    className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-blue-700 border border-blue-200"
-  >
-    <Star size={18} />
-    <span className="font-semibold text-sm">Interested</span>
-  </div>
-) : post.postType == "pagePost" &&
-  post.contentType == "product" &&
-  followerId.includes(user?.uid) &&
-  post.adminId !== user?.uid &&
-  !post.isPageShare ? (
-  <div
-    onClick={() => {
-      sentMessageHandler("product");
-    }}
-    className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-purple-700 border border-purple-200"
-  >
-    <BiCartAdd size={18} />
-    <span className="font-semibold text-sm">Buy</span>
-  </div>
-) : post.postType == "pagePost" &&
-  post.contentType == "job" &&
-  followerId.includes(user?.uid) &&
-  post.adminId !== user?.uid &&
-  !post.isPageShare ? (
-  <div
-    onClick={() => {
-      sentMessageHandler("job");
-    }}
-    className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-green-700 border border-green-200"
-  >
-    <Paperclip size={18} />
-    <span className="font-semibold text-sm">Apply</span>
-  </div>
-) : null}
+          {post.postType == "pagePost" &&
+          post.contentType == "event" &&
+          followerId.includes(user?.uid) &&
+          post.adminId !== user?.uid &&
+          !post.isPageShare ? (
+            <div
+              onClick={() => {
+                sentMessageHandler("event");
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-blue-700 border border-blue-200"
+            >
+              <Star size={18} />
+              <span className="font-semibold text-sm">Interested</span>
+            </div>
+          ) : post.postType == "pagePost" &&
+            post.contentType == "product" &&
+            followerId.includes(user?.uid) &&
+            post.adminId !== user?.uid &&
+            !post.isPageShare ? (
+            <div
+              onClick={() => {
+                sentMessageHandler("product");
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-purple-700 border border-purple-200"
+            >
+              <BiCartAdd size={18} />
+              <span className="font-semibold text-sm">Buy</span>
+            </div>
+          ) : post.postType == "pagePost" &&
+            post.contentType == "job" &&
+            followerId.includes(user?.uid) &&
+            post.adminId !== user?.uid &&
+            !post.isPageShare ? (
+            <div
+              onClick={() => {
+                sentMessageHandler("job");
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-green-700 border border-green-200"
+            >
+              <Paperclip size={18} />
+              <span className="font-semibold text-sm">Apply</span>
+            </div>
+          ) : null}
 
-{/* Follow to Interested / Buy / Apply buttons for non-followers */}
-{post.postType == "pagePost" &&
- post.contentType == "event" &&
- !followerId.includes(user?.uid) &&
- post.adminId !== user?.uid &&
- !post.isPageShare ? (
-  <div
-    onClick={() => {
-      followHandler();
-    }}
-    className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-blue-700 border border-blue-200"
-  >
-    <Star size={18} />
-    <span className="font-semibold text-sm">Follow to Interested</span>
-  </div>
-) : post.postType == "pagePost" &&
-  post.contentType == "product" &&
-  !followerId.includes(user?.uid) &&
-  post.adminId !== user?.uid &&
-  !post.isPageShare ? (
-  <div
-    onClick={() => {
-      followHandler();
-    }}
-    className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-purple-700 border border-purple-200"
-  >
-    <BiCartAdd size={18} />
-    <span className="font-semibold text-sm">Follow to Buy</span>
-  </div>
-) : post.postType == "pagePost" &&
-  post.contentType == "job" &&
-  !followerId.includes(user?.uid) &&
-  post.adminId !== user?.uid &&
-  !post.isPageShare ? (
-  <div
-    onClick={() => {
-      followHandler();
-    }}
-    className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-green-700 border border-green-200"
-  >
-    <Paperclip size={18} />
-    <span className="font-semibold text-sm">Follow to Apply</span>
-  </div>
-) : null}
-
-
+          {/* Follow to Interested / Buy / Apply buttons for non-followers */}
+          {post.postType == "pagePost" &&
+          post.contentType == "event" &&
+          !followerId.includes(user?.uid) &&
+          post.adminId !== user?.uid &&
+          !post.isPageShare ? (
+            <div
+              onClick={() => {
+                followHandler();
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-blue-700 border border-blue-200"
+            >
+              <Star size={18} />
+              <span className="font-semibold text-sm">
+                Follow to Interested
+              </span>
+            </div>
+          ) : post.postType == "pagePost" &&
+            post.contentType == "product" &&
+            !followerId.includes(user?.uid) &&
+            post.adminId !== user?.uid &&
+            !post.isPageShare ? (
+            <div
+              onClick={() => {
+                followHandler();
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-purple-700 border border-purple-200"
+            >
+              <BiCartAdd size={18} />
+              <span className="font-semibold text-sm">Follow to Buy</span>
+            </div>
+          ) : post.postType == "pagePost" &&
+            post.contentType == "job" &&
+            !followerId.includes(user?.uid) &&
+            post.adminId !== user?.uid &&
+            !post.isPageShare ? (
+            <div
+              onClick={() => {
+                followHandler();
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 hover:scale-105 transition-all cursor-pointer text-green-700 border border-green-200"
+            >
+              <Paperclip size={18} />
+              <span className="font-semibold text-sm">Follow to Apply</span>
+            </div>
+          ) : null}
         </div>
 
         {/* Additional Actions */}

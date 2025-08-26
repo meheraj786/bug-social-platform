@@ -73,7 +73,7 @@ const Notification = () => {
   }
 
 return (
-  <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 py-6 px-4">
+  <div className="min-h-screen mt-10 xl:mt-0 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 py-6 px-4">
     <Container>
       <div className="max-w-2xl mx-auto">
         

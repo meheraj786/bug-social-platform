@@ -7,9 +7,10 @@ import { Link } from "react-router";
 import moment from "moment";
 import { motion } from "motion/react";
 import UnfriendPopup from "../../layouts/UnfriendPopup";
+import { MoveDiagonal2 } from "lucide-react";
 
 export default function Friends() {
-
+  const [listLoad, setListLoad]= useState(3)
   const [friendList, setFriendList] = useState([]);
   const [friendListLoading, setFriendListLoading] = useState(true);
   const db = getDatabase();
@@ -69,12 +70,12 @@ export default function Friends() {
   if (!currentUser) return
 
   if (friendListLoading) {
-    return <div className="w-full lg:w-[400px] h-[45%]  bg-gray-100 fixed bottom-0 right-0 shadow-md rounded-xl p-4 space-y-4">Loading friends...</div>;
+    return <div className="w-full static xl:w-[400px] h-[45%]  bg-gray-100 xl:fixed bottom-0 right-0 shadow-md rounded-xl p-4 space-y-4">Loading friends...</div>;
   }
 return (
   <motion.div initial={{ opacity: 0, scale: 0.9 }}
   animate={{ opacity: 1, scale: 1 }}   
-  transition={{ duration: 0.4, ease: "easeOut" }} className="w-full lg:w-[400px] font-secondary h-[45%]  bg-white/90 backdrop-blur-xl fixed bottom-0 right-0 shadow-2xl rounded-t-3xl border-t border-gray-200/50 p-6 space-y-5 overflow-y-auto">
+  transition={{ duration: 0.4, ease: "easeOut" }} className="w-full static lg:w-[400px] font-secondary h-[45%]  bg-white/90 backdrop-blur-xl xl:fixed bottom-0 right-0 shadow-2xl rounded-t-3xl border-t border-gray-200/50 p-6 space-y-5 overflow-y-auto">
     
       {
         unFriendPop && <UnfriendPopup name={selectFriend.name} image={selectFriend.image} unfriendPopup={setUnfriendPop} unfriendHandler={unFriendHandler}/>
@@ -91,7 +92,7 @@ return (
     </div>
 
     {/* Friends List */}
-    <div className="space-y-4">
+    <div className="hidden xl:block space-y-4">
       {friendList.map((friend, idx) => (
         <div 
           key={idx} 
@@ -141,6 +142,60 @@ return (
           </div>
         </div>
       ))}
+    </div>
+    <div className="space-y-4 xl:hidden">
+      {friendList.slice(0,listLoad).map((friend, idx) => (
+        <div 
+          key={idx} 
+          className="flex items-center justify-between gap-4 p-4 bg-gradient-to-r from-gray-50/80 to-white/80 rounded-2xl border border-gray-200/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group"
+        >
+          {/* Profile Section */}
+          <div className="flex items-center gap-4 flex-1">
+            <div className="relative">
+              <img
+                src={friend.image}
+                alt={friend.name}
+                className="w-12 h-12 rounded-full object-cover border-2 border-purple-200 group-hover:border-purple-400 transition-colors duration-300"
+              />
+              {/* <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div> */}
+            </div>
+            
+            <Link to={`/profile/${friend.id}`} className="flex-1 min-w-0">
+              <p className="text-gray-900 font-primary font-semibold text-sm hover:text-purple-600 transition-colors duration-200 truncate">
+                {friend.name}
+              </p>
+              <p className="text-gray-500 text-xs font-medium">@{friend.name}</p>
+            </Link>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2">
+            <Link to={`/messages/chat/${friend.id}`}>
+            <button className="text-xs bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 font-medium flex items-center gap-1.5">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
+              </svg>
+              Chat
+            </button>
+            </Link>
+            
+            <button 
+              onClick={() => {setSelectedFriend(friend)
+                setUnfriendPop(true)
+              }} 
+              className="text-xs bg-white hover:bg-red-50 border border-gray-300 hover:border-red-300 text-gray-600 hover:text-red-600 px-4 py-2 rounded-full shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 font-medium flex items-center gap-1.5"
+            >
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Remove
+            </button>
+          </div>
+        </div>
+      ))}
+      {
+        friendList.length<=listLoad && friendList.length > 3 ? <button onClick={()=>setListLoad(3)} className="px-3 py-1 rounded-lg bg-gradient-to-l text-sm from-purple-500 to-blue-500 flex items-center justify-center gap-x-2 text-white"> <MoveDiagonal2 />Load Less</button> : <button onClick={()=>setListLoad((prev)=>prev+3)} className="px-3 py-1 rounded-lg bg-gradient-to-l text-sm from-purple-500 to-blue-500 flex items-center justify-center gap-x-2 text-white"> <MoveDiagonal2 />Load More</button>
+      }
     </div>
 
     {/* Empty State */}

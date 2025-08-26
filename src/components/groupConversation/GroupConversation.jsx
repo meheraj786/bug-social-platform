@@ -218,7 +218,7 @@ const handleGrpMsgNotificationDelete = () => {
     <>
       <div
         onClick={handleGrpMsgNotificationDelete}
-        className="h-full flex flex-col bg-gradient-to-br from-white to-gray-50/50 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/20 max-w-3xl mx-auto relative overflow-hidden"
+        className="h-full flex flex-col bg-gradient-to-br from-white to-gray-50/50 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/20  relative overflow-hidden"
       >
         {imgUploadPop && (
           <ImageUploadPop

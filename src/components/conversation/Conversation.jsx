@@ -310,7 +310,7 @@ const typingTracker = () => {
       {roomuser.pageName ? (
         <div
           onClick={handleMsgNotificationDelete}
-          className="h-full flex flex-col bg-gradient-to-br from-white to-gray-50/50 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/20 max-w-3xl mx-auto relative overflow-hidden"
+          className="h-full flex flex-col bg-gradient-to-br p-6 from-white to-gray-50/50 backdrop-blur-xl  rounded-3xl shadow-2xl border border-white/20 relative overflow-hidden"
         >
           {/* {unFirendModalActive && (
         <UnfriendPopup
@@ -403,7 +403,7 @@ const typingTracker = () => {
           {/* Messages Container - Flexible and Scrollable */}
           <div
             ref={scrollContainerRef}
-            className="flex-1 overflow-y-auto  mb-6 space-y-6 pr-2"
+            className="flex-1 overflow-y-auto mb-6 space-y-6 pr-2"
           >
             <AnimatePresence initial={false}>
               {messageList?.map((msg) => (
@@ -661,7 +661,7 @@ const typingTracker = () => {
       ) : (
         <div
           onClick={handleMsgNotificationDelete}
-          className="h-full flex flex-col bg-gradient-to-br from-white to-gray-50/50 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/20 max-w-3xl mx-auto relative overflow-hidden"
+          className="h-full flex flex-col bg-gradient-to-br from-white to-gray-50/50 backdrop-blur-xl p-6 rounded-3xl shadow-2xl border border-white/20  relative overflow-hidden"
         >
           {unFirendModalActive && (
             <UnfriendPopup

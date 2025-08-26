@@ -12,6 +12,7 @@ import {
   Bookmark,
   BookmarkCheck,
   MessageCircle,
+  MoveDiagonal2,
 } from "lucide-react";
 import { getDatabase, onValue, push, ref, set } from "firebase/database";
 import { useSelector } from "react-redux";
@@ -25,6 +26,8 @@ const PageSidebar = () => {
   const [pagesList, setPagesList] = useState([]);
   const db = getDatabase();
   const currentUser = useSelector((state) => state.user.user);
+  const [listLoad, setListLoad]= useState(3)
+  const [listLoadSuggested, setListLoadSuggested]= useState(3)
   
   const [followedPageId, setFollowedPageId]= useState([])
 
@@ -129,7 +132,7 @@ const PageSidebar = () => {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="w-full lg:w-[400px] h-[32%] fixed bottom-0 left-0 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl border border-gray-200/50 p-4 lg:p-2 lg:px-4 overflow-y-auto"
+      className="w-full lg:w-[400px] h-[32%] static my-5 xl:my-0 xl:fixed bottom-0 left-0 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl border border-gray-200/50 p-4 lg:p-2 lg:px-4 overflow-y-auto"
     >
       {/* Header */}
       <div className="flex items-center justify-between sticky top-0 bg-white backdrop-blur-xl py-2 px-2 lg:px-0 border-b border-gray-200/50 z-10">
@@ -143,7 +146,7 @@ const PageSidebar = () => {
 
       {/* Followed Pages */}
       {followedPages.length > 0 && (
-        <div className="mt-2 space-y-3">
+        <div className="mt-2 hidden xl:block space-y-3">
           <div className="flex items-center gap-2">
             <div className="w-1 h-5 bg-gradient-to-b from-green-500 to-blue-500 rounded-full"></div>
             <h3 className="font-semibold text-gray-800">Following</h3>
@@ -201,6 +204,69 @@ const PageSidebar = () => {
             ))}
         </div>
       )}
+      {followedPages.length > 0 && (
+        <div className="mt-2 xl:hidden space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-5 bg-gradient-to-b from-green-500 to-blue-500 rounded-full"></div>
+            <h3 className="font-semibold text-gray-800">Following</h3>
+            <span className="bg-green-500 text-white text-[12px] px-2 py-0.5 rounded-full font-medium">
+              {followedPages.length}
+            </span>
+          </div>
+
+          {followedPages.slice(0,listLoad).map((page, idx) => (
+              <motion.div
+                key={page.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className="relative overflow-hidden bg-gradient-to-r from-green-50/80 to-blue-50/80 rounded-2xl border border-green-200/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group"
+              >
+                {/* Content */}
+                <div className="p-2 flex items-center gap-2">
+                  <div className="relative flex-shrink-0">
+                    <img
+                      src={page.followingimg}
+                      alt={page.followingname}
+                      className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md group-hover:shadow-lg transition-shadow duration-300"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <Link to={`/page-profile/${page.followingid}`}>
+                    <h4 className="text-gray-900 font-semibold text-[12px] hover:text-green-600 truncate cursor-pointer">
+                      {page.followingname}
+                    </h4>
+                    
+                    </Link>
+                  </div>
+                  
+
+                  <div className="flex flex-col gap-1">
+                    <button
+                      className="text-[12px] bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-2 py-1 rounded-full shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 font-medium flex items-center gap-1"
+                    >
+                      <UserCheck className="w-3 h-3" />
+                      Following
+                    </button>
+                    <Link to={`messages/chat/${page.followingid}`}>
+                    <button
+                      onClick={() => handleSendMessage(page)}
+                      className="text-[12px] bg-white hover:bg-gray-50 border border-gray-300 text-gray-600 hover:text-blue-600 px-2 py-1 rounded-full shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 font-medium flex items-center gap-1"
+                    >
+                      <MessageCircle className="w-3 h-3" />
+                      Message
+                    </button>
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+                  {
+        followedPages.length <= listLoad && followedPages.length > 3 ? <button onClick={()=>setListLoad(3)} className="px-3 py-1 rounded-lg bg-gradient-to-l text-sm from-purple-500 to-blue-500 flex items-center justify-center gap-x-2 text-white"> <MoveDiagonal2 />Load Less</button> : followedPages.length > 3 ? <button onClick={()=>setListLoad((prev)=>prev+3)} className="px-3 py-1 rounded-lg bg-gradient-to-l text-sm from-purple-500 to-blue-500 flex items-center justify-center gap-x-2 text-white"> <MoveDiagonal2 />Load More</button> : null
+      }
+        </div>
+      )}
+      
 
       {/* Suggested Pages */}
       <div className="mt-3 space-y-2">
@@ -212,7 +278,7 @@ const PageSidebar = () => {
         )}
 
         {pagesList
-          .filter((page) => !followedPages.includes(page.id))
+          .filter((page) => !followedPages.includes(page.id)).slice(0,listLoadSuggested)
           .map((page, idx) => (
             <motion.div
               key={page.id}
@@ -258,11 +324,15 @@ const PageSidebar = () => {
                   
                 </div>
                 }
-
-                
               </div>
             </motion.div>
           ))}
+                            {
+        pagesList
+          .filter((page) => !followedPages.includes(page.id)).length <= listLoad && pagesList
+          .filter((page) => !followedPages.includes(page.id)).length > 3 ? <button onClick={()=>setListLoad(3)} className="px-3 py-1 rounded-lg bg-gradient-to-l text-sm from-purple-500 to-blue-500 flex items-center justify-center gap-x-2 text-white"> <MoveDiagonal2 />Load Less</button> : pagesList
+          .filter((page) => !followedPages.includes(page.id)).length > 3 ? <button onClick={()=>setListLoad((prev)=>prev+3)} className="px-3 py-1 rounded-lg bg-gradient-to-l text-sm from-purple-500 to-blue-500 flex items-center justify-center gap-x-2 text-white"> <MoveDiagonal2 />Load More</button> : null
+      }
       </div>
 
       {/* Empty State */}

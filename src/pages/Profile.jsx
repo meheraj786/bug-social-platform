@@ -435,7 +435,10 @@ export default function Profile() {
 
   const UploadButton = ({ onChange }) => (
     <>
-      {coverImageLoading ? (
+    {
+      userProfile?.id==user?.uid && (
+        <>
+              {coverImageLoading ? (
         <span className="bg-white w-12 h-12 flex justify-center items-center z-[555] absolute bottom-10 right-10 rounded-full cursor-pointer shadow-md hover:scale-105 transition">
           <MoonLoader size={40}  color="#ca64cc" />
         </span>
@@ -445,6 +448,9 @@ export default function Profile() {
           <input type="file" onChange={onChange} className="hidden" />
         </label>
       )}
+        </>
+      )
+    }
     </>
   );
 
@@ -521,7 +527,7 @@ export default function Profile() {
             </div>
           </div>
           <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8">
-            <div className="flex justify-between items-start flex-wrap gap-6 ml-48">
+            <div className="flex justify-between items-start flex-wrap gap-6 xl:ml-48 mt-20 xl:mt-0">
               <div className="flex-1">
                 <h1 className="text-4xl font-bold font-primary bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
                   {userProfile?.username}

@@ -18,6 +18,7 @@ const GroupListSidebar = () => {
   const [joinRequests, setjoinRequests]= useState([])
   const [joinedGroups, setJoinedGroups]= useState([])
   const [joinedGroupsId, setJoinedGroupsId]= useState([])
+  const [listLoad, setListLoad]= useState(3)
 
   useEffect(() => {
     const followRef = ref(db, "member/");
@@ -108,7 +109,7 @@ const cancelJoinRequest = (group) => {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="w-full lg:w-[400px] h-[32%] fixed top-[35%] left-0 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl border border-gray-200/50 p-2 lg:p-2 lg:px-4 overflow-y-auto"
+      className="w-full lg:w-[400px] h-[32%] static xl:fixed top-[35%] left-0 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl border border-gray-200/50 p-2 lg:p-2 lg:px-4 overflow-y-auto"
     >
       {/* Header */}
       <div className="flex items-center justify-between sticky top-0 bg-white/90 backdrop-blur-xl py-2 px-1 lg:px-0 border-b border-gray-200/50 z-10">

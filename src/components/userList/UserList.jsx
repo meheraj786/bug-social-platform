@@ -18,6 +18,7 @@ import moment from "moment";
 import CustomToast from "../../layouts/CustomToast";
 import { motion } from "motion/react";
 import Container from "../../layouts/Container";
+import { MoveDiagonal2 } from "lucide-react";
 export default function UserList() {
   const [userList, setUserList] = useState([]);
   const [requestList, setRequestList] = useState([]);
@@ -27,7 +28,7 @@ export default function UserList() {
   const currentUser = useSelector((state) => state.user.user);
   const [friendRequestList, setFriendRequestList] = useState([]);
   const [requestListLoading, setRequestListLoading] = useState(true);
-
+  const [listLoad, setListLoad] = useState(3);
 
   useEffect(() => {
     const requestRef = ref(db, "friendRequest/");
@@ -175,23 +176,23 @@ export default function UserList() {
   };
 
   if (!currentUser) {
-  return <Navigate to="/"/>;
-}
+    return <Navigate to="/" />;
+  }
 
   if (userLoading) {
     return (
-      <div className="text-center absolute top-5 left-5 text-gray-500 mt-5">
+      <div className="text-center xl:absolute static top-5 left-5 text-gray-500 mt-5">
         Loading users...
       </div>
     );
   }
 
-return (
+  return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="w-full font-secondary lg:w-[400px] h-[45%] fixed mt-[80px] top-0 right-0 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl border border-gray-200/50 p-6 space-y-5 overflow-y-auto"
+      className="w-full font-secondary lg:w-[400px] h-[45%] static xl:fixed xl:mt-[80px] my-5 xl:my-0 top-0 right-0 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl border border-gray-200/50 p-6 space-y-5 overflow-y-auto"
     >
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -229,7 +230,12 @@ return (
                   </div>
                 </div>
 
-                <Link to={`/profile/${user?.id==user.senderid ? user.reciverid : user.senderid}`} className="flex-1 min-w-0">
+                <Link
+                  to={`/profile/${
+                    user?.id == user.senderid ? user.reciverid : user.senderid
+                  }`}
+                  className="flex-1 min-w-0"
+                >
                   <p className="text-gray-900 font-primary font-semibold text-sm hover:text-purple-600 transition-colors duration-200 truncate">
                     {user?.sendername}
                   </p>
@@ -284,7 +290,7 @@ return (
       )}
 
       {/* Suggested Users Section */}
-      <div className="space-y-4">
+      <div className="space-y-4 hidden xl:block">
         {friendRequestList.length > 0 && (
           <div className="flex items-center gap-2">
             <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
@@ -375,6 +381,133 @@ return (
               </div>
             </div>
           ))}
+      </div>
+      <div className="space-y-4 xl:hidden">
+        {friendRequestList.length > 0 && (
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
+            <h3 className="font-semibold text-gray-800">Suggested</h3>
+          </div>
+        )}
+
+        {userList
+          .filter(
+            (user) =>
+              !friendList.includes(user.id + currentUser.uid) &&
+              !friendList.includes(currentUser.uid + user.id)
+          )
+          .slice(0, listLoad)
+          .map((user, idx) => (
+            <div
+              key={idx}
+              className="flex items-center justify-between gap-4 p-4 bg-gradient-to-r from-gray-50/80 to-white/80 rounded-2xl border border-gray-200/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group"
+            >
+              <div className="flex items-center gap-4 flex-1">
+                <div className="relative">
+                  <img
+                    src={user.imageUrl}
+                    alt={user.username}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 group-hover:border-blue-400 transition-colors duration-300"
+                  />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-gray-400 rounded-full border-2 border-white"></div>
+                </div>
+
+                <Link to={`/profile/${user.id}`} className="flex-1 min-w-0">
+                  <p className="text-gray-900 font-primary font-semibold text-sm hover:text-blue-600 transition-colors duration-200 truncate">
+                    {user.username}
+                  </p>
+                  <p className="text-gray-500 text-xs font-medium truncate">
+                    {user.email}
+                  </p>
+                </Link>
+              </div>
+
+              <div className="flex items-center">
+                {requestList.includes(user.id + currentUser.uid) ||
+                requestList.includes(currentUser.uid + user.id) ? (
+                  <button
+                    onClick={(e) => {
+                      cancelRequest(user);
+                      e.stopPropagation();
+                    }}
+                    className="text-xs bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 font-medium flex items-center gap-1.5"
+                  >
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Pending
+                  </button>
+                ) : (
+                  <button
+                    onClick={(e) => {
+                      handleRequest(user);
+                      e.stopPropagation();
+                    }}
+                    className="text-xs bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 font-medium flex items-center gap-1.5"
+                  >
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
+                    </svg>
+                    Add Friend
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        {userList
+          .filter(
+            (user) =>
+              !friendList.includes(user.id + currentUser.uid) &&
+              !friendList.includes(currentUser.uid + user.id)
+          ).length <= listLoad && userList
+          .filter(
+            (user) =>
+              !friendList.includes(user.id + currentUser.uid) &&
+              !friendList.includes(currentUser.uid + user.id)
+          ).length > 3 ? (
+          <button
+            onClick={() => setListLoad(3)}
+            className="px-3 py-1 rounded-lg bg-gradient-to-l text-sm from-purple-500 to-blue-500 flex items-center justify-center gap-x-2 text-white"
+          >
+            {" "}
+            <MoveDiagonal2 />
+            Load Less
+          </button>
+        ) : userList
+          .filter(
+            (user) =>
+              !friendList.includes(user.id + currentUser.uid) &&
+              !friendList.includes(currentUser.uid + user.id)
+          ).length > 3 ?  (
+          <button
+            onClick={() => setListLoad((prev) => prev + 3)}
+            className="px-3 py-1 rounded-lg bg-gradient-to-l text-sm from-purple-500 to-blue-500 flex items-center justify-center gap-x-2 text-white"
+          >
+            {" "}
+            <MoveDiagonal2 />
+            Load More
+          </button>
+        ): null}
       </div>
 
       {/* Empty State */}

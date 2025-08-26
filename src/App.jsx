@@ -16,14 +16,13 @@ import Friends from "./components/friends/Friends";
 function App() {
   return (
     <>
-      {/* <Banner /> */}
       <FeatureImage/>
       <ProfileSidebar/>
-      <GroupListSidebar/>
       <Friends/>
+      <FriendList/>
+      <GroupListSidebar/>
       <PageSidebar/>
       <BlogPostForm />
-      <FriendList/>
       <BlogList />
     </>
   );

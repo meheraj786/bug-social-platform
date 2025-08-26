@@ -182,7 +182,7 @@ if (!user) return null;
   };
 
   return (
-    <div className="w-full mx-auto p-4">
+    <div className="w-full mt-11 xl:mt-0 mx-auto p-4">
       {showAddStoryModal && (
         <StoryModal
           storyText={storyText}
@@ -201,7 +201,7 @@ if (!user) return null;
       )}
 
       <Container>
-        <div className="bg-white mx-40 rounded-2xl shadow-lg border border-gray-100 px-6 py-2">
+        <div className="bg-white xl:mx-40 rounded-2xl shadow-lg border border-gray-100 px-6 py-2">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               Stories
