@@ -321,10 +321,10 @@ export default function UserList() {
 
                 <Link to={`/profile/${user.id}`} className="flex-1 min-w-0">
                   <p className="text-gray-900 font-primary font-semibold text-sm hover:text-blue-600 transition-colors duration-200 truncate">
-                    {user.username}
+                    {user.username.slice(0,18)}
                   </p>
                   <p className="text-gray-500 text-xs font-medium truncate">
-                    {user.email}
+                    {user.email.slice(0,20)}
                   </p>
                 </Link>
               </div>

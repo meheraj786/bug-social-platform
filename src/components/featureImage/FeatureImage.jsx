@@ -182,7 +182,7 @@ if (!user) return null;
   };
 
   return (
-    <div className="w-full mt-11 xl:mt-0 mx-auto p-4">
+    <div className="w-full mt-25 xl:mt-0 mx-auto p-4">
       {showAddStoryModal && (
         <StoryModal
           storyText={storyText}

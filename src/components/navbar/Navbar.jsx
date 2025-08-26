@@ -22,6 +22,8 @@ import { IoChevronDownOutline, IoNotificationsOutline } from "react-icons/io5";
 import { getDatabase, onValue, ref, update } from "firebase/database";
 import { AiOutlineMessage } from "react-icons/ai";
 import { PanelsTopLeft, Users } from "lucide-react";
+import SearchResultModal from "../../layouts/SearchResultModal";
+import SearchBox from "../../layouts/SearchBox";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -31,7 +33,8 @@ const Navbar = () => {
   const user = useSelector((state) => state.user.user);
   const db = getDatabase();
   const [msgNotification, setMsgNotification] = useState([]);
-  const [msgNotif, setMsgNotif]= useState([])
+  const [msgNotif, setMsgNotif] = useState([]);
+  const [searchActive, setSearchActive] = useState(false);
 
   useEffect(() => {
     const requestRef = ref(db, "friendlist/");
@@ -66,12 +69,12 @@ const Navbar = () => {
     });
   }, [user?.uid, db, friendList]);
 
-    useEffect(() => {
+  useEffect(() => {
     const notificationRef = ref(db, "messagenotification/");
     onValue(notificationRef, (snapshot) => {
       let arr = [];
       snapshot.forEach((item) => {
-        if (item.val().adminId==user?.uid) {
+        if (item.val().adminId == user?.uid) {
           arr.push(item.val().reciverid);
         }
       });
@@ -80,7 +83,6 @@ const Navbar = () => {
   }, [db]);
 
   console.log(msgNotif, "msgnotif");
-  
 
   const signOutHandler = () => {
     const auth = getAuth();
@@ -96,7 +98,7 @@ const Navbar = () => {
   };
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [unSeenNotifi, setUnseenNotifi]= useState([])
+  const [unSeenNotifi, setUnseenNotifi] = useState([]);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -119,11 +121,10 @@ const Navbar = () => {
         }
       });
       setNotification(arr);
-      setUnseenNotifi(arr.filter((n)=>!n.isSeen))
+      setUnseenNotifi(arr.filter((n) => !n.isSeen));
     });
   }, [db, user]);
 
-  
   const notificationSeen = () => {
     setTimeout(() => {
       notification.map((n) => {
@@ -136,17 +137,16 @@ const Navbar = () => {
 
   return (
     <div className="bg-gradient-to-r from-purple-700 via-blue-600 to-blue-800 fixed w-full z-[999] font-secondary text-white py-3 shadow-md">
+      {searchActive && (
+        <SearchResultModal onClose={() => setSearchActive(false)} />
+      )}
       <Toaster position="top-right" reverseOrder={false} duration={2000} />
       <div className="md:max-w-[1450px] px-10 mx-auto">
         <Flex className="justify-center lg:justify-between gap-y-5 lg:gap-y-0">
-          <Logo />
-          {/* <input
-                type="text"
-                placeholder="Search GitHub"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-1.5 w-64 bg-gradient-to-r from-purple-500 to-blue-500 border border-gray-700 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-              /> */}
+          <Flex className="flex-1 justify-center gap-y-3 xl:gap-y-0 xl:justify-start gap-x-10">
+            <Logo />
+            <SearchBox onSearchClick={() => setSearchActive(true)} />
+          </Flex>
 
           <Flex>
             <NavLink
@@ -206,9 +206,9 @@ const Navbar = () => {
                     onClick={toggleDropdown}
                     className="flex items-center gap-x-2 p-1 rounded-full text-sm font-medium text-white hover:border hover:border-white  border border-white/0 transition-all duration-200 focus:outline-none"
                   >
-                    {
-                      msgNotif.length>0 && <span className="w-3 h-3 absolute bg-red-500 top-1 right-5 rounded-full animate-pulse"></span>
-                    }
+                    {msgNotif.length > 0 && (
+                      <span className="w-3 h-3 absolute bg-red-500 top-1 right-5 rounded-full animate-pulse"></span>
+                    )}
                     <img
                       className="w-7 h-7 rounded-full"
                       src={user?.photoURL}
@@ -267,12 +267,11 @@ const Navbar = () => {
                           className="flex items-center relative gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-all duration-200 group"
                           onClick={() => setIsDropdownOpen(false)}
                         >
-                          {
-                      msgNotif.length>0 && <span className="w-3 h-3 absolute bg-red-500 top-2 right-2 rounded-full animate-pulse"></span>
-                    }
+                          {msgNotif.length > 0 && (
+                            <span className="w-3 h-3 absolute bg-red-500 top-2 right-2 rounded-full animate-pulse"></span>
+                          )}
                           <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors duration-200">
                             <PanelsTopLeft className="text-sm text-gray-600 group-hover:text-blue-600" />
-                                                
                           </div>
                           <span className="font-medium">Manage Your Pages</span>
                         </NavLink>
