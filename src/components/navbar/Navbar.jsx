@@ -80,7 +80,7 @@ const Navbar = () => {
       });
       setMsgNotif(arr);
     });
-  }, [db]);
+  }, [db, user]);
 
   console.log(msgNotif, "msgnotif");
 
@@ -206,9 +206,11 @@ const Navbar = () => {
                     onClick={toggleDropdown}
                     className="flex items-center gap-x-2 p-1 rounded-full text-sm font-medium text-white hover:border hover:border-white  border border-white/0 transition-all duration-200 focus:outline-none"
                   >
-                    {msgNotif.length > 0 && (
-                      <span className="w-3 h-3 absolute bg-red-500 top-1 right-5 rounded-full animate-pulse"></span>
-                    )}
+                    {msgNotif &&
+                      msgNotif.length > 0 &&
+                      msgNotif.length >= 1 && (
+                        <span className="w-3 h-3 absolute bg-red-500 top-1 right-5 rounded-full animate-pulse"></span>
+                      )}
                     <img
                       className="w-7 h-7 rounded-full"
                       src={user?.photoURL}

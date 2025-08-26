@@ -153,7 +153,7 @@ const handleGrpMsgNotificationDelete = () => {
         })
         .catch((err) => {
           console.error(err);
-          toast.error("Failed to send message.");
+          console.log("Failed to send message.");
         });
     } else {
       set(push(ref(db, "message")), {
@@ -183,7 +183,7 @@ const handleGrpMsgNotificationDelete = () => {
         })
         .catch((err) => {
           console.error(err);
-          toast.error("Failed to send message.");
+          console.log("Failed to send message.");
         });
     }
     setShowEmoji(false);
