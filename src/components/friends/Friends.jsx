@@ -99,7 +99,7 @@ return (
           className="flex items-center justify-between gap-4 p-4 bg-gradient-to-r from-gray-50/80 to-white/80 rounded-2xl border border-gray-200/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group"
         >
           {/* Profile Section */}
-          <div className="flex items-center gap-4 flex-1">
+          <div className="flex items-center justify-between gap-4 flex-1">
             <div className="relative">
               <img
                 src={friend.image}
@@ -118,7 +118,7 @@ return (
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap justify-end items-center gap-2">
             <Link to={`/messages/chat/${friend.id}`}>
             <button className="text-xs bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 font-medium flex items-center gap-1.5">
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
