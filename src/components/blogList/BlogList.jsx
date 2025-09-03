@@ -22,7 +22,6 @@ const BlogList = () => {
   const [activeTab, setActiveTab] = useState("global");
   const [loading, setLoading] = useState(true);
 
-  // Load saved tab from localStorage on component mount
   useEffect(() => {
     const savedTab = localStorage.getItem("activeTab");
     if (savedTab) {
@@ -93,7 +92,7 @@ const BlogList = () => {
       });
       setIsLoading(false);
       setFollowBlogList(arr);
-      setLoading(false);
+      
     });
   }, [db, followingId]);
   useEffect(() => {
@@ -111,6 +110,10 @@ const BlogList = () => {
       setGroupPost(arr);
     });
   }, [db, groupId]);
+
+  setTimeout(() => {
+    setLoading(false);
+  }, 1500);
 
 
   if (loading) return <CustomLoader/>
