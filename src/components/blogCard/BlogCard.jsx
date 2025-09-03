@@ -374,7 +374,6 @@ const BlogCard = ({ blog }) => {
             </div>
           </Flex>
 
-          {/* Action Buttons */}
           <div className="flex items-center gap-2">
             {user?.uid === blog.adminId && !editMode ? (
               <div className="relative">
@@ -424,7 +423,6 @@ const BlogCard = ({ blog }) => {
         </Flex>
       </div>
 
-      {/* Content Section */}
       <div className="px-6 pb-4">
         {editMode ? (
           <textarea
@@ -438,7 +436,6 @@ const BlogCard = ({ blog }) => {
           </div>
         )}
 
-        {/* Extra Content Based on Type */}
         {blog.contentType === 'event' && blog.eventDate && (
           <div className="mt-4 p-4 bg-blue-50 rounded-2xl border border-blue-100">
             <Flex className="items-center gap-3">

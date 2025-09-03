@@ -124,7 +124,7 @@ const BlogList = () => {
         {user && (
           <div className=" hidden xl:flex justify-center my-6 w-full">
             <div className="relative bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-1.5 flex items-center shadow-xl border border-gray-200/50">
-              {/* Background slider */}
+             
               <div
                 className={`absolute top-1.5 bottom-1.5 w-1/3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg transition-all duration-500 ease-out ${
                   activeTab === "following"
@@ -134,8 +134,6 @@ const BlogList = () => {
                     : "translate-x-0"
                 }`}
               />
-
-              {/* Global Button */}
               <button
                 onClick={() => {
                   setActiveTab("global");
@@ -150,7 +148,6 @@ const BlogList = () => {
                 🌍 <span>Global</span>
               </button>
 
-              {/* Following Button */}
               <button
                 onClick={() => {
                   setActiveTab("following");
@@ -165,7 +162,6 @@ const BlogList = () => {
                 👥 <span>Following</span>
               </button>
 
-              {/* Groups Button - FIXED */}
               <button
                 onClick={() => {
                   setActiveTab("groups");
@@ -181,7 +177,6 @@ const BlogList = () => {
               </button>
             </div>
 
-            {/* Status indicator */}
             <div className="ml-6 flex items-center">
               <div className="text-sm text-gray-600 bg-white/80 backdrop-blur-sm border border-gray-200/50 px-4 py-2.5 rounded-full shadow-sm flex items-center gap-2">
                 <div
@@ -219,7 +214,6 @@ const BlogList = () => {
                 }`}
               />
 
-              {/* Global Button */}
               <button
                 onClick={() => {
                   setActiveTab("global");
@@ -234,7 +228,6 @@ const BlogList = () => {
                 🌍 <span>Global</span>
               </button>
 
-              {/* Following Button */}
               <button
                 onClick={() => {
                   setActiveTab("following");
@@ -249,7 +242,6 @@ const BlogList = () => {
                 👥 <span>Following</span>
               </button>
 
-              {/* Groups Button - FIXED */}
               <button
                 onClick={() => {
                   setActiveTab("groups");
@@ -265,7 +257,6 @@ const BlogList = () => {
               </button>
             </div>
 
-            {/* Status indicator */}
             <div className="ml-2 mt-2 flex items-center">
               <div className="text-sm text-gray-600 bg-white/80 backdrop-blur-sm border border-gray-200/50 px-4 py-2.5 rounded-full shadow-sm flex items-center gap-2">
                 <div
