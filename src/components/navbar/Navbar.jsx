@@ -145,7 +145,7 @@ const Navbar = () => {
         <Flex className="justify-center lg:justify-between gap-y-5 lg:gap-y-0">
           <Flex className="flex-1 justify-center gap-y-3 xl:gap-y-0 xl:justify-start gap-x-10">
             <Logo />
-            <SearchBox onSearchClick={() => setSearchActive(true)} />
+            {user && <SearchBox onSearchClick={() => setSearchActive(true)} />}
           </Flex>
 
           <Flex>
